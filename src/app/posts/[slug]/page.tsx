@@ -14,7 +14,12 @@ export async function generateStaticParams() {
   }));
 }
 
-export default async function PostPage({ params }: { params: { slug: string } }) {
+interface PostPageProps {
+  params: { slug: string };
+}
+
+export default async function PostPage(props: PostPageProps) {
+  const { params } = props;
   const post = await getPostBySlug(params.slug);
 
   if (!post) {
