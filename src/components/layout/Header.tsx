@@ -10,7 +10,6 @@ const navLinks = [
   { href: '/', label: 'Home' },
   { href: '/posts', label: 'Posts' },
   { href: '/sobre', label: 'Sobre' },
-  { href: '/admin', label: 'Admin' },
 ];
 
 export function Header() {

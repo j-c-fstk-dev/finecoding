@@ -5,4 +5,6 @@ export interface Post {
   tags: string[];
   content: string;
   excerpt: string;
+  imageUrl: string;
+  imageHint: string;
 }

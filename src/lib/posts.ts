@@ -7,6 +7,8 @@ const posts: Post[] = [
     date: '2024-07-21',
     tags: ['Next.js', 'React', 'Web Dev'],
     excerpt: 'A deep dive into the new features of Next.js 15 and how to leverage them for modern web applications.',
+    imageUrl: 'https://placehold.co/600x400.png',
+    imageHint: 'futuristic code',
     content: `
 # Welcome to the Future of Web Dev: Next.js 15
 
@@ -42,6 +44,8 @@ Stay tuned for more updates and tutorials on Fine Coding!
     date: '2024-07-15',
     tags: ['AI', 'Machine Learning', 'GenAI'],
     excerpt: 'Understand the basics of AI models like LLMs and diffusion models without getting lost in the jargon.',
+    imageUrl: 'https://placehold.co/600x400.png',
+    imageHint: 'abstract ai',
     content: `
 # Demystifying AI Models
 
@@ -66,6 +70,8 @@ These are often used for image generation. They start with random noise and grad
     date: '2024-07-10',
     tags: ['Philosophy', 'Code Quality', 'Best Practices'],
     excerpt: 'What does it mean to be a "Fine Coder"? It\'s more than just writing code that works. It\'s about craftsmanship.',
+    imageUrl: 'https://placehold.co/600x400.png',
+    imageHint: 'glowing circuit',
     content: `
 # The Art of "Fine Coding"
 

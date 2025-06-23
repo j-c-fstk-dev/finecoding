@@ -1,8 +1,9 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import type { Post } from '@/types';
-import { Calendar, Tag } from 'lucide-react';
+import { Calendar } from 'lucide-react';
 import { format } from 'date-fns';
 
 interface PostCardProps {
@@ -11,7 +12,19 @@ interface PostCardProps {
 
 export function PostCard({ post }: PostCardProps) {
   return (
-    <Card className="flex h-full flex-col overflow-hidden border-2 border-transparent transition-all duration-300 ease-in-out hover:border-primary hover:shadow-lg hover:shadow-primary/20">
+    <Card className="group flex h-full flex-col overflow-hidden border-2 border-transparent transition-all duration-300 ease-in-out hover:border-primary hover:shadow-lg hover:shadow-primary/20">
+      <div className="overflow-hidden">
+        <Link href={`/posts/${post.slug}`}>
+          <Image
+            src={post.imageUrl}
+            alt={post.title}
+            width={600}
+            height={400}
+            className="w-full object-cover aspect-video transition-transform duration-300 group-hover:scale-105"
+            data-ai-hint={post.imageHint}
+          />
+        </Link>
+      </div>
       <CardHeader>
         <CardTitle className="font-headline text-xl leading-tight">
           <Link href={`/posts/${post.slug}`} className="hover:text-primary transition-colors">
