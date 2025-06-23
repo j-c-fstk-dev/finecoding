@@ -7,10 +7,6 @@ import { Calendar, Tag } from 'lucide-react';
 import { format } from 'date-fns';
 import { MarkdownRenderer } from '@/components/blog/MarkdownRenderer';
 
-type Props = {
-  params: { slug: string };
-};
-
 export async function generateStaticParams() {
   const posts = await getPosts();
   return posts.map((post) => ({
@@ -18,7 +14,7 @@ export async function generateStaticParams() {
   }));
 }
 
-export default async function PostPage({ params }: Props) {
+export default async function PostPage({ params }: { params: { slug: string } }) {
   const post = await getPostBySlug(params.slug);
 
   if (!post) {
