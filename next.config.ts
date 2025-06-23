@@ -1,8 +1,11 @@
 /** @type {import('next').NextConfig} */
+
+const isGithubActions = process.env.GITHUB_ACTIONS === 'true';
+
 const nextConfig = {
   output: 'export',
-  basePath: '/finecoding',
-  assetPrefix: '/finecoding/',
+  basePath: isGithubActions ? '/finecoding' : '',
+  assetPrefix: isGithubActions ? '/finecoding/' : '',
   images: {
     unoptimized: true,
   },
