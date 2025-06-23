@@ -6,9 +6,10 @@ import { getPosts } from "@/lib/posts";
 import { Badge } from "@/components/ui/badge";
 import { PlusCircle, MoreHorizontal } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { format } from 'date-fns';
 
-export default function DashboardPage() {
-    const posts = getPosts();
+export default async function DashboardPage() {
+    const posts = await getPosts();
 
     return (
         <Card>
@@ -47,7 +48,7 @@ export default function DashboardPage() {
                                         ))}
                                     </div>
                                 </TableCell>
-                                <TableCell className="hidden md:table-cell">{post.date}</TableCell>
+                                <TableCell className="hidden md:table-cell">{format(post.date, 'MMM d, yyyy')}</TableCell>
                                 <TableCell>
                                      <DropdownMenu>
                                         <DropdownMenuTrigger asChild>

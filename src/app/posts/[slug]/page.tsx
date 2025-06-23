@@ -14,14 +14,14 @@ type PostPageProps = {
 };
 
 export async function generateStaticParams() {
-  const posts = getPosts();
+  const posts = await getPosts();
   return posts.map((post) => ({
     slug: post.slug,
   }));
 }
 
-export default function PostPage({ params }: PostPageProps) {
-  const post = getPostBySlug(params.slug);
+export default async function PostPage({ params }: PostPageProps) {
+  const post = await getPostBySlug(params.slug);
 
   if (!post) {
     notFound();

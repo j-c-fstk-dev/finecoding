@@ -4,8 +4,8 @@ import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { CodeRain } from '@/components/layout/CodeRain';
 
-export default function Home() {
-  const posts = getPosts();
+export default async function Home() {
+  const posts = await getPosts();
 
   return (
     <div className="relative flex min-h-screen flex-col">

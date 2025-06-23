@@ -4,16 +4,30 @@ import { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-import { Mail } from 'lucide-react';
+import { Mail, Loader2 } from 'lucide-react';
+import { subscribeToNewsletter } from '@/lib/newsletter';
 
 export function EmailSignup() {
   const [email, setEmail] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (email) {
-      console.log('Email submitted:', email);
+    if (!email) {
+      toast({
+        title: 'Error',
+        description: 'Please enter an email address.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    setIsLoading(true);
+    const result = await subscribeToNewsletter(email);
+    setIsLoading(false);
+
+    if (result.success) {
       toast({
         title: 'Subscription successful!',
         description: `Thanks for subscribing, ${email}.`,
@@ -21,8 +35,8 @@ export function EmailSignup() {
       setEmail('');
     } else {
       toast({
-        title: 'Error',
-        description: 'Please enter a valid email address.',
+        title: 'Subscription Failed',
+        description: result.error || 'An unexpected error occurred.',
         variant: 'destructive',
       });
     }
@@ -42,9 +56,10 @@ export function EmailSignup() {
           onChange={(e) => setEmail(e.target.value)}
           required
           className="flex-1"
+          disabled={isLoading}
         />
-        <Button type="submit">
-          <Mail className="mr-2 h-4 w-4" />
+        <Button type="submit" disabled={isLoading}>
+          {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Mail className="mr-2 h-4 w-4" />}
           Subscribe
         </Button>
       </form>

@@ -3,8 +3,8 @@ import { PostCard } from '@/components/blog/PostCard';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 
-export default function PostsPage() {
-  const posts = getPosts();
+export default async function PostsPage() {
+  const posts = await getPosts();
 
   return (
     <div className="flex min-h-screen flex-col">
