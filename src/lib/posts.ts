@@ -1,7 +1,7 @@
 'use server';
 
 import { db } from '@/lib/firebase';
-import { collection, getDocs, doc, getDoc, query, orderBy } from 'firebase/firestore';
+import { collection, getDocs, doc, getDoc, query, orderBy, addDoc, serverTimestamp } from 'firebase/firestore';
 import type { Post } from '@/types';
 
 // This function now fetches all posts from Firestore
@@ -47,4 +47,29 @@ export async function getPostBySlug(slug: string): Promise<Post | undefined> {
     imageUrl: data.imageUrl,
     imageHint: data.imageHint,
   } as Post;
+}
+
+// This function adds a new post to Firestore
+export async function addPost(postData: { title: string; content: string; tags: string[] }): Promise<{ id: string }> {
+  try {
+    const postsCollection = collection(db, 'posts');
+    
+    // Create an excerpt from the first 150 characters of the content
+    const excerpt = postData.content.substring(0, 150) + '...';
+
+    const newPostData = {
+      ...postData,
+      excerpt,
+      date: serverTimestamp(),
+      imageUrl: 'https://placehold.co/600x400.png',
+      imageHint: 'code technology',
+    };
+
+    const docRef = await addDoc(postsCollection, newPostData);
+    
+    return { id: docRef.id };
+  } catch (error) {
+    console.error("Error adding document: ", error);
+    throw new Error("Could not create post.");
+  }
 }

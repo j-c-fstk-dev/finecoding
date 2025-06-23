@@ -13,6 +13,8 @@ import { Loader2, Wand2 } from "lucide-react";
 import { suggestTags } from "@/ai/flows/suggest-tags";
 import type { Post } from "@/types";
 import { Badge } from "@/components/ui/badge";
+import { addPost } from "@/lib/posts";
+import { useRouter } from "next/navigation";
 
 const formSchema = z.object({
   title: z.string().min(5, { message: "Title must be at least 5 characters." }),
@@ -31,6 +33,7 @@ export function PostEditorForm({ post }: PostEditorFormProps) {
   const [isSuggesting, setIsSuggesting] = useState(false);
   const [currentTagInput, setCurrentTagInput] = useState('');
   const { toast } = useToast();
+  const router = useRouter();
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -84,14 +87,34 @@ export function PostEditorForm({ post }: PostEditorFormProps) {
 
   async function onSubmit(values: FormData) {
     setIsSubmitting(true);
-    console.log("Form submitted:", values);
-    // Here you would typically call an API to save the post
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    toast({
-      title: post ? "Post Updated!" : "Post Created!",
-      description: `"${values.title}" has been saved.`,
-    });
-    setIsSubmitting(false);
+    try {
+      if (post) {
+        // TODO: Implement update logic
+        console.log("Updating post:", values);
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        toast({
+          title: "Post Updated!",
+          description: `"${values.title}" has been saved.`,
+        });
+      } else {
+        await addPost(values);
+        toast({
+          title: "Post Created!",
+          description: `"${values.title}" has been published.`,
+        });
+        router.push('/dashboard');
+        router.refresh(); // Forces a refresh of the dashboard to show the new post
+      }
+    } catch (error) {
+      console.error("Failed to save post:", error);
+      toast({
+        title: "Submission Failed",
+        description: "Could not save the post. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (

@@ -1,7 +1,7 @@
 export interface Post {
   slug: string;
   title: string;
-  date: any; // Can be a string or a Firestore Timestamp
+  date: Date;
   tags: string[];
   content: string;
   excerpt: string;
