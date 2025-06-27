@@ -7,8 +7,6 @@ import { Calendar, Tag } from 'lucide-react';
 import { format } from 'date-fns';
 import { MarkdownRenderer } from '@/components/blog/MarkdownRenderer';
 
-// This function is REQUIRED for static export of dynamic routes.
-// It tells Next.js which pages to build.
 export async function generateStaticParams() {
   const posts = await getPosts();
   return posts.map((post) => ({
@@ -16,8 +14,6 @@ export async function generateStaticParams() {
   }));
 }
 
-// Using the simple, direct, inline type for the props.
-// This resolves the stubborn TypeScript build error.
 export default async function PostPage({ params }: { params: { slug: string } }) {
   const post = await getPostBySlug(params.slug);
 
