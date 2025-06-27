@@ -7,7 +7,8 @@ import { Calendar, Tag } from 'lucide-react';
 import { format } from 'date-fns';
 import { MarkdownRenderer } from '@/components/blog/MarkdownRenderer';
 
-export async function generateStaticParams() {
+// Optionally, you can type the return value for better editor support
+export async function generateStaticParams(): Promise<{ slug: string }[]> {
   const posts = await getPosts();
   return posts.map((post) => ({
     slug: post.slug,
