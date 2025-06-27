@@ -15,7 +15,13 @@ export async function generateStaticParams(): Promise<{ slug: string }[]> {
   }));
 }
 
-export default async function PostPage({ params }: { params: { slug: string } }) {
+type PostPageProps = {
+  params: {
+    slug: string;
+  };
+};
+
+export default async function PostPage({ params }: PostPageProps) {
   const post = await getPostBySlug(params.slug);
 
   if (!post) {
