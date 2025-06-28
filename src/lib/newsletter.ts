@@ -1,7 +1,6 @@
 'use server';
 
 import { db } from '@/lib/firebase';
-import { collection, addDoc, serverTimestamp, query, where, getDocs } from 'firebase/firestore';
 import { z } from 'zod';
 
 const SubscribeSchema = z.object({
@@ -24,6 +23,10 @@ export async function subscribeToNewsletter(email: string) {
   }
 
   try {
+    // Dynamically import firestore functions only when needed.
+    // This prevents the SDK from being initialized during the static build process.
+    const { collection, addDoc, serverTimestamp, query, where, getDocs } = await import('firebase/firestore');
+
     const newsletterCollection = collection(db, 'subscribers');
 
     // Check if email already exists
