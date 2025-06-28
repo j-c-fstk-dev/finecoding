@@ -1,5 +1,6 @@
-# Workflow to build and deploy the Next.js app to Firebase App Hosting
-name: Deploy to Firebase App Hosting
+# This workflow is disabled. Deployment is now handled by Netlify.
+# You can safely delete this file from your repository.
+name: Deploy to Firebase App Hosting (DISABLED)
 
 on:
   push:
@@ -7,24 +8,23 @@ on:
       - main
   workflow_dispatch:
 
-# These permissions are required for authentication with Google Cloud
 permissions:
   contents: read
-  id-token: write
 
 jobs:
-  deploy:
+  build_check:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
-      # The 'firebase-apphosting-deploy' action handles all the necessary steps:
-      # - Sets up Node.js
-      # - Installs dependencies
-      # - Builds the app
-      # - Deploys to Firebase App Hosting
-      - name: Deploy to Firebase App Hosting
-        uses: firebase/firebase-apphosting-deploy@v0.2.1
+      
+      - name: Setup Node
+        uses: actions/setup-node@v4
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          node-version: "20"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
