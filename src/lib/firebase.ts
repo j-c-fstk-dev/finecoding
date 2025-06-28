@@ -13,13 +13,21 @@ const firebaseConfig = {
 let firebaseApp: FirebaseApp | undefined;
 let db: Firestore | null = null;
 
-// Only initialize Firebase if the project ID is available.
-// This is crucial for build environments like GitHub Actions where secrets may not be present.
-if (firebaseConfig.projectId) {
-  firebaseApp = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
+// This is a more robust check. It ensures the projectId is a non-empty string.
+// In CI/CD environments for static export, env vars can be undefined or empty strings.
+const hasFirebaseConfig = firebaseConfig.projectId && typeof firebaseConfig.projectId === 'string' && firebaseConfig.projectId.length > 0;
+
+if (hasFirebaseConfig) {
+  if (getApps().length === 0) {
+    firebaseApp = initializeApp(firebaseConfig);
+  } else {
+    firebaseApp = getApps()[0];
+  }
   db = getFirestore(firebaseApp);
 } else {
-  console.warn("Firebase project ID is not defined. Firebase services will be unavailable. This is expected during static builds without full environment configuration.");
+  // This will be logged during the build process in GitHub Actions, confirming
+  // that Firebase is intentionally not being initialized.
+  console.warn("Firebase config is incomplete or missing. Firebase services will be unavailable. This is expected during static builds without full environment configuration.");
 }
 
 export { firebaseApp, db };
