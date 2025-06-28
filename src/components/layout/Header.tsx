@@ -61,38 +61,46 @@ export function Header() {
                     <span className="sr-only">Open menu</span>
                   </Button>
                 </SheetTrigger>
-                <SheetContent side="left">
-                  <div className="mb-8">
-                     <Link href="/" className="flex items-center space-x-2">
-                        <Code2 className="h-6 w-6 text-primary" />
-                        <span className="font-headline text-xl font-bold">
-                          Fine <span className="text-primary">Coding</span>
-                        </span>
-                      </Link>
-                  </div>
-                  <nav className="grid gap-4">
-                    {navLinks.map(({ href, label }) => (
-                      <SheetClose asChild key={href}>
-                        <Link
-                          href={href}
-                          className={cn(
-                            'text-lg text-muted-foreground transition-colors hover:text-foreground',
-                            pathname === href && 'text-foreground'
-                          )}
-                          onClick={() => setIsMobileMenuOpen(false)}
-                        >
-                          {label}
+                <SheetContent side="left" className="flex flex-col">
+                  <div>
+                    <div className="mb-8">
+                       <Link href="/" className="flex items-center space-x-2">
+                          <Code2 className="h-6 w-6 text-primary" />
+                          <span className="font-headline text-xl font-bold">
+                            Fine <span className="text-primary">Coding</span>
+                          </span>
                         </Link>
-                      </SheetClose>
-                    ))}
-                  </nav>
+                    </div>
+                    <nav className="grid gap-4">
+                      {navLinks.map(({ href, label }) => (
+                        <SheetClose asChild key={href}>
+                          <Link
+                            href={href}
+                            className={cn(
+                              'text-lg text-muted-foreground transition-colors hover:text-foreground',
+                              pathname === href && 'text-foreground'
+                            )}
+                            onClick={() => setIsMobileMenuOpen(false)}
+                          >
+                            {label}
+                          </Link>
+                        </SheetClose>
+                      ))}
+                    </nav>
+                  </div>
+                  <div className="mt-auto border-t border-border/40 pt-4">
+                    <div className="flex items-center justify-between">
+                        <span className="text-lg text-muted-foreground">Mudar Tema</span>
+                        <ThemeSwitch />
+                    </div>
+                  </div>
                 </SheetContent>
               </Sheet>
             </div>
           </div>
 
-          {/* Right Side: Theme Switch */}
-          <div>
+          {/* Right Side: Theme Switch for Desktop */}
+          <div className="hidden md:flex">
              <ThemeSwitch />
           </div>
         </div>
