@@ -9,6 +9,14 @@ const SubscribeSchema = z.object({
 });
 
 export async function subscribeToNewsletter(email: string) {
+  // Gracefully handle builds without Firebase credentials.
+  if (!db) {
+    console.warn('Firebase is not initialized. Newsletter subscription is disabled during build.');
+    // In a real scenario for a static build, you might just do nothing.
+    // Here we return an error to be consistent with the live environment behavior.
+    return { error: 'Service is temporarily unavailable.' };
+  }
+  
   const result = SubscribeSchema.safeParse({ email });
 
   if (!result.success) {

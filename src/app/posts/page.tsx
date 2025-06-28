@@ -1,7 +1,11 @@
+import { getPosts } from '@/lib/posts';
+import { PostCard } from '@/components/blog/PostCard';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 
-export default function PostsPage() {
+export default async function AllPostsPage() {
+  const posts = await getPosts();
+
   return (
     <div className="flex min-h-screen flex-col">
       <Header />
@@ -12,8 +16,15 @@ export default function PostsPage() {
               All Posts
             </h1>
             <p className="mt-4 text-lg text-muted-foreground">
-              Content temporarily unavailable while we fix a build issue.
+              Browse all articles published on the blog.
             </p>
+          </section>
+          <section className="mt-12">
+            <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+              {posts.map((post) => (
+                <PostCard key={post.slug} post={post} />
+              ))}
+            </div>
           </section>
         </div>
       </main>
