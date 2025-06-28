@@ -7,21 +7,16 @@ import { Calendar, Tag } from 'lucide-react';
 import { format } from 'date-fns';
 import { MarkdownRenderer } from '@/components/blog/MarkdownRenderer';
 
-// Optionally, you can type the return value for better editor support
-export async function generateStaticParams(): Promise<{ slug: string }[]> {
+// Let TypeScript infer the return type of this async function
+export async function generateStaticParams() {
   const posts = await getPosts();
   return posts.map((post) => ({
     slug: post.slug,
   }));
 }
 
-type PostPageProps = {
-  params: {
-    slug: string;
-  };
-};
-
-export default async function PostPage({ params }: PostPageProps) {
+// Use inline typing for params to avoid any conflicts
+export default async function PostPage({ params }: { params: { slug: string } }) {
   const post = await getPostBySlug(params.slug);
 
   if (!post) {
