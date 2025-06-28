@@ -36,23 +36,6 @@ export async function getPosts(): Promise<Post[]> {
   try {
     const q = query(postsCollection, orderBy('date', 'desc'));
     const querySnapshot = await getDocs(q);
-
-    if (querySnapshot.empty) {
-        // Return a default welcome post if no posts exist
-        return [
-            {
-                id: 'welcome-post',
-                slug: 'welcome-to-fine-coding',
-                title: 'Welcome to Fine Coding',
-                date: new Date(),
-                tags: ['welcome', 'firestore'],
-                excerpt: 'This is your first post, created dynamically from Firestore!',
-                imageUrl: 'https://placehold.co/600x400.png',
-                imageHint: 'welcome code',
-                content: '## Welcome!\n\nThis blog is now fully dynamic and connected to Firestore. You can create, edit, and delete posts from the admin dashboard.',
-            }
-        ];
-    }
     
     const posts = querySnapshot.docs.map(doc => {
       const data = doc.data();
