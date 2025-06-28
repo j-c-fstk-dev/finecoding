@@ -6,8 +6,13 @@ import type { Post } from '@/types';
 
 // This function now fetches all posts from Firestore
 export async function getPosts(): Promise<Post[]> {
-  // During static export, Firebase might not be available if credentials aren't set.
-  // This try/catch allows the build to succeed by returning an empty array.
+  // During static export, if Firebase credentials aren't set, return an empty array.
+  // This prevents the build from crashing when trying to connect to a non-existent database.
+  if (!process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID) {
+    console.warn("Firebase project ID not found. Returning empty array for posts. This is expected during static builds without full environment configuration.");
+    return [];
+  }
+
   try {
     const postsCollection = collection(db, 'posts');
     // Order by date in descending order to get the newest posts first
@@ -29,15 +34,20 @@ export async function getPosts(): Promise<Post[]> {
     });
     return posts;
   } catch (error) {
-    console.warn("Could not fetch posts from Firestore during build. This is expected if Firebase credentials are not configured in the build environment. Returning empty array.");
+    console.error("Error fetching posts from Firestore:", error);
+    console.warn("Could not fetch posts from Firestore during build. Returning empty array.");
     return [];
   }
 }
 
 // This function fetches a single post by its slug (document ID)
 export async function getPostBySlug(slug: string): Promise<Post | undefined> {
-  // During static export, Firebase might not be available if credentials aren't set.
-  // This try/catch allows the build to succeed by returning undefined.
+  // During static export, if Firebase credentials aren't set, return undefined.
+  if (!process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID) {
+    console.warn(`Firebase project ID not found. Returning undefined for post '${slug}'. This is expected during static builds.`);
+    return undefined;
+  }
+  
   try {
     const postDocRef = doc(db, 'posts', slug);
     const postDoc = await getDoc(postDocRef);
@@ -58,7 +68,8 @@ export async function getPostBySlug(slug: string): Promise<Post | undefined> {
       imageHint: data.imageHint,
     } as Post;
   } catch (error) {
-    console.warn(`Could not fetch post '${slug}' from Firestore during build. This is expected if Firebase credentials are not configured in the build environment. Returning undefined.`);
+    console.error(`Error fetching post '${slug}' from Firestore:`, error);
+    console.warn(`Could not fetch post '${slug}' from Firestore during build. Returning undefined.`);
     return undefined;
   }
 }
