@@ -1,15 +1,29 @@
+
 'use server';
 
 import { db } from '@/lib/firebase';
 import { collection, getDocs, doc, getDoc, query, orderBy, addDoc, serverTimestamp } from 'firebase/firestore';
 import type { Post } from '@/types';
 
+const fallbackPost: Post = {
+  slug: 'static-build-post',
+  title: 'Static Build Post',
+  date: new Date(),
+  tags: ['static-site-generation'],
+  content: 'This post is a placeholder generated at build time. Actual content is fetched from Firestore.',
+  excerpt: 'This is a placeholder post for static builds.',
+  imageUrl: 'https://placehold.co/600x400.png',
+  imageHint: 'placeholder',
+};
+
+
 // This function now fetches all posts from Firestore
 export async function getPosts(): Promise<Post[]> {
-  // If db is not initialized (e.g., during build without env vars), return an empty array.
+  // If db is not initialized (e.g., during build without env vars), return a fallback post.
+  // This allows `generateStaticParams` to succeed.
   if (!db) {
-    console.warn("Firestore is not initialized. Returning empty array for posts. This is expected during static builds.");
-    return [];
+    console.warn("Firestore is not initialized. Returning fallback post for static build.");
+    return [fallbackPost];
   }
 
   try {
@@ -31,20 +45,20 @@ export async function getPosts(): Promise<Post[]> {
         imageHint: data.imageHint,
       } as Post);
     });
-    return posts;
+    return posts.length > 0 ? posts : [fallbackPost];
   } catch (error) {
     console.error("Error fetching posts from Firestore:", error);
-    console.warn("Could not fetch posts from Firestore during build. Returning empty array.");
-    return [];
+    console.warn("Could not fetch posts from Firestore during build. Returning fallback post.");
+    return [fallbackPost];
   }
 }
 
 // This function fetches a single post by its slug (document ID)
 export async function getPostBySlug(slug: string): Promise<Post | undefined> {
-  // If db is not initialized, return undefined.
+  // If db is not initialized, return the fallback post if the slug matches.
   if (!db) {
-    console.warn(`Firestore is not initialized. Returning undefined for post '${slug}'. This is expected during static builds.`);
-    return undefined;
+    console.warn(`Firestore is not initialized. Checking for fallback post '${slug}'.`);
+    return slug === fallbackPost.slug ? fallbackPost : undefined;
   }
   
   try {
