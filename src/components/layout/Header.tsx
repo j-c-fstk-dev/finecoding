@@ -90,7 +90,7 @@ export function Header() {
                   </div>
                   <div className="mt-auto border-t border-border/40 pt-4">
                     <div className="flex items-center justify-between">
-                        <span className="text-lg text-muted-foreground">Mudar Tema</span>
+                        <span className="text-lg text-muted-foreground">Change Theme</span>
                         <ThemeSwitch />
                     </div>
                   </div>
