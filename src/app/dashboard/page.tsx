@@ -7,6 +7,9 @@ import { Badge } from "@/components/ui/badge";
 import { PlusCircle, MoreHorizontal } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { format } from 'date-fns';
+import { DeletePostButton } from "@/components/admin/DeletePostButton";
+
+export const dynamic = 'force-dynamic';
 
 export default async function DashboardPage() {
     const posts = await getPosts();
@@ -59,10 +62,10 @@ export default async function DashboardPage() {
                                         </DropdownMenuTrigger>
                                         <DropdownMenuContent align="end">
                                             <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                            <DropdownMenuItem>
+                                            <DropdownMenuItem asChild>
                                                 <Link href={`/dashboard/edit/${post.slug}`} className="w-full">Edit</Link>
                                             </DropdownMenuItem>
-                                            <DropdownMenuItem>Delete</DropdownMenuItem>
+                                            {post.id && <DeletePostButton postId={post.id} postTitle={post.title} />}
                                         </DropdownMenuContent>
                                     </DropdownMenu>
                                 </TableCell>

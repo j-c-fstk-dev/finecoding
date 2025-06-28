@@ -1,71 +1,148 @@
 'use server';
 
-import fs from 'fs';
-import path from 'path';
-import matter from 'gray-matter';
+import { db } from '@/lib/firebase';
 import type { Post } from '@/types';
+import { 
+  collection, 
+  getDocs, 
+  getDoc, 
+  addDoc, 
+  updateDoc, 
+  deleteDoc, 
+  doc, 
+  query, 
+  where, 
+  orderBy, 
+  Timestamp,
+  limit
+} from 'firebase/firestore';
+import { revalidatePath } from 'next/cache';
 
-const postsDirectory = path.join(process.cwd(), 'src/posts');
+const postsCollection = collection(db!, 'posts');
 
-export async function getPosts(): Promise<Post[]> {
-  const fileNames = fs.readdirSync(postsDirectory);
-  const allPostsData = fileNames.map((fileName) => {
-    const slug = fileName.replace(/\.md$/, '');
-    const fullPath = path.join(postsDirectory, fileName);
-    const fileContents = fs.readFileSync(fullPath, 'utf8');
-    const matterResult = matter(fileContents);
-
-    const post: Post = {
-      slug,
-      title: matterResult.data.title,
-      date: new Date(matterResult.data.date),
-      tags: matterResult.data.tags,
-      excerpt: matterResult.data.excerpt,
-      imageUrl: matterResult.data.imageUrl,
-      imageHint: matterResult.data.imageHint,
-      content: matterResult.content,
-    };
-    return post;
-  });
-
-  return allPostsData.sort((a, b) => {
-    if (a.date < b.date) {
-      return 1;
-    } else {
-      return -1;
-    }
-  });
+function createSlug(title: string): string {
+  return title
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)+/g, '');
 }
 
-export async function getPostBySlug(slug: string): Promise<Post | undefined> {
-  const fullPath = path.join(postsDirectory, `${slug}.md`);
-  
-  try {
-    const fileContents = fs.readFileSync(fullPath, 'utf8');
-    const matterResult = matter(fileContents);
+export async function getPosts(): Promise<Post[]> {
+  if (!db) {
+    console.warn("Firestore is not initialized. Returning empty posts array.");
+    return [];
+  }
 
-    const post: Post = {
-      slug,
-      title: matterResult.data.title,
-      date: new Date(matterResult.data.date),
-      tags: matterResult.data.tags,
-      excerpt: matterResult.data.excerpt,
-      imageUrl: matterResult.data.imageUrl,
-      imageHint: matterResult.data.imageHint,
-      content: matterResult.content,
-    };
-    return post;
+  try {
+    const q = query(postsCollection, orderBy('date', 'desc'));
+    const querySnapshot = await getDocs(q);
+
+    if (querySnapshot.empty) {
+        // Return a default welcome post if no posts exist
+        return [
+            {
+                id: 'welcome-post',
+                slug: 'welcome-to-fine-coding',
+                title: 'Welcome to Fine Coding',
+                date: new Date(),
+                tags: ['welcome', 'firestore'],
+                excerpt: 'This is your first post, created dynamically from Firestore!',
+                imageUrl: 'https://placehold.co/600x400.png',
+                imageHint: 'welcome code',
+                content: '## Welcome!\n\nThis blog is now fully dynamic and connected to Firestore. You can create, edit, and delete posts from the admin dashboard.',
+            }
+        ];
+    }
+    
+    const posts = querySnapshot.docs.map(doc => {
+      const data = doc.data();
+      return {
+        id: doc.id,
+        ...data,
+        date: (data.date as Timestamp).toDate(),
+      } as Post;
+    });
+
+    return posts;
   } catch (error) {
-    // If the file doesn't exist, return undefined
-    return undefined;
+    console.error("Error fetching posts:", error);
+    return [];
   }
 }
 
-export async function addPost(postData: { title: string; content: string; tags: string[] }): Promise<{ id: string }> {
-  // This function is now a placeholder.
-  // With the switch to local markdown files, adding/editing posts
-  // needs a new mechanism, such as a serverless function that can
-  // commit to the git repository.
-  console.warn('addPost is a placeholder in the new static architecture.');
-  throw new Error("Adding posts directly is not supported in this static architecture. Please add posts by creating new .md files in the 'src/posts' directory.");
+export async function getPostBySlug(slug: string): Promise<Post | null> {
+    if (!db) {
+        console.warn("Firestore is not initialized.");
+        return null;
+    }
+
+    try {
+        const q = query(postsCollection, where('slug', '==', slug), limit(1));
+        const querySnapshot = await getDocs(q);
+
+        if (querySnapshot.empty) {
+            return null;
+        }
+
+        const postDoc = querySnapshot.docs[0];
+        const data = postDoc.data();
+
+        return {
+            id: postDoc.id,
+            ...data,
+            date: (data.date as Timestamp).toDate(),
+        } as Post;
+
+    } catch (error) {
+        console.error("Error fetching post by slug:", error);
+        return null;
+    }
+}
+
+export async function addPost(postData: Omit<Post, 'id' | 'slug' | 'date'>) {
+    if (!db) throw new Error("Firestore is not initialized.");
+
+    const slug = createSlug(postData.title);
+    
+    const newPost = {
+        ...postData,
+        slug,
+        date: Timestamp.fromDate(new Date()),
+    };
+    
+    await addDoc(postsCollection, newPost);
+    revalidatePath('/');
+    revalidatePath('/posts');
+    revalidatePath('/dashboard');
+    revalidatePath(`/posts/${slug}`);
+}
+
+export async function updatePost(id: string, postData: Partial<Post>) {
+    if (!db) throw new Error("Firestore is not initialized.");
+    
+    const postRef = doc(db, 'posts', id);
+    const updatedData = { ...postData };
+    
+    // If title is updated, update slug as well
+    if (postData.title) {
+        updatedData.slug = createSlug(postData.title);
+    }
+
+    await updateDoc(postRef, updatedData);
+    revalidatePath('/');
+    revalidatePath('/posts');
+    revalidatePath('/dashboard');
+    if (updatedData.slug) {
+        revalidatePath(`/posts/${updatedData.slug}`);
+    }
+}
+
+export async function deletePost(id: string) {
+    if (!db) throw new Error("Firestore is not initialized.");
+    
+    const postRef = doc(db, 'posts', id);
+    await deleteDoc(postRef);
+    revalidatePath('/');
+    revalidatePath('/posts');
+    revalidatePath('/dashboard');
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useForm, Controller } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Button } from "@/components/ui/button";
@@ -13,11 +13,14 @@ import { Loader2, Wand2 } from "lucide-react";
 import { suggestTags } from "@/ai/flows/suggest-tags";
 import type { Post } from "@/types";
 import { Badge } from "@/components/ui/badge";
-import { addPost } from "@/lib/posts";
+import { addPost, updatePost } from "@/lib/posts";
 import { useRouter } from "next/navigation";
 
 const formSchema = z.object({
   title: z.string().min(5, { message: "Title must be at least 5 characters." }),
+  excerpt: z.string().min(10, { message: "Excerpt must be at least 10 characters." }).max(200, { message: "Excerpt must be 200 characters or less." }),
+  imageUrl: z.string().url({ message: "Please enter a valid URL for the image." }),
+  imageHint: z.string().optional(),
   content: z.string().min(50, { message: "Content must be at least 50 characters." }),
   tags: z.array(z.string()).min(1, { message: "At least one tag is required." }),
 });
@@ -39,6 +42,9 @@ export function PostEditorForm({ post }: PostEditorFormProps) {
     resolver: zodResolver(formSchema),
     defaultValues: {
       title: post?.title || "",
+      excerpt: post?.excerpt || "",
+      imageUrl: post?.imageUrl || "https://placehold.co/600x400.png",
+      imageHint: post?.imageHint || "",
       content: post?.content || "",
       tags: post?.tags || [],
     },
@@ -49,7 +55,7 @@ export function PostEditorForm({ post }: PostEditorFormProps) {
   function handleTagKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
     if (e.key === 'Enter' && currentTagInput.trim()) {
       e.preventDefault();
-      const newTags = [...tags, currentTagInput.trim()];
+      const newTags = [...new Set([...tags, currentTagInput.trim()])];
       form.setValue('tags', newTags, { shouldValidate: true });
       setCurrentTagInput('');
     }
@@ -88,14 +94,14 @@ export function PostEditorForm({ post }: PostEditorFormProps) {
   async function onSubmit(values: FormData) {
     setIsSubmitting(true);
     try {
-      if (post) {
-        // TODO: Implement update logic
-        console.log("Updating post:", values);
-        await new Promise(resolve => setTimeout(resolve, 1000));
+      if (post && post.id) {
+        await updatePost(post.id, values);
         toast({
           title: "Post Updated!",
           description: `"${values.title}" has been saved.`,
         });
+        router.push('/dashboard');
+        router.refresh();
       } else {
         await addPost(values);
         toast({
@@ -103,7 +109,7 @@ export function PostEditorForm({ post }: PostEditorFormProps) {
           description: `"${values.title}" has been published.`,
         });
         router.push('/dashboard');
-        router.refresh(); // Forces a refresh of the dashboard to show the new post
+        router.refresh();
       }
     } catch (error: any) {
       console.error("Failed to save post:", error);
@@ -133,6 +139,48 @@ export function PostEditorForm({ post }: PostEditorFormProps) {
             </FormItem>
           )}
         />
+        <FormField
+          control={form.control}
+          name="excerpt"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Excerpt</FormLabel>
+              <FormControl>
+                <Input placeholder="A short summary of the post" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <FormField
+            control={form.control}
+            name="imageUrl"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Image URL</FormLabel>
+                <FormControl>
+                  <Input placeholder="https://placehold.co/600x400.png" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="imageHint"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Image Hint (for AI)</FormLabel>
+                <FormControl>
+                  <Input placeholder="e.g. 'code terminal'" {...field} />
+                </FormControl>
+                 <FormDescription>One or two keywords describing the image.</FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
         <FormField
           control={form.control}
           name="content"
