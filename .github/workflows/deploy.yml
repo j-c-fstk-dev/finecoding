@@ -25,6 +25,6 @@ jobs:
       # - Builds the app
       # - Deploys to Firebase App Hosting
       - name: Deploy to Firebase App Hosting
-        uses: firebase/firebase-apphosting-deploy@v0
+        uses: firebase/firebase-apphosting-deploy@v0.2.1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
