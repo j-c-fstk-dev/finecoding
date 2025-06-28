@@ -105,11 +105,11 @@ export function PostEditorForm({ post }: PostEditorFormProps) {
         router.push('/dashboard');
         router.refresh(); // Forces a refresh of the dashboard to show the new post
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Failed to save post:", error);
       toast({
         title: "Submission Failed",
-        description: "Could not save the post. Please try again.",
+        description: error.message || "Could not save the post. Please try again.",
         variant: "destructive",
       });
     } finally {
