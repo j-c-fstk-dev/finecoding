@@ -6,10 +6,9 @@ import type { Post } from '@/types';
 
 // This function now fetches all posts from Firestore
 export async function getPosts(): Promise<Post[]> {
-  // During static export, if Firebase credentials aren't set, return an empty array.
-  // This prevents the build from crashing when trying to connect to a non-existent database.
-  if (!process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID) {
-    console.warn("Firebase project ID not found. Returning empty array for posts. This is expected during static builds without full environment configuration.");
+  // If db is not initialized (e.g., during build without env vars), return an empty array.
+  if (!db) {
+    console.warn("Firestore is not initialized. Returning empty array for posts. This is expected during static builds.");
     return [];
   }
 
@@ -42,9 +41,9 @@ export async function getPosts(): Promise<Post[]> {
 
 // This function fetches a single post by its slug (document ID)
 export async function getPostBySlug(slug: string): Promise<Post | undefined> {
-  // During static export, if Firebase credentials aren't set, return undefined.
-  if (!process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID) {
-    console.warn(`Firebase project ID not found. Returning undefined for post '${slug}'. This is expected during static builds.`);
+  // If db is not initialized, return undefined.
+  if (!db) {
+    console.warn(`Firestore is not initialized. Returning undefined for post '${slug}'. This is expected during static builds.`);
     return undefined;
   }
   
@@ -76,6 +75,10 @@ export async function getPostBySlug(slug: string): Promise<Post | undefined> {
 
 // This function adds a new post to Firestore
 export async function addPost(postData: { title: string; content: string; tags: string[] }): Promise<{ id: string }> {
+  if (!db) {
+    throw new Error("Firestore is not initialized. Cannot add post.");
+  }
+  
   try {
     const postsCollection = collection(db, 'posts');
     
