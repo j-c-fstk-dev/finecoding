@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Github, Twitter, Linkedin, Code2 } from 'lucide-react';
+import { Github, Twitter, Linkedin, Code2, Shield } from 'lucide-react';
 import { EmailSignup } from '@/components/blog/EmailSignup';
 
 export function Footer() {
@@ -25,6 +25,9 @@ export function Footer() {
               <a href="#" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary">
                 <Linkedin size={20} />
               </a>
+              <Link href="/admin" className="text-muted-foreground hover:text-primary" title="Admin Login">
+                <Shield size={20} />
+              </Link>
             </div>
           </div>
           <div className="md:col-span-2">
