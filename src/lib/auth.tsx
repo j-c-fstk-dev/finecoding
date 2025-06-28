@@ -2,11 +2,11 @@
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut, type User } from 'firebase/auth';
+import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut, type User, type Auth } from 'firebase/auth';
 import { firebaseApp } from '@/lib/firebase';
 import { Loader2 } from 'lucide-react';
 
-const auth = getAuth(firebaseApp);
+const auth: Auth | null = firebaseApp ? getAuth(firebaseApp) : null;
 
 interface AuthContextType {
   user: User | null;
@@ -22,6 +22,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (!auth) {
+      console.warn("Firebase Auth is not available. Running in offline mode.");
+      setLoading(false);
+      return;
+    }
+
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setUser(user);
       setLoading(false);
@@ -31,10 +37,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const login = (email: string, password: string) => {
+    if (!auth) return Promise.reject(new Error("Firebase is not initialized."));
     return signInWithEmailAndPassword(auth, email, password);
   };
 
   const logout = () => {
+    if (!auth) return Promise.reject(new Error("Firebase is not initialized."));
     return signOut(auth);
   };
 
