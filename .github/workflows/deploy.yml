@@ -1,55 +1,30 @@
-# Workflow to build and deploy the Next.js site to GitHub Pages
-name: Deploy to GitHub Pages
+# Workflow to build and deploy the Next.js app to Firebase App Hosting
+name: Deploy to Firebase App Hosting
 
 on:
-  # Runs on pushes to the main branch
   push:
     branches:
       - main
-  # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
-# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+# These permissions are required for authentication with Google Cloud
 permissions:
   contents: read
-  pages: write
   id-token: write
 
-# Allow only one concurrent deployment
-concurrency:
-  group: "pages"
-  cancel-in-progress: false
-
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-          cache: 'npm'
-      - name: Install dependencies
-        run: npm install
-      - name: Build
-        run: npm run build
-      - name: Setup Pages
-        uses: actions/configure-pages@v4
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          # Upload the 'out' directory which contains the exported static site
-          path: './out'
 
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+      # The 'firebase-apphosting-deploy' action handles all the necessary steps:
+      # - Sets up Node.js
+      # - Installs dependencies
+      # - Builds the app
+      # - Deploys to Firebase App Hosting
+      - name: Deploy to Firebase App Hosting
+        uses: firebase/firebase-apphosting-deploy@v0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
