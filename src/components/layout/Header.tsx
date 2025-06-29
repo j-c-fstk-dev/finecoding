@@ -5,19 +5,48 @@ import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { Code2, Menu } from 'lucide-react';
 import { ThemeSwitch } from '@/components/ui/ThemeSwitch';
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Sheet, SheetContent, SheetTrigger, SheetClose } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 
 const navLinks = [
   { href: '/', label: 'Home' },
   { href: '/posts', label: 'All Posts' },
-  { href: '/sobre', label: 'About' },
+  { href: '/about', label: 'About' },
 ];
 
 export function Header() {
   const pathname = usePathname();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isGlitching, setIsGlitching] = useState(false);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    const scheduleGlitch = () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+
+      const randomDelay = Math.random() * 2000 + 5000; // 5 to 7 seconds
+
+      timeoutRef.current = setTimeout(() => {
+        setIsGlitching(true);
+        setTimeout(() => {
+          setIsGlitching(false);
+        }, 300); // Duration of the glitch animation
+        scheduleGlitch();
+      }, randomDelay);
+    };
+
+    scheduleGlitch();
+
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, []);
+
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 py-4 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -25,9 +54,17 @@ export function Header() {
         {/* ROW 1: Title */}
         <div className="mb-4 flex items-center justify-center">
           <Link href="/" className="flex items-center space-x-2">
-            <Code2 className="h-8 w-8 text-primary" />
+            <span className={cn('glitch-icon', { 'is-glitching': isGlitching })}>
+                <Code2 className="h-8 w-8 text-primary transition-colors" />
+            </span>
             <span className="font-headline text-2xl font-bold sm:text-3xl">
-              Fine <span className="text-primary">Coding</span>
+              Fine{' '}
+              <span
+                className={cn('glitch-text text-primary', { 'is-glitching': isGlitching })}
+                data-glitch="Coding"
+              >
+                Coding
+              </span>
             </span>
           </Link>
         </div>
@@ -64,10 +101,18 @@ export function Header() {
                 <SheetContent side="left" className="flex flex-col">
                   <div>
                     <div className="mb-8">
-                       <Link href="/" className="flex items-center space-x-2">
-                          <Code2 className="h-6 w-6 text-primary" />
+                       <Link href="/" className="flex items-center space-x-2" onClick={() => setIsMobileMenuOpen(false)}>
+                          <span className={cn('glitch-icon', { 'is-glitching': isGlitching })}>
+                              <Code2 className="h-6 w-6 text-primary" />
+                          </span>
                           <span className="font-headline text-xl font-bold">
-                            Fine <span className="text-primary">Coding</span>
+                            Fine{' '}
+                             <span
+                                className={cn('glitch-text text-primary', { 'is-glitching': isGlitching })}
+                                data-glitch="Coding"
+                              >
+                                Coding
+                              </span>
                           </span>
                         </Link>
                     </div>
