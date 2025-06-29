@@ -12,9 +12,9 @@ interface PostCardProps {
 
 export function PostCard({ post }: PostCardProps) {
   return (
-    <Card className="card-glow group h-full overflow-hidden p-0 border-0 transition-all duration-300 ease-in-out hover:shadow-lg hover:shadow-primary/20">
+    <div className="card-glow group relative h-full rounded-lg bg-transparent p-0 transition-all duration-300 ease-in-out hover:shadow-lg hover:shadow-primary/20">
       <div className="relative z-10 h-full w-full bg-card rounded-lg flex flex-col border-2 border-transparent group-hover:border-primary transition-all duration-300 ease-in-out">
-        <div className="overflow-hidden">
+        <div className="overflow-hidden rounded-t-lg">
           <Link href={`/posts/${post.slug}`}>
             <Image
               src={post.imageUrl}
@@ -48,6 +48,6 @@ export function PostCard({ post }: PostCardProps) {
           ))}
         </CardFooter>
       </div>
-    </Card>
+    </div>
   );
 }

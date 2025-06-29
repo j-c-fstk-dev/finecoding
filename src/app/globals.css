@@ -277,6 +277,11 @@ body {
   to   { transform: rotate(360deg); }
 }
 
+.card-glow {
+  position: relative;
+  overflow: hidden;
+}
+
 .card-glow::before {
   content: "";
   position: absolute;
