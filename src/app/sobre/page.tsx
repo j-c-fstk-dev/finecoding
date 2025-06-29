@@ -2,7 +2,7 @@ import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import Image from 'next/image';
 
-export default function SobrePage() {
+export default function AboutPage() {
   return (
     <div className="flex min-h-screen flex-col">
       <Header />
@@ -19,12 +19,12 @@ export default function SobrePage() {
           
           <section className="mt-12 prose prose-lg dark:prose-invert max-w-none font-body">
             <Image 
-              src="https://placehold.co/800x400.png"
-              alt="Abstract representation of code"
+              src="https://res.cloudinary.com/dr0weongo/image/upload/v1751168647/file_00000000591c61f59c33352b1d8f37fd_ncuhov.png"
+              alt="A portrait of the author"
               width={800}
               height={400}
-              className="rounded-lg"
-              data-ai-hint="abstract code"
+              className="rounded-lg object-cover aspect-[2/1]"
+              data-ai-hint="portrait author"
             />
             <h2>Our Philosophy</h2>
             <p>
