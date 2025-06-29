@@ -271,3 +271,25 @@ body {
   -ms-transform: translateY(-50%);
   transform: translateY(-50%);
 }
+
+@keyframes card-glow-rotation {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+.card-glow::before {
+  content: "";
+  position: absolute;
+  left: -50%;
+  top: -50%;
+  width: 200%;
+  height: 200%;
+  background-image: conic-gradient(transparent, #33cc8e, transparent 30%);
+  animation: card-glow-rotation 10000ms linear infinite;
+  transition: opacity 300ms ease-in-out;
+  opacity: 1;
+}
+
+.group:hover .card-glow::before {
+  opacity: 0;
+}
