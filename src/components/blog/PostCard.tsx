@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import type { Post } from '@/types';
 import { Calendar } from 'lucide-react';
@@ -12,9 +12,9 @@ interface PostCardProps {
 
 export function PostCard({ post }: PostCardProps) {
   return (
-    <div className="card-glow group relative h-full rounded-lg bg-transparent p-0 transition-all duration-300 ease-in-out hover:shadow-lg hover:shadow-primary/20">
-      <div className="relative z-10 h-full w-full bg-card rounded-lg flex flex-col border-2 border-transparent group-hover:border-primary transition-all duration-300 ease-in-out">
-        <div className="overflow-hidden rounded-t-lg">
+    <div className="card-glow group">
+      <div className="card-content-wrapper border-2 border-transparent group-hover:border-primary transition-all duration-300 ease-in-out">
+        <div className="overflow-hidden rounded-t-[calc(var(--radius)-4px)]">
           <Link href={`/posts/${post.slug}`}>
             <Image
               src={post.imageUrl}

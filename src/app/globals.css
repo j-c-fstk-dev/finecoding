@@ -280,11 +280,14 @@ body {
 .card-glow {
   position: relative;
   overflow: hidden;
+  border-radius: var(--radius);
+  padding: 2px; /* This creates the frame for the glow */
 }
 
 .card-glow::before {
   content: "";
   position: absolute;
+  z-index: -1; /* Places the glow behind the card content */
   left: -50%;
   top: -50%;
   width: 200%;
@@ -297,4 +300,13 @@ body {
 
 .group:hover .card-glow::before {
   opacity: 0;
+}
+
+.card-glow > .card-content-wrapper {
+  height: 100%;
+  width: 100%;
+  background: hsl(var(--card));
+  border-radius: calc(var(--radius) - 2px); /* Inner radius needs to be slightly smaller */
+  display: flex;
+  flex-direction: column;
 }
