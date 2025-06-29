@@ -27,7 +27,7 @@ export function Header() {
         clearTimeout(timeoutRef.current);
       }
 
-      const randomDelay = Math.random() * 2000 + 5000; // 5 to 7 seconds
+      const randomDelay = Math.random() * 4000 + 8000; // 8 to 12 seconds
 
       timeoutRef.current = setTimeout(() => {
         setIsGlitching(true);

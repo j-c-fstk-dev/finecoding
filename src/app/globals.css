@@ -354,12 +354,12 @@ body {
 
 .glitch-text.is-glitching::before {
   animation: glitch-anim 300ms cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
-  color: hsl(var(--accent));
+  color: #8b00ff;
   z-index: -1;
 }
 
 .glitch-text.is-glitching::after {
   animation: glitch-anim 300ms cubic-bezier(0.25, 0.46, 0.45, 0.94) reverse both;
-  color: hsl(var(--foreground));
+  color: #00e571;
   z-index: -2;
 }
