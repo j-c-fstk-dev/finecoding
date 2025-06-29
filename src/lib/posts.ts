@@ -14,7 +14,8 @@ import {
   where, 
   orderBy, 
   Timestamp,
-  limit
+  limit,
+  increment
 } from 'firebase/firestore';
 import { revalidatePath } from 'next/cache';
 
@@ -82,7 +83,7 @@ export async function getPostBySlug(slug: string): Promise<Post | null> {
     }
 }
 
-export async function addPost(postData: Omit<Post, 'id' | 'slug' | 'date'>) {
+export async function addPost(postData: Omit<Post, 'id' | 'slug' | 'date' | 'likes'>) {
     if (!db) throw new Error("Firestore is not initialized.");
 
     const slug = createSlug(postData.title);
@@ -90,6 +91,7 @@ export async function addPost(postData: Omit<Post, 'id' | 'slug' | 'date'>) {
     const newPost = {
         ...postData,
         slug,
+        likes: 0,
         date: Timestamp.fromDate(new Date()),
     };
     
@@ -104,12 +106,14 @@ export async function updatePost(id: string, postData: Partial<Post>) {
     if (!db) throw new Error("Firestore is not initialized.");
     
     const postRef = doc(db, 'posts', id);
-    const updatedData = { ...postData };
+    const updatedData: Partial<Post> = { ...postData };
     
-    // If title is updated, update slug as well
     if (postData.title) {
         updatedData.slug = createSlug(postData.title);
     }
+    
+    // Ensure 'likes' is not accidentally overwritten
+    delete (updatedData as any).likes;
 
     await updateDoc(postRef, updatedData);
     revalidatePath('/');
@@ -128,4 +132,14 @@ export async function deletePost(id: string) {
     revalidatePath('/');
     revalidatePath('/posts');
     revalidatePath('/dashboard');
+}
+
+export async function likePost(id: string, slug: string) {
+    if (!db) throw new Error("Firestore is not initialized.");
+    
+    const postRef = doc(db, 'posts', id);
+    await updateDoc(postRef, {
+        likes: increment(1)
+    });
+    revalidatePath(`/posts/${slug}`);
 }

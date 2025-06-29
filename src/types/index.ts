@@ -8,4 +8,12 @@ export interface Post {
   excerpt: string;
   imageUrl: string;
   imageHint: string;
+  likes: number;
+}
+
+export interface Comment {
+  id: string;
+  name: string;
+  comment: string;
+  createdAt: Date;
 }

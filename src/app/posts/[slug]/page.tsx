@@ -1,11 +1,14 @@
 import { notFound } from 'next/navigation';
 import { getPostBySlug, getPosts } from '@/lib/posts';
+import { getComments } from '@/lib/comments';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { Badge } from '@/components/ui/badge';
 import { Calendar, Tag } from 'lucide-react';
 import { format } from 'date-fns';
 import { MarkdownRenderer } from '@/components/blog/MarkdownRenderer';
+import { Separator } from '@/components/ui/separator';
+import { PostInteraction } from '@/components/blog/PostInteraction';
 
 export async function generateStaticParams() {
   const posts = await getPosts();
@@ -17,9 +20,11 @@ export async function generateStaticParams() {
 export default async function PostPage({ params }: { params: { slug: string } }) {
   const post = await getPostBySlug(params.slug);
 
-  if (!post) {
+  if (!post || !post.id) {
     notFound();
   }
+
+  const comments = await getComments(post.id);
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -50,6 +55,9 @@ export default async function PostPage({ params }: { params: { slug: string } })
           <div className="prose prose-lg dark:prose-invert max-w-none font-body">
             <MarkdownRenderer content={post.content} />
           </div>
+          
+          <PostInteraction post={post} initialComments={comments} />
+          
         </article>
       </main>
       <Footer />
