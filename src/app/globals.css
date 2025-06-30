@@ -387,7 +387,7 @@ body {
   border: .25em solid var(--glow-color);
   padding: 1em 3em;
   color: var(--glow-color);
-  font-size: 15px;
+  font-size: 13px;
   font-weight: bold;
   background-color: var(--btn-color);
   border-radius: 1em;
