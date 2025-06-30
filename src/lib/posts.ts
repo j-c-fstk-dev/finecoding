@@ -19,8 +19,6 @@ import {
 } from 'firebase/firestore';
 import { revalidatePath } from 'next/cache';
 
-const postsCollection = collection(db!, 'posts');
-
 function createSlug(title: string): string {
   return title
     .toLowerCase()
@@ -35,6 +33,7 @@ export async function getPosts(): Promise<Post[]> {
   }
 
   try {
+    const postsCollection = collection(db, 'posts');
     const q = query(postsCollection, orderBy('date', 'desc'));
     const querySnapshot = await getDocs(q);
     
@@ -61,6 +60,7 @@ export async function getPostBySlug(slug: string): Promise<Post | null> {
     }
 
     try {
+        const postsCollection = collection(db, 'posts');
         const q = query(postsCollection, where('slug', '==', slug), limit(1));
         const querySnapshot = await getDocs(q);
 
@@ -95,6 +95,7 @@ export async function addPost(postData: Omit<Post, 'id' | 'slug' | 'date' | 'lik
         date: Timestamp.fromDate(new Date()),
     };
     
+    const postsCollection = collection(db, 'posts');
     await addDoc(postsCollection, newPost);
     revalidatePath('/');
     revalidatePath('/posts');
