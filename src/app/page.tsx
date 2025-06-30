@@ -3,7 +3,6 @@ import { PostCard } from '@/components/blog/PostCard';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { CodeRain } from '@/components/layout/CodeRain';
-import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 
@@ -35,12 +34,10 @@ export default async function Home() {
               </div>
               {posts.length > 3 && (
                 <div className="mt-12 text-center">
-                   <Button asChild variant="outline" size="lg">
-                    <Link href="/posts">
-                      View All Posts
-                      <ArrowRight className="ml-2 h-4 w-4" />
-                    </Link>
-                  </Button>
+                  <Link href="/posts" className="glowing-btn">
+                    View All Posts
+                    <ArrowRight />
+                  </Link>
                 </div>
               )}
             </section>
