@@ -8,26 +8,27 @@ body {
 
 @layer base {
   :root {
-    --background: 0 0% 94%;
-    --foreground: 0 0% 20%;
+    --background: 0 0% 98%;
+    --foreground: 0 0% 15%;
     --card: 0 0% 100%;
-    --card-foreground: 0 0% 20%;
+    --card-foreground: 0 0% 15%;
     --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 20%;
-    --primary: 217 71% 60%;
+    --popover-foreground: 0 0% 15%;
+    --primary: 151 45% 45%;
     --primary-foreground: 0 0% 100%;
     --secondary: 0 0% 96.1%;
     --secondary-foreground: 0 0% 9%;
     --muted: 0 0% 96.1%;
     --muted-foreground: 0 0% 40%;
-    --accent: 217 71% 60%;
+    --accent: 151 45% 45%;
     --accent-foreground: 0 0% 100%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
     --border: 0 0% 89.8%;
     --input: 0 0% 89.8%;
-    --ring: 217 71% 60%;
+    --ring: 151 45% 45%;
     --radius: 0.5rem;
+    --btn-color: hsl(var(--background));
   }
  
   .dark {
@@ -50,6 +51,7 @@ body {
     --border: 0 0% 20%;
     --input: 0 0% 20%;
     --ring: 151 45% 30%;
+    --btn-color: hsl(160 48% 20%);
   }
 }
 
@@ -292,7 +294,7 @@ body {
   top: -50%;
   width: 200%;
   height: 200%;
-  background-image: conic-gradient(transparent, #33cc8e, transparent 30%);
+  background-image: conic-gradient(transparent, hsl(var(--primary)), transparent 30%);
   animation: card-glow-rotation 10000ms linear infinite;
   transition: opacity 300ms ease-in-out;
   opacity: 1;
@@ -377,7 +379,6 @@ body {
 .glowing-btn {
   --glow-color: hsl(151 45% 45%);
   --glow-spread-color: hsl(151 45% 45% / 0.78);
-  --btn-color: hsl(160 48% 20%);
  
   display: inline-flex;
   align-items: center;

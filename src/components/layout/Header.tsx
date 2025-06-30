@@ -7,6 +7,7 @@ import { Code2, Menu } from 'lucide-react';
 import { ThemeSwitch } from '@/components/ui/ThemeSwitch';
 import { useState, useEffect, useRef } from 'react';
 import { Sheet, SheetContent, SheetTrigger, SheetClose } from '@/components/ui/sheet';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Button } from '@/components/ui/button';
 
 const navLinks = [
@@ -71,25 +72,39 @@ export function Header() {
         
         {/* ROW 2: Nav bar */}
         <div className="flex w-full items-center justify-between">
-          {/* Left Side: Desktop Nav or Mobile Hamburger */}
+          {/* Left Side: Navigation triggers */}
           <div>
-            {/* Desktop Navigation */}
-            <nav className="hidden items-center gap-6 text-sm md:flex">
-              {navLinks.map(({ href, label }) => (
-                <Link
-                  key={href}
-                  href={href}
-                  className={cn(
-                    'transition-colors hover:text-foreground/80',
-                    pathname === href ? 'text-foreground' : 'text-foreground/60'
-                  )}
-                >
-                  {label}
-                </Link>
-              ))}
-            </nav>
+            {/* Desktop Navigation Popover */}
+            <div className="hidden md:block">
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="ghost" size="icon">
+                    <Menu className="h-6 w-6" />
+                    <span className="sr-only">Open menu</span>
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-2" align="start">
+                  <nav className="flex items-center gap-2">
+                    {navLinks.map(({ href, label }) => (
+                      <Link
+                        key={href}
+                        href={href}
+                        className={cn(
+                          'rounded-md px-3 py-1.5 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground',
+                          pathname === href
+                            ? 'bg-accent text-accent-foreground'
+                            : 'text-foreground/60'
+                        )}
+                      >
+                        {label}
+                      </Link>
+                    ))}
+                  </nav>
+                </PopoverContent>
+              </Popover>
+            </div>
 
-            {/* Mobile Navigation */}
+            {/* Mobile Navigation Sheet */}
             <div className="md:hidden">
               <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
                 <SheetTrigger asChild>
