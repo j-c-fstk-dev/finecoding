@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { ResourceCard } from './ResourceCard';
 import { AnimatePresence, motion } from 'framer-motion';
+import { Badge } from '@/components/ui/badge';
 
 interface FilterableResourceListProps {
   resources: Resource[];
