@@ -8,7 +8,7 @@ body {
 
 @layer base {
   :root {
-    --background: 0 0% 98%;
+    --background: 0 0% 96%;
     --foreground: 0 0% 15%;
     --card: 0 0% 100%;
     --card-foreground: 0 0% 15%;
@@ -28,7 +28,6 @@ body {
     --input: 0 0% 89.8%;
     --ring: 151 45% 45%;
     --radius: 0.5rem;
-    --btn-color: hsl(var(--background));
   }
  
   .dark {
@@ -51,7 +50,6 @@ body {
     --border: 0 0% 20%;
     --input: 0 0% 20%;
     --ring: 151 45% 30%;
-    --btn-color: hsl(160 48% 20%);
   }
 }
 
@@ -375,10 +373,11 @@ body {
   scrollbar-width: none;  /* Firefox */
 }
 
-/* Glowing Button from Uiverse.io */
+/* Glowing Button from Uiverse.io - Adapted for Theming */
 .glowing-btn {
-  --glow-color: hsl(151 45% 45%);
-  --glow-spread-color: hsl(151 45% 45% / 0.78);
+  /* Default (Light Theme) variables */
+  --glow-color: hsl(var(--primary));
+  --glow-spread-color: hsl(var(--primary) / 0.75);
  
   display: inline-flex;
   align-items: center;
@@ -390,15 +389,27 @@ body {
   color: var(--glow-color);
   font-size: 13px;
   font-weight: bold;
-  background-color: var(--btn-color);
+  background-color: hsl(var(--background));
   border-radius: 1em;
   outline: none;
+  /* Reduced glow for light theme for subtlety */
+  box-shadow: 0 0 0.5em 0.125em var(--glow-color),
+         0 0 1em 0.25em var(--glow-spread-color),
+         inset 0 0 0.25em 0.125em var(--glow-color);
+  text-shadow: 0 0 .25em var(--glow-color);
+  position: relative;
+  transition: all 0.3s;
+}
+
+.dark .glowing-btn {
+  /* Override for Dark Theme for a more prominent glow */
+  --glow-color: hsl(151 45% 45%); /* Brighter green for dark mode */
+  --glow-spread-color: hsl(151 45% 45% / 0.78);
+  /* Full glow for dark mode */
   box-shadow: 0 0 1em .25em var(--glow-color),
          0 0 4em 1em var(--glow-spread-color),
          inset 0 0 .75em .25em var(--glow-color);
   text-shadow: 0 0 .5em var(--glow-color);
-  position: relative;
-  transition: all 0.3s;
 }
 
 .glowing-btn svg {
@@ -421,7 +432,7 @@ body {
 }
 
 .glowing-btn:hover {
-  color: var(--btn-color);
+  color: hsl(var(--primary-foreground));
   background-color: var(--glow-color);
   box-shadow: 0 0 1em .25em var(--glow-color),
          0 0 4em 2em var(--glow-spread-color),
