@@ -19,6 +19,120 @@ import {
 } from 'firebase/firestore';
 import { revalidatePath } from 'next/cache';
 
+export async function getResources(): Promise<Resource[]> {
+  if (!db) {
+    console.warn("Firestore is not initialized. Returning empty resources array.");
+    return [];
+  }
+
+  try {
+    const resourcesCollection = collection(db, 'resources');
+    const q = query(resourcesCollection, orderBy('createdAt', 'desc'));
+    const querySnapshot = await getDocs(q);
+
+    // If the database is empty, populate it with sample data.
+    if (querySnapshot.empty && sampleResources.length > 0) {
+      console.log("No resources found, populating with sample data...");
+      const batch = writeBatch(db);
+      sampleResources.forEach(resource => {
+        const docRef = doc(collection(db, 'resources'));
+        const dataWithTimestamp = {
+            ...resource,
+            createdAt: Timestamp.fromDate(resource.createdAt || new Date()),
+        };
+        batch.set(docRef, dataWithTimestamp);
+      });
+      await batch.commit();
+      console.log("Sample data populated.");
+
+      // Re-fetch after populating
+      const newQuerySnapshot = await getDocs(q);
+      const resources = newQuerySnapshot.docs.map(doc => {
+        const data = doc.data();
+        return {
+          id: doc.id,
+          ...data,
+          createdAt: (data.createdAt as Timestamp).toDate(),
+        } as Resource;
+      });
+      return resources;
+    }
+    
+    const resources = querySnapshot.docs.map(doc => {
+      const data = doc.data();
+      return {
+        id: doc.id,
+        ...data,
+        createdAt: (data.createdAt as Timestamp).toDate(),
+      } as Resource;
+    });
+
+    return resources;
+  } catch (error) {
+    console.error("Error fetching resources:", error);
+    return [];
+  }
+}
+
+export async function getResourceById(id: string): Promise<Resource | null> {
+    if (!db) {
+        console.warn("Firestore is not initialized.");
+        return null;
+    }
+
+    try {
+        const resourceRef = doc(db, 'resources', id);
+        const docSnap = await getDoc(resourceRef);
+
+        if (!docSnap.exists()) {
+            return null;
+        }
+
+        const data = docSnap.data();
+        return {
+            id: docSnap.id,
+            ...data,
+            createdAt: (data.createdAt as Timestamp).toDate(),
+        } as Resource;
+
+    } catch (error) {
+        console.error("Error fetching resource by id:", error);
+        return null;
+    }
+}
+
+export async function addResource(resourceData: Omit<Resource, 'id' | 'createdAt'>) {
+    if (!db) throw new Error("Firestore is not initialized.");
+
+    const newResource = {
+        ...resourceData,
+        createdAt: serverTimestamp(),
+    };
+    
+    const resourcesCollection = collection(db, 'resources');
+    await addDoc(resourcesCollection, newResource);
+    revalidatePath('/resources');
+    revalidatePath('/dashboard/resources');
+}
+
+export async function updateResource(id: string, resourceData: Partial<Resource>) {
+    if (!db) throw new Error("Firestore is not initialized.");
+    
+    const resourceRef = doc(db, 'resources', id);
+    await updateDoc(resourceRef, resourceData);
+    revalidatePath('/resources');
+    revalidatePath('/dashboard/resources');
+}
+
+export async function deleteResource(id: string) {
+    if (!db) throw new Error("Firestore is not initialized.");
+    
+    const resourceRef = doc(db, 'resources', id);
+    await deleteDoc(resourceRef);
+    revalidatePath('/resources');
+    revalidatePath('/dashboard/resources');
+}
+
 const sampleResources: Omit<Resource, 'id'>[] = [
   // AI & Machine Learning
   {
