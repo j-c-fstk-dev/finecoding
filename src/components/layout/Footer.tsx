@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Github, Twitter, Linkedin, Code2, Shield } from 'lucide-react';
+import { Github, Twitter, Code2 } from 'lucide-react';
 import { EmailSignup } from '@/components/blog/EmailSignup';
 
 export function Footer() {
@@ -13,21 +13,24 @@ export function Footer() {
               <span className="font-bold font-headline">Fine Coding</span>
             </Link>
             <p className="text-center text-sm text-muted-foreground md:text-left">
-              © {new Date().getFullYear()} Matrix Coder. All rights reserved.
+              Uma iniciativa{' '}
+              <a
+                href="https://beregenerativelife.wordpress.com/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-semibold text-foreground hover:text-primary hover:underline"
+              >
+                @BeRegen
+              </a>
+              . © {new Date().getFullYear()}
             </p>
             <div className="mt-4 flex space-x-4">
-              <a href="#" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary">
+              <a href="https://github.com/j-c-fstk-dev/finecoding" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary">
                 <Github size={20} />
               </a>
-              <a href="#" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary">
+              <a href="https://x.com/FineCodingBlog?t=Rl_dmSeMK_BiVDU3XWQdIw&s=09" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary">
                 <Twitter size={20} />
               </a>
-              <a href="#" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary">
-                <Linkedin size={20} />
-              </a>
-              <Link href="/admin" className="text-muted-foreground hover:text-primary" title="Admin Login">
-                <Shield size={20} />
-              </Link>
             </div>
           </div>
           <div className="md:col-span-2">
