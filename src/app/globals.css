@@ -424,6 +424,7 @@ body {
 
 .dark .glowing-btn {
   --glow-spread-color: hsl(151 45% 45% / 0.78);
+  color: hsl(var(--foreground));
   background-color: hsl(var(--background));
   box-shadow: 0 0 1em .25em var(--glow-color),
          0 0 4em 1em var(--glow-spread-color),
