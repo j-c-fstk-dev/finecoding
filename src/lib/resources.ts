@@ -14,7 +14,8 @@ import {
   orderBy, 
   Timestamp,
   serverTimestamp,
-  query
+  query,
+  writeBatch
 } from 'firebase/firestore';
 import { revalidatePath } from 'next/cache';
 
@@ -22,7 +23,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   // AI & Machine Learning
   {
     name: 'OpenAI GPT-4 API',
-    description: 'Acesso à API do modelo de linguagem mais avançado da OpenAI para diversas aplicações, de geração de texto a análise.',
+    description: "Access to the API of OpenAI's most advanced language model for various applications, from text generation to analysis.",
     link: 'https://openai.com/gpt-4/',
     category: 'AI & Machine Learning',
     pricing: 'Paid',
@@ -31,7 +32,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'Google Cloud AI Platform',
-    description: 'Conjunto de serviços de ML gerenciados que permite construir, treinar e implantar modelos em escala.',
+    description: 'A suite of managed ML services that allows you to build, train, and deploy models at scale.',
     link: 'https://cloud.google.com/ai-platform/',
     category: 'AI & Machine Learning',
     pricing: 'Paid',
@@ -40,7 +41,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'AWS SageMaker',
-    description: 'Serviço de ML totalmente gerenciado que ajuda desenvolvedores e cientistas de dados a construir, treinar e implantar modelos rapidamente.',
+    description: 'A fully managed ML service that helps developers and data scientists build, train, and deploy models quickly.',
     link: 'https://aws.amazon.com/sagemaker/',
     category: 'AI & Machine Learning',
     pricing: 'Paid',
@@ -49,7 +50,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'Azure Machine Learning',
-    description: 'Plataforma de nuvem para acelerar o ciclo de vida de aprendizado de máquina, incluindo treinamento, implantação e gerenciamento de modelos.',
+    description: 'A cloud platform to accelerate the machine learning lifecycle, including training, deployment, and model management.',
     link: 'https://azure.microsoft.com/en-us/products/machine-learning/',
     category: 'AI & Machine Learning',
     pricing: 'Paid',
@@ -58,7 +59,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'Hugging Face Hub (Models & Inference APIs)',
-    description: 'Embora tenha muitos modelos gratuitos, oferece Inference APIs pagas para uso em produção de modelos populares.',
+    description: 'While it has many free models, it offers paid Inference APIs for production use of popular models.',
     link: 'https://huggingface.co/docs/api-inference/pricing',
     category: 'AI & Machine Learning',
     pricing: 'Paid',
@@ -67,7 +68,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'Cohere API',
-    description: 'Oferece modelos de linguagem grandes e poderosos para geração, incorporação e pesquisa, com planos pagos para uso comercial.',
+    description: 'Offers powerful large language models for generation, embedding, and search, with paid plans for commercial use.',
     link: 'https://cohere.com/',
     category: 'AI & Machine Learning',
     pricing: 'Paid',
@@ -76,7 +77,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'Weights & Biases',
-    description: 'Plataforma para rastreamento, visualização e colaboração em experimentos de aprendizado de máquina. Oferece planos pagos para equipes.',
+    description: 'A platform for tracking, visualizing, and collaborating on machine learning experiments. Offers paid plans for teams.',
     link: 'https://wandb.ai/',
     category: 'AI & Machine Learning',
     pricing: 'Paid',
@@ -85,7 +86,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'RunwayML',
-    description: 'Plataforma para criação de conteúdo visual usando IA (geração de vídeo, imagem, edição), com planos pagos para recursos avançados e maior uso.',
+    description: 'A platform for creating visual content using AI (video generation, image editing), with paid plans for advanced features.',
     link: 'https://runwayml.com/',
     category: 'AI & Machine Learning',
     pricing: 'Paid',
@@ -94,7 +95,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'Midjourney',
-    description: 'Gerador de imagens a partir de texto (text-to-image) de alta qualidade, operado via Discord, com planos de assinatura.',
+    description: 'A high-quality text-to-image generator operated via Discord, with subscription plans.',
     link: 'https://www.midjourney.com/',
     category: 'AI & Machine Learning',
     pricing: 'Paid',
@@ -103,7 +104,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'Replicate',
-    description: 'Permite rodar modelos de IA no cloud com uma API simples, pagando apenas pelo uso, com diversos modelos pré-treinados e a possibilidade de subir os seus.',
+    description: 'Lets you run AI models in the cloud with a simple API, paying only for usage, with many pre-trained models available.',
     link: 'https://replicate.com/',
     category: 'AI & Machine Learning',
     pricing: 'Paid',
@@ -112,7 +113,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'Google Colab',
-    description: 'Permite escrever e executar código Python no navegador, com acesso gratuito a GPUs e TPUs para ML.',
+    description: 'Allows you to write and execute Python code in your browser, with free access to GPUs and TPUs for ML.',
     link: 'https://colab.research.google.com/',
     category: 'AI & Machine Learning',
     pricing: 'Free Tier',
@@ -121,7 +122,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'Kaggle',
-    description: 'Plataforma de competições de ciência de dados que oferece notebooks gratuitos com GPUs para experimentos de ML e acesso a grandes conjuntos de dados.',
+    description: 'A data science competition platform that offers free notebooks with GPUs for ML experiments and access to large datasets.',
     link: 'https://www.kaggle.com/',
     category: 'AI & Machine Learning',
     pricing: 'Free Tier',
@@ -130,7 +131,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'TensorFlow Lite',
-    description: 'Permite executar modelos de TensorFlow em dispositivos móveis e embarcados, com ferramentas e modelos pré-treinados para uso gratuito.',
+    description: 'Allows running TensorFlow models on mobile and embedded devices, with free tools and pre-trained models.',
     link: 'https://www.tensorflow.org/lite/',
     category: 'AI & Machine Learning',
     pricing: 'Free Tier',
@@ -139,7 +140,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'PyTorch Mobile',
-    description: 'Ferramenta para levar modelos PyTorch para dispositivos móveis, com a estrutura para desenvolvimento e inferência gratuita.',
+    description: 'A tool for bringing PyTorch models to mobile devices, with a free framework for development and inference.',
     link: 'https://pytorch.org/mobile/',
     category: 'AI & Machine Learning',
     pricing: 'Free Tier',
@@ -148,7 +149,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'Roboflow',
-    description: 'Plataforma para construção de datasets para visão computacional, com um plano gratuito para projetos e inferência limitados.',
+    description: 'A platform for building computer vision datasets, with a free plan for limited projects and inference.',
     link: 'https://roboflow.com/',
     category: 'AI & Machine Learning',
     pricing: 'Free Tier',
@@ -157,7 +158,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'Hugging Face Hub (Model Repository)',
-    description: 'Milhares de modelos pré-treinados e datasets abertos disponíveis para download e uso gratuito (Inferência via API pode ser paga, mas o download e uso local é gratuito).',
+    description: 'Thousands of pre-trained models and open datasets available for free download and use (API inference can be paid).',
     link: 'https://huggingface.co/models',
     category: 'AI & Machine Learning',
     pricing: 'Free Tier',
@@ -166,7 +167,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'Google Cloud AI Platform (Free Tier)',
-    description: 'Oferece créditos e limites de uso gratuitos para alguns serviços de ML, ideal para experimentação.',
+    description: 'Offers credits and free usage limits for some ML services, ideal for experimentation.',
     link: 'https://cloud.google.com/free/docs/gcp-free-tier#ai-ml',
     category: 'AI & Machine Learning',
     pricing: 'Free Tier',
@@ -175,7 +176,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'AWS Free Tier (SageMaker, Rekognition, etc.)',
-    description: 'Diversos serviços de IA/ML na AWS possuem uma camada gratuita para novos usuários, permitindo experimentar antes de pagar.',
+    description: 'Several AI/ML services on AWS have a free tier for new users, allowing you to experiment before paying.',
     link: 'https://aws.amazon.com/free/',
     category: 'AI & Machine Learning',
     pricing: 'Free Tier',
@@ -184,7 +185,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'Azure Free Account (Azure ML, Cognitive Services)',
-    description: 'Conta gratuita da Azure com créditos e serviços de IA/ML que podem ser usados sem custo por um tempo.',
+    description: 'Free Azure account with credits and AI/ML services that can be used at no cost for a limited time.',
     link: 'https://azure.microsoft.com/en-us/free/',
     category: 'AI & Machine Learning',
     pricing: 'Free Tier',
@@ -193,7 +194,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'Gradio',
-    description: 'Biblioteca Python para construir interfaces de usuário rápidas para modelos de ML, permitindo demonstrações interativas de forma gratuita.',
+    description: 'A Python library for building quick user interfaces for ML models, allowing for interactive demos for free.',
     link: 'https://www.gradio.app/',
     category: 'AI & Machine Learning',
     pricing: 'Free Tier',
@@ -202,7 +203,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'TensorFlow',
-    description: 'Biblioteca open source completa para aprendizado de máquina, desenvolvida pelo Google, amplamente utilizada para pesquisa e produção.',
+    description: 'A complete open-source library for machine learning, developed by Google, widely used for research and production.',
     link: 'https://www.tensorflow.org/',
     category: 'AI & Machine Learning',
     pricing: 'Open Source',
@@ -211,7 +212,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'PyTorch',
-    description: 'Framework open source de aprendizado de máquina desenvolvido pelo Facebook (Meta), conhecido por sua flexibilidade e facilidade de uso.',
+    description: 'An open-source machine learning framework developed by Facebook (Meta), known for its flexibility and ease of use.',
     link: 'https://pytorch.org/',
     category: 'AI & Machine Learning',
     pricing: 'Open Source',
@@ -220,7 +221,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'scikit-learn',
-    description: 'Biblioteca Python para aprendizado de máquina clássico (classificação, regressão, clustering), fácil de usar e com excelente documentação.',
+    description: 'A Python library for classic machine learning (classification, regression, clustering), easy to use with excellent documentation.',
     link: 'https://scikit-learn.org/',
     category: 'AI & Machine Learning',
     pricing: 'Open Source',
@@ -229,7 +230,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'Keras',
-    description: 'API de alto nível para construir e treinar modelos de deep learning, que pode rodar em cima de TensorFlow ou PyTorch.',
+    description: 'A high-level API for building and training deep learning models, which can run on top of TensorFlow or PyTorch.',
     link: 'https://keras.io/',
     category: 'AI & Machine Learning',
     pricing: 'Open Source',
@@ -238,7 +239,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'Jupyter Notebook / Lab',
-    description: 'Ambiente de computação interativo open source que permite criar e compartilhar documentos que contêm código, equações, visualizações e texto narrativo.',
+    description: 'An open-source interactive computing environment that allows creating and sharing documents containing code, equations, and visualizations.',
     link: 'https://jupyter.org/',
     category: 'AI & Machine Learning',
     pricing: 'Open Source',
@@ -247,7 +248,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'MLflow',
-    description: 'Plataforma open source para gerenciar o ciclo de vida do ML, incluindo experimentação, reprodutibilidade e implantação.',
+    description: 'An open-source platform to manage the ML lifecycle, including experimentation, reproducibility, and deployment.',
     link: 'https://mlflow.org/',
     category: 'AI & Machine Learning',
     pricing: 'Open Source',
@@ -256,7 +257,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'OpenMMLab',
-    description: 'Coleção de ferramentas e benchmarks open source para pesquisa em visão computacional, incluindo detecção de objetos, segmentação e mais.',
+    description: 'A collection of open-source tools and benchmarks for computer vision research, including object detection, segmentation, and more.',
     link: 'https://openmmlab.com/',
     category: 'AI & Machine Learning',
     pricing: 'Open Source',
@@ -265,7 +266,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'FastAI',
-    description: 'Biblioteca open source que facilita o treinamento de modelos de deep learning de última geração com uma API de alto nível, construída sobre PyTorch.',
+    description: 'An open-source library that simplifies training state-of-the-art deep learning models with a high-level API, built on PyTorch.',
     link: 'https://www.fast.ai/',
     category: 'AI & Machine Learning',
     pricing: 'Open Source',
@@ -274,7 +275,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'Apache MXNet',
-    description: 'Framework de deep learning open source, escalável e flexível, que suporta múltiplos idiomas de programação.',
+    description: 'A scalable and flexible open-source deep learning framework that supports multiple programming languages.',
     link: 'https://mxnet.apache.org/',
     category: 'AI & Machine Learning',
     pricing: 'Open Source',
@@ -283,7 +284,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'ONNX (Open Neural Network Exchange)',
-    description: 'Formato open source para representar modelos de aprendizado de máquina, permitindo a interoperabilidade entre diferentes frameworks.',
+    description: 'An open format for representing machine learning models, enabling interoperability between different frameworks.',
     link: 'https://onnx.ai/',
     category: 'AI & Machine Learning',
     pricing: 'Open Source',
@@ -294,7 +295,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   // Developer Tools
   {
     name: 'JetBrains IntelliJ IDEA Ultimate',
-    description: 'Uma IDE poderosa para desenvolvimento Java, Kotlin, Scala e outras linguagens, com recursos avançados para Spring, bancos de dados, etc.',
+    description: 'A powerful IDE for Java, Kotlin, Scala, and other languages, with advanced features for Spring, databases, etc.',
     link: 'https://www.jetbrains.com/idea/',
     category: 'Developer Tools',
     pricing: 'Paid',
@@ -303,7 +304,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'Sublime Text',
-    description: 'Um editor de código sofisticado e rápido, conhecido por sua interface de usuário elegante, alto desempenho e plugins robustos.',
+    description: 'A sophisticated and fast code editor, known for its sleek user interface, high performance, and robust plugins.',
     link: 'https://www.sublimetext.com/',
     category: 'Developer Tools',
     pricing: 'Paid',
@@ -312,7 +313,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'Postman',
-    description: 'Plataforma de colaboração para desenvolvimento de APIs, permitindo projetar, testar, documentar e monitorar APIs. Oferece planos pagos para equipes e recursos avançados.',
+    description: 'A collaboration platform for API development, allowing you to design, test, document, and monitor APIs. Offers paid plans for teams.',
     link: 'https://www.postman.com/',
     category: 'Developer Tools',
     pricing: 'Paid',
@@ -321,7 +322,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'TablePlus',
-    description: 'Um moderno cliente de banco de dados nativo para macOS, Windows, Linux, que suporta múltiplos bancos de dados com uma GUI limpa.',
+    description: 'A modern native database client for macOS, Windows, and Linux, supporting multiple databases with a clean GUI.',
     link: 'https://tableplus.com/',
     category: 'Developer Tools',
     pricing: 'Paid',
@@ -330,7 +331,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'Fiddler Everywhere',
-    description: 'Proxy de depuração web que permite inspecionar, depurar e modificar tráfego HTTP/HTTPS entre um computador e a internet.',
+    description: 'A web debugging proxy that allows you to inspect, debug, and modify HTTP/HTTPS traffic between a computer and the internet.',
     link: 'https://www.telerik.com/fiddler/fiddler-everywhere/',
     category: 'Developer Tools',
     pricing: 'Paid',
@@ -339,7 +340,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'DataGrip (JetBrains)',
-    description: 'Uma IDE de banco de dados que oferece suporte a vários DBMSs, proporcionando uma experiência unificada para desenvolvimento de banco de dados.',
+    description: 'A database IDE that supports multiple DBMSs, providing a unified experience for database development.',
     link: 'https://www.jetbrains.com/datagrip/',
     category: 'Developer Tools',
     pricing: 'Paid',
@@ -348,7 +349,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'Tower',
-    description: 'Cliente Git GUI (interface gráfica do usuário) para Mac e Windows, que simplifica o uso do Git com uma interface visual intuitiva.',
+    description: 'A Git GUI client for Mac and Windows that simplifies using Git with an intuitive visual interface.',
     link: 'https://www.git-tower.com/',
     category: 'Developer Tools',
     pricing: 'Paid',
@@ -357,7 +358,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'WebStorm (JetBrains)',
-    description: 'Uma IDE poderosa para desenvolvimento JavaScript, TypeScript, HTML e CSS, ideal para frameworks front-end como React, Angular e Vue.',
+    description: 'A powerful IDE for JavaScript, TypeScript, HTML, and CSS development, ideal for front-end frameworks like React, Angular, and Vue.',
     link: 'https://www.jetbrains.com/webstorm/',
     category: 'Developer Tools',
     pricing: 'Paid',
@@ -366,7 +367,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'Beyond Compare',
-    description: 'Ferramenta de comparação de arquivos e pastas que permite comparar e mesclar arquivos de texto, pastas, arquivos zip e FTP.',
+    description: 'A file and folder comparison tool that allows you to compare and merge text files, folders, zip archives, and FTP sites.',
     link: 'https://www.scootersoftware.com/',
     category: 'Developer Tools',
     pricing: 'Paid',
@@ -375,7 +376,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'Dash',
-    description: 'Um navegador de documentação e gerenciador de snippets de código para desenvolvedores, com acesso offline a mais de 200 conjuntos de documentos APIs.',
+    description: 'A documentation browser and code snippet manager for developers, with offline access to over 200 API documentation sets.',
     link: 'https://kapeli.com/dash',
     category: 'Developer Tools',
     pricing: 'Paid',
@@ -384,7 +385,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'Postman (Free Tier)',
-    description: 'Permite o uso básico para indivíduos e pequenas equipes, incluindo coleções de API, testes e documentação limitada.',
+    description: 'Allows basic use for individuals and small teams, including API collections, testing, and limited documentation.',
     link: 'https://www.postman.com/pricing/',
     category: 'Developer Tools',
     pricing: 'Free Tier',
@@ -393,7 +394,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'GitHub Desktop',
-    description: 'Aplicativo de desktop open source que simplifica o fluxo de trabalho do Git e GitHub, tornando a colaboração mais fácil.',
+    description: 'An open-source desktop application that simplifies the Git and GitHub workflow, making collaboration easier.',
     link: 'https://desktop.github.com/',
     category: 'Developer Tools',
     pricing: 'Free Tier',
@@ -402,7 +403,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'Insomnia',
-    description: 'Um cliente de API REST e GraphQL de código aberto, com recursos de design, depuração e teste de APIs. Oferece funcionalidades gratuitas robustas.',
+    description: 'An open-source REST and GraphQL API client with features for designing, debugging, and testing APIs. Offers robust free functionality.',
     link: 'https://insomnia.rest/',
     category: 'Developer Tools',
     pricing: 'Free Tier',
@@ -411,7 +412,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'DBeaver Community Edition',
-    description: 'Um cliente universal de banco de dados open source com uma GUI para múltiplos bancos de dados.',
+    description: 'An open-source universal database client with a GUI for multiple databases.',
     link: 'https://dbeaver.io/',
     category: 'Developer Tools',
     pricing: 'Free Tier',
@@ -420,7 +421,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'Sentry (Free Tier)',
-    description: 'Monitoramento de erros em tempo real que ajuda a descobrir, triar e priorizar erros em seu código em produção, com um plano gratuito para pequenos projetos.',
+    description: 'Real-time error monitoring that helps discover, triage, and prioritize errors in your production code, with a free plan for small projects.',
     link: 'https://sentry.io/pricing/',
     category: 'Developer Tools',
     pricing: 'Free Tier',
@@ -429,7 +430,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'CodeSandbox',
-    description: 'Um ambiente de desenvolvimento online para projetos web, com foco em desenvolvimento front-end e prototipagem, oferecendo um plano gratuito.',
+    description: 'An online development environment for web projects, focusing on front-end development and prototyping, offering a free plan.',
     link: 'https://codesandbox.io/',
     category: 'Developer Tools',
     pricing: 'Free Tier',
@@ -438,7 +439,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'Ngrok',
-    description: 'Cria túneis seguros para sua máquina local a partir da internet, ótimo para testar webhooks ou compartilhar um ambiente de desenvolvimento local, com uma camada gratuita.',
+    description: 'Creates secure tunnels to your local machine from the internet, great for testing webhooks or sharing a local development environment, with a free tier.',
     link: 'https://ngrok.com/',
     category: 'Developer Tools',
     pricing: 'Free Tier',
@@ -447,7 +448,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'VS Code (Visual Studio Code)',
-    description: 'Um editor de código-fonte leve, mas poderoso, com suporte a milhares de extensões, tornando-o extremamente versátil para qualquer linguagem.',
+    description: 'A lightweight yet powerful source-code editor with support for thousands of extensions, making it extremely versatile for any language.',
     link: 'https://code.visualstudio.com/',
     category: 'Developer Tools',
     pricing: 'Open Source',
@@ -456,7 +457,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'Git',
-    description: 'O sistema de controle de versão distribuído mais amplamente usado, essencial para o desenvolvimento colaborativo.',
+    description: 'The most widely used distributed version control system, essential for collaborative development.',
     link: 'https://git-scm.com/',
     category: 'Developer Tools',
     pricing: 'Open Source',
@@ -465,7 +466,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'Docker',
-    description: 'Plataforma open source para desenvolver, enviar e executar aplicativos usando contêineres.',
+    description: 'An open-source platform for developing, shipping, and running applications using containers.',
     link: 'https://www.docker.com/',
     category: 'Developer Tools',
     pricing: 'Open Source',
@@ -474,7 +475,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'Node.js',
-    description: 'Ambiente de tempo de execução JavaScript open source que permite construir aplicativos de rede escaláveis e de alto desempenho.',
+    description: 'An open-source JavaScript runtime environment that allows building scalable and high-performance network applications.',
     link: 'https://nodejs.org/',
     category: 'Developer Tools',
     pricing: 'Open Source',
@@ -483,7 +484,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'Python',
-    description: 'Linguagem de programação open source popular para desenvolvimento web, ciência de dados, IA, automação e muito mais.',
+    description: 'A popular open-source programming language for web development, data science, AI, automation, and more.',
     link: 'https://www.python.org/',
     category: 'Developer Tools',
     pricing: 'Open Source',
@@ -492,7 +493,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'Kubernetes',
-    description: 'Sistema open source para automatizar a implantação, escalamento e gerenciamento de aplicativos conteinerizados.',
+    description: 'An open-source system for automating the deployment, scaling, and management of containerized applications.',
     link: 'https://kubernetes.io/',
     category: 'Developer Tools',
     pricing: 'Open Source',
@@ -501,7 +502,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'ESLint',
-    description: 'Ferramenta de linting para JavaScript e JSX, que ajuda a identificar e corrigir problemas em seu código.',
+    description: 'A linting tool for JavaScript and JSX that helps identify and fix problems in your code.',
     link: 'https://eslint.org/',
     category: 'Developer Tools',
     pricing: 'Open Source',
@@ -510,7 +511,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'Prettier',
-    description: 'Um formatador de código opinativo que impõe um estilo consistente em todo o seu projeto, eliminando discussões de estilo.',
+    description: 'An opinionated code formatter that enforces a consistent style across your entire project, eliminating style discussions.',
     link: 'https://prettier.io/',
     category: 'Developer Tools',
     pricing: 'Open Source',
@@ -519,7 +520,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'Webpack',
-    description: 'Um bundler de módulos open source para JavaScript, que empacota ativos para uso em um navegador.',
+    description: 'An open-source module bundler for JavaScript, which packages assets for use in a browser.',
     link: 'https://webpack.js.org/',
     category: 'Developer Tools',
     pricing: 'Open Source',
@@ -528,18 +529,18 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'Vagrant',
-    description: 'Ferramenta open source para construir e gerenciar ambientes de máquinas virtuais portáteis e replicáveis.',
+    description: 'An open-source tool for building and managing portable and replicable virtual machine environments.',
     link: 'https://www.vagrantup.com/',
     category: 'Developer Tools',
     pricing: 'Open Source',
     icon: 'TerminalSquare',
     createdAt: new Date('2024-05-21T05:40:00Z'),
   },
-
+  
   // DevOps & Hosting
   {
     name: 'AWS (Amazon Web Services)',
-    description: 'A maior plataforma de nuvem do mundo, oferecendo uma vasta gama de serviços para computação, armazenamento, bancos de dados, analytics, machine learning, e mais.',
+    description: "The world's largest cloud platform, offering a vast range of services for computing, storage, databases, analytics, machine learning, and more.",
     link: 'https://aws.amazon.com/',
     category: 'DevOps & Hosting',
     pricing: 'Paid',
@@ -548,7 +549,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'Google Cloud Platform (GCP)',
-    description: 'Oferece uma suite de serviços de computação em nuvem, incluindo IaaS, PaaS e ambientes serverless, com forte integração com ferramentas de ML.',
+    description: 'Offers a suite of cloud computing services, including IaaS, PaaS, and serverless environments, with strong integration with ML tools.',
     link: 'https://cloud.google.com/',
     category: 'DevOps & Hosting',
     pricing: 'Paid',
@@ -557,7 +558,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'Microsoft Azure',
-    description: 'Uma plataforma de computação em nuvem que fornece serviços de desenvolvimento, computação, rede, análise, armazenamento, e mais.',
+    description: 'A cloud computing platform that provides services for development, computing, networking, analytics, storage, and more.',
     link: 'https://azure.microsoft.com/',
     category: 'DevOps & Hosting',
     pricing: 'Paid',
@@ -566,7 +567,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'DigitalOcean',
-    description: 'Um provedor de infraestrutura de nuvem simples e escalável, popular entre desenvolvedores por seus "Droplets" (VMs) e interfaces amigáveis.',
+    description: 'A simple and scalable cloud infrastructure provider, popular among developers for its "Droplets" (VMs) and user-friendly interfaces.',
     link: 'https://www.digitalocean.com/',
     category: 'DevOps & Hosting',
     pricing: 'Paid',
@@ -575,7 +576,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'Vercel',
-    description: 'Plataforma para Static Sites e Serverless Functions, otimizada para frameworks React, Next.js, Vue, Nuxt, com foco em alta performance e DX (Developer Experience).',
+    description: 'A platform for Static Sites and Serverless Functions, optimized for frameworks like React, Next.js, and Vue, with a focus on high performance and DX.',
     link: 'https://vercel.com/',
     category: 'DevOps & Hosting',
     pricing: 'Paid',
@@ -584,7 +585,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'GitLab CI/CD',
-    description: 'Parte integrante do GitLab, oferece uma solução CI/CD robusta, integrada ao gerenciamento de código e outras ferramentas DevOps. Planos pagos com mais recursos.',
+    description: 'An integral part of GitLab, it offers a robust CI/CD solution integrated with code management and other DevOps tools. Paid plans have more features.',
     link: 'https://docs.gitlab.com/ee/ci/',
     category: 'DevOps & Hosting',
     pricing: 'Paid',
@@ -593,7 +594,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'Datadog',
-    description: 'Plataforma de monitoramento e segurança para aplicações em nuvem em larga escala, oferecendo observabilidade de infraestrutura, logs e APM (Application Performance Monitoring).',
+    description: 'A monitoring and security platform for large-scale cloud applications, offering infrastructure observability, logs, and APM.',
     link: 'https://www.datadoghq.com/',
     category: 'DevOps & Hosting',
     pricing: 'Paid',
@@ -602,7 +603,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'New Relic',
-    description: 'Plataforma de observabilidade que ajuda a entender e otimizar o desempenho de softwares complexos em produção.',
+    description: 'An observability platform that helps understand and optimize the performance of complex software in production.',
     link: 'https://newrelic.com/',
     category: 'DevOps & Hosting',
     pricing: 'Paid',
@@ -611,7 +612,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'HashiCorp Vault',
-    description: 'Ferramenta para gerenciar segredos e proteger dados sensíveis em ambientes modernos de DevOps. Oferece versões pagas com recursos de nível empresarial.',
+    description: 'A tool for managing secrets and protecting sensitive data in modern DevOps environments. Offers paid versions with enterprise-level features.',
     link: 'https://www.hashicorp.com/products/vault',
     category: 'DevOps & Hosting',
     pricing: 'Paid',
@@ -620,7 +621,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'JFrog Artifactory',
-    description: 'Um repositório binário universal que gerencia todos os artefatos de software, com planos pagos para empresas e equipes maiores.',
+    description: 'A universal binary repository that manages all software artifacts, with paid plans for larger companies and teams.',
     link: 'https://jfrog.com/artifactory/',
     category: 'DevOps & Hosting',
     pricing: 'Paid',
@@ -629,7 +630,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'Netlify',
-    description: 'Oferece um plano gratuito generoso para hospedar sites estáticos e Single Page Applications, com CI/CD, HTTPS, e funções serverless limitadas.',
+    description: 'Offers a generous free plan for hosting static sites and SPAs, with CI/CD, HTTPS, and limited serverless functions.',
     link: 'https://www.netlify.com/pricing/',
     category: 'DevOps & Hosting',
     pricing: 'Free Tier',
@@ -638,7 +639,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'Vercel (Hobby Plan)',
-    description: 'Permite hospedar projetos pessoais e não comerciais gratuitamente, com CI/CD e funções serverless.',
+    description: 'Allows hosting personal and non-commercial projects for free, with CI/CD and serverless functions.',
     link: 'https://vercel.com/pricing',
     category: 'DevOps & Hosting',
     pricing: 'Free Tier',
@@ -647,7 +648,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'Render',
-    description: 'Oferece uma camada gratuita para serviços web estáticos, bancos de dados e mais, facilitando a implantação de diversos tipos de aplicativos.',
+    description: 'Offers a free tier for static web services, databases, and more, making it easy to deploy various types of applications.',
     link: 'https://render.com/pricing',
     category: 'DevOps & Hosting',
     pricing: 'Free Tier',
@@ -656,7 +657,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'Cloudflare Workers',
-    description: 'Permite executar código JavaScript na rede global da Cloudflare com um plano gratuito generoso para requisições diárias, ideal para borda.',
+    description: "Allows you to run JavaScript code on Cloudflare's global network with a generous free plan for daily requests, ideal for the edge.",
     link: 'https://www.cloudflare.com/lp/workers-free/',
     category: 'DevOps & Hosting',
     pricing: 'Free Tier',
@@ -665,7 +666,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'GitHub Actions',
-    description: 'O serviço CI/CD integrado ao GitHub oferece um número significativo de minutos de execução gratuitos por mês para repositórios públicos e privados.',
+    description: 'The CI/CD service integrated with GitHub offers a significant number of free execution minutes per month for public and private repositories.',
     link: 'https://github.com/features/actions',
     category: 'DevOps & Hosting',
     pricing: 'Free Tier',
@@ -674,7 +675,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'GitLab CI/CD (Free Tier)',
-    description: 'A versão gratuita do GitLab (self-managed ou GitLab.com) inclui funcionalidades CI/CD completas para repositórios públicos e privados com limites de minutos.',
+    description: 'The free version of GitLab (self-managed or GitLab.com) includes full CI/CD functionalities for public and private repositories with minute limits.',
     link: 'https://about.gitlab.com/pricing/',
     category: 'DevOps & Hosting',
     pricing: 'Free Tier',
@@ -683,7 +684,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'Firebase Hosting',
-    description: 'Parte do Firebase, oferece hospedagem rápida e segura para conteúdo web com um generoso plano gratuito (Spark Plan).',
+    description: 'Part of Firebase, it offers fast and secure hosting for web content with a generous free plan (Spark Plan).',
     link: 'https://firebase.google.com/docs/hosting/',
     category: 'DevOps & Hosting',
     pricing: 'Free Tier',
@@ -692,7 +693,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'Docker Hub (Free Tier)',
-    description: 'Repositório de imagens Docker que permite armazenar e compartilhar imagens de contêineres, com um plano gratuito para uso individual.',
+    description: 'A Docker image repository that allows storing and sharing container images, with a free plan for individual use.',
     link: 'https://hub.docker.com/',
     category: 'DevOps & Hosting',
     pricing: 'Free Tier',
@@ -701,7 +702,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'Logtail (Better Stack)',
-    description: 'Monitoramento de logs em tempo real com uma camada gratuita que inclui um volume limitado de logs e retenção.',
+    description: 'Real-time log monitoring with a free tier that includes a limited volume of logs and retention.',
     link: 'https://betterstack.com/logtail/pricing',
     category: 'DevOps & Hosting',
     pricing: 'Free Tier',
@@ -710,7 +711,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'Jenkins',
-    description: 'Servidor de automação open source líder para CI/CD, flexível e com milhares de plugins.',
+    description: 'A leading open-source automation server for CI/CD, flexible and with thousands of plugins.',
     link: 'https://www.jenkins.io/',
     category: 'DevOps & Hosting',
     pricing: 'Open Source',
@@ -719,7 +720,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'Ansible',
-    description: 'Ferramenta open source de automação de TI para gerenciamento de configuração, implantação de aplicativos e orquestração.',
+    description: 'An open-source IT automation tool for configuration management, application deployment, and orchestration.',
     link: 'https://www.ansible.com/',
     category: 'DevOps & Hosting',
     pricing: 'Open Source',
@@ -728,7 +729,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'Prometheus',
-    description: 'Sistema open source de monitoramento e alerta de sistemas em tempo real, popular em ambientes de nuvem nativa.',
+    description: 'An open-source system for real-time monitoring and alerting of systems, popular in cloud-native environments.',
     link: 'https://prometheus.io/',
     category: 'DevOps & Hosting',
     pricing: 'Open Source',
@@ -737,7 +738,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'Grafana',
-    description: 'Ferramenta open source para visualização e análise de dados, comumente usada em conjunto com Prometheus para criar dashboards de monitoramento.',
+    description: 'An open-source tool for data visualization and analysis, commonly used with Prometheus to create monitoring dashboards.',
     link: 'https://grafana.com/',
     category: 'DevOps & Hosting',
     pricing: 'Open Source',
@@ -746,7 +747,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'Terraform',
-    description: 'Ferramenta open source de Infraestrutura como Código (IaC) que permite provisionar e gerenciar infraestrutura em diversas nuvens.',
+    description: 'An open-source Infrastructure as Code (IaC) tool that allows provisioning and managing infrastructure across various clouds.',
     link: 'https://www.terraform.io/',
     category: 'DevOps & Hosting',
     pricing: 'Open Source',
@@ -755,7 +756,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'Nagios',
-    description: 'Sistema de monitoramento open source que permite monitorar sistemas, redes e infraestrutura.',
+    description: 'An open-source monitoring system that allows monitoring of systems, networks, and infrastructure.',
     link: 'https://www.nagios.org/',
     category: 'DevOps & Hosting',
     pricing: 'Open Source',
@@ -764,7 +765,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'ELK Stack (Elasticsearch, Logstash, Kibana)',
-    description: 'Conjunto de ferramentas open source para ingestão, armazenamento, busca e visualização de logs e dados.',
+    description: 'A set of open-source tools for log and data ingestion, storage, search, and visualization.',
     link: 'https://www.elastic.co/elk-stack/',
     category: 'DevOps & Hosting',
     pricing: 'Open Source',
@@ -773,18 +774,18 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'Argo CD',
-    description: 'Uma ferramenta de implantação contínua (CD) declarativa e baseada em GitOps para Kubernetes.',
+    description: 'A declarative, GitOps-based continuous deployment (CD) tool for Kubernetes.',
     link: 'https://argocd.readthedocs.io/',
     category: 'DevOps & Hosting',
     pricing: 'Open Source',
     icon: 'Server',
     createdAt: new Date('2024-05-20T05:40:00Z'),
   },
-
+  
   // Productivity
   {
     name: 'Notion',
-    description: 'Um espaço de trabalho tudo-em-um para anotações, gerenciamento de projetos, bancos de dados, wikis e colaboração, amplamente utilizado por desenvolvedores e equipes.',
+    description: 'An all-in-one workspace for notes, project management, databases, wikis, and collaboration, widely used by developers and teams.',
     link: 'https://www.notion.so/',
     category: 'Productivity',
     pricing: 'Paid',
@@ -793,7 +794,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'Todoist',
-    description: 'Um aplicativo de lista de tarefas e gerenciamento de projetos que ajuda a organizar o trabalho e a vida pessoal, com recursos avançados para produtividade.',
+    description: 'A to-do list and project management app that helps organize work and personal life, with advanced productivity features.',
     link: 'https://todoist.com/',
     category: 'Productivity',
     pricing: 'Paid',
@@ -802,7 +803,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'Forest',
-    description: 'Um aplicativo de produtividade que ajuda a focar e evitar distrações, plantando uma árvore virtual enquanto você se concentra.',
+    description: 'A productivity app that helps you focus and avoid distractions by planting a virtual tree while you concentrate.',
     link: 'https://www.forestapp.cc/',
     category: 'Productivity',
     pricing: 'Paid',
@@ -811,7 +812,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'ClickUp',
-    description: 'Uma plataforma de gerenciamento de projetos e produtividade que centraliza tarefas, documentos, metas e chat em um único lugar.',
+    description: 'A project management and productivity platform that centralizes tasks, documents, goals, and chat in one place.',
     link: 'https://clickup.com/',
     category: 'Productivity',
     pricing: 'Paid',
@@ -820,7 +821,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'RescueTime',
-    description: 'Um aplicativo de rastreamento de tempo automático que monitora suas atividades no computador e fornece relatórios detalhados sobre como você gasta seu tempo.',
+    description: 'An automatic time-tracking app that monitors your computer activities and provides detailed reports on how you spend your time.',
     link: 'https://www.rescuetime.com/',
     category: 'Productivity',
     pricing: 'Paid',
@@ -829,7 +830,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'Things 3 (macOS/iOS)',
-    description: 'Um gerenciador de tarefas premiado, conhecido por seu design limpo, interface intuitiva e foco em ajudar você a realizar as coisas.',
+    description: 'An award-winning task manager, known for its clean design, intuitive interface, and focus on helping you get things done.',
     link: 'https://culturedcode.com/things/',
     category: 'Productivity',
     pricing: 'Paid',
@@ -838,7 +839,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'Dashlane',
-    description: 'Gerenciador de senhas e carteira digital que ajuda a proteger suas contas online e preencher formulários automaticamente, aumentando a segurança e a produtividade.',
+    description: 'A password manager and digital wallet that helps protect your online accounts and autofill forms, increasing security and productivity.',
     link: 'https://www.dashlane.com/',
     category: 'Productivity',
     pricing: 'Paid',
@@ -847,7 +848,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'Krisp',
-    description: 'Um aplicativo de cancelamento de ruído baseado em IA que remove ruídos de fundo de chamadas e reuniões, melhorando a clareza da comunicação.',
+    description: 'An AI-based noise-canceling app that removes background noise from calls and meetings, improving communication clarity.',
     link: 'https://krisp.ai/',
     category: 'Productivity',
     pricing: 'Paid',
@@ -856,7 +857,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'Figma (Professional/Organization Plans)',
-    description: 'Embora tenha uma camada gratuita, os planos pagos oferecem recursos avançados de colaboração, prototipagem e design system para equipes maiores.',
+    description: 'While it has a free tier, paid plans offer advanced collaboration, prototyping, and design system features for larger teams.',
     link: 'https://www.figma.com/pricing/',
     category: 'Productivity',
     pricing: 'Paid',
@@ -865,7 +866,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'Linear',
-    description: 'Um rastreador de problemas e ferramenta de gerenciamento de projetos focado em equipes de software de alto desempenho, conhecido por sua velocidade e simplicidade.',
+    description: 'An issue tracker and project management tool focused on high-performance software teams, known for its speed and simplicity.',
     link: 'https://linear.app/',
     category: 'Productivity',
     pricing: 'Paid',
@@ -874,7 +875,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'Asana (Basic Plan)',
-    description: 'Ferramenta de gerenciamento de projetos e tarefas que permite que equipes organizem, rastreiem e gerenciem seus trabalhos. O plano básico é gratuito para equipes menores.',
+    description: 'A project and task management tool that allows teams to organize, track, and manage their work. The basic plan is free for smaller teams.',
     link: 'https://asana.com/pricing',
     category: 'Productivity',
     pricing: 'Free Tier',
@@ -883,7 +884,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'Trello',
-    description: 'Ferramenta de gerenciamento de projetos baseada em quadros Kanban, ideal para organização visual de tarefas e fluxos de trabalho. Oferece um plano gratuito robusto.',
+    description: 'A Kanban-based project management tool, ideal for visual organization of tasks and workflows. Offers a robust free plan.',
     link: 'https://trello.com/pricing',
     category: 'Productivity',
     pricing: 'Free Tier',
@@ -892,7 +893,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'Evernote (Free Plan)',
-    description: 'Aplicativo de anotações que permite capturar ideias, organizar notas e gerenciar tarefas, com um plano gratuito limitado.',
+    description: 'A note-taking app that allows you to capture ideas, organize notes, and manage tasks, with a limited free plan.',
     link: 'https://evernote.com/compare-plans',
     category: 'Productivity',
     pricing: 'Free Tier',
@@ -901,7 +902,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'Slack (Free Plan)',
-    description: 'Plataforma de comunicação para equipes, que permite conversas em tempo real, compartilhamento de arquivos e integração com outras ferramentas. O plano gratuito é para uso básico.',
+    description: 'A communication platform for teams, allowing real-time conversations, file sharing, and integration with other tools. The free plan is for basic use.',
     link: 'https://slack.com/pricing',
     category: 'Productivity',
     pricing: 'Free Tier',
@@ -910,7 +911,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'Microsoft To Do',
-    description: 'Um aplicativo de lista de tarefas simples e inteligente que ajuda a planejar o dia e gerenciar tarefas de forma eficaz, sincronizado com o Outlook. Gratuito com conta Microsoft.',
+    description: 'A simple and smart to-do list app that helps plan your day and manage tasks effectively, synced with Outlook. Free with a Microsoft account.',
     link: 'https://todo.microsoft.com/',
     category: 'Productivity',
     pricing: 'Free',
@@ -919,7 +920,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'Notion (Free Personal Plan)',
-    description: 'Acesso gratuito a recursos básicos de anotações, wikis e gerenciamento de projetos para uso individual.',
+    description: 'Free access to basic features for notes, wikis, and project management for individual use.',
     link: 'https://www.notion.so/pricing',
     category: 'Productivity',
     pricing: 'Free Tier',
@@ -928,7 +929,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'Google Workspace (Free Apps)',
-    description: 'As versões gratuitas de Docs, Sheets, Slides, Calendar, Gmail, etc., são ferramentas de produtividade essenciais.',
+    description: 'The free versions of Docs, Sheets, Slides, Calendar, Gmail, etc., are essential productivity tools.',
     link: 'https://workspace.google.com/',
     category: 'Productivity',
     pricing: 'Free',
@@ -937,7 +938,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'Zoom (Basic Plan)',
-    description: 'Plataforma de videoconferência que oferece reuniões gratuitas com duração limitada e número de participantes.',
+    description: 'A video conferencing platform that offers free meetings with limited duration and number of participants.',
     link: 'https://zoom.us/pricing',
     category: 'Productivity',
     pricing: 'Free Tier',
@@ -946,7 +947,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'Grammarly (Free Version)',
-    description: 'Ferramenta de escrita que verifica gramática, ortografia, pontuação e estilo, ajudando a melhorar a clareza da comunicação escrita.',
+    description: 'A writing tool that checks grammar, spelling, punctuation, and style, helping to improve the clarity of written communication.',
     link: 'https://www.grammarly.com/premium',
     category: 'Productivity',
     pricing: 'Free Tier',
@@ -955,7 +956,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'Calendly (Basic Plan)',
-    description: 'Ferramenta de agendamento que simplifica a marcação de reuniões, permitindo que outros reservem horários em sua agenda disponível.',
+    description: 'A scheduling tool that simplifies booking meetings by allowing others to book times on your available calendar.',
     link: 'https://calendly.com/pricing',
     category: 'Productivity',
     pricing: 'Free Tier',
@@ -964,7 +965,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'Joplin',
-    description: 'Um aplicativo de anotações e lista de tarefas open source com sincronização em nuvem e suporte a Markdown.',
+    description: 'An open-source note-taking and to-do list app with cloud sync and Markdown support.',
     link: 'https://joplinapp.org/',
     category: 'Productivity',
     pricing: 'Open Source',
@@ -973,7 +974,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'Standard Notes',
-    description: 'Um aplicativo de anotações e-mail simples, privado e open source, com foco em segurança e criptografia.',
+    description: 'A simple, private, and open-source note-taking app with a focus on security and encryption.',
     link: 'https://standardnotes.com/',
     category: 'Productivity',
     pricing: 'Open Source',
@@ -982,7 +983,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'Obsidian',
-    description: 'Um poderoso software de base de conhecimento open source que funciona sobre um diretório local de arquivos Markdown, ideal para conectar ideias.',
+    description: 'A powerful open-source knowledge base software that works on a local directory of Markdown files, ideal for connecting ideas.',
     link: 'https://obsidian.md/',
     category: 'Productivity',
     pricing: 'Open Source',
@@ -991,7 +992,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'Nextcloud',
-    description: 'Uma suíte de ferramentas de produtividade open source, incluindo armazenamento de arquivos, comunicação e colaboração, que você pode hospedar em seu próprio servidor.',
+    description: 'An open-source productivity suite, including file storage, communication, and collaboration tools, that you can host on your own server.',
     link: 'https://nextcloud.com/',
     category: 'Productivity',
     pricing: 'Open Source',
@@ -1000,7 +1001,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'Mattermost',
-    description: 'Uma plataforma de colaboração open source alternativa ao Slack, para equipes que precisam de comunicação segura e privada.',
+    description: 'An open-source collaboration platform alternative to Slack, for teams that need secure and private communication.',
     link: 'https://mattermost.com/',
     category: 'Productivity',
     pricing: 'Open Source',
@@ -1009,7 +1010,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'Self-hosted GitLab',
-    description: 'Além do CI/CD, o GitLab (versão self-hosted) é uma plataforma completa de DevOps que inclui gerenciamento de projetos, wikis e muito mais, tudo open source.',
+    description: 'Besides CI/CD, GitLab (self-hosted version) is a complete DevOps platform that includes project management, wikis, and more, all open source.',
     link: 'https://about.gitlab.com/install/',
     category: 'Productivity',
     pricing: 'Open Source',
@@ -1018,7 +1019,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'KanbanFlow',
-    description: 'Uma ferramenta online de quadro Kanban com recursos de rastreamento de tempo e Pomodoro, com uma versão gratuita e completa.',
+    description: 'An online Kanban board tool with time tracking and Pomodoro features, with a full-featured free version.',
     link: 'https://kanbanflow.com/',
     category: 'Productivity',
     pricing: 'Free Tier',
@@ -1027,7 +1028,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'FocusWriter',
-    description: 'Um editor de texto simples e sem distrações para escritores, projetado para ajudá-lo a focar na escrita.',
+    description: 'A simple, distraction-free text editor for writers, designed to help you focus on writing.',
     link: 'https://gottcode.org/focuswriter/',
     category: 'Productivity',
     pricing: 'Open Source',
@@ -1036,7 +1037,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'OpenProject',
-    description: 'Um software de gerenciamento de projetos open source para equipes que buscam planejamento de projetos, gerenciamento de tarefas e acompanhamento de tempo.',
+    description: 'An open-source project management software for teams seeking project planning, task management, and time tracking.',
     link: 'https://www.openproject.org/',
     category: 'Productivity',
     pricing: 'Open Source',
@@ -1045,18 +1046,18 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'Draw.io (diagrams.net)',
-    description: 'Um editor de diagramas open source gratuito que pode ser usado online ou offline para criar fluxogramas, diagramas UML e mais.',
+    description: 'A free open-source diagram editor that can be used online or offline to create flowcharts, UML diagrams, and more.',
     link: 'https://app.diagrams.net/',
     category: 'Productivity',
     pricing: 'Open Source',
     icon: 'Zap',
     createdAt: new Date('2024-05-19T05:10:00Z'),
   },
-
+  
   // Books & Courses
   {
     name: '"Clean Code" by Robert C. Martin',
-    description: 'Um livro clássico que aborda os princípios de escrita de código limpo e de fácil manutenção.',
+    description: 'A classic book that covers the principles of writing clean, maintainable code.',
     link: 'https://www.oreilly.com/library/view/clean-code/9780136083238/',
     category: 'Books & Courses',
     pricing: 'Paid',
@@ -1065,7 +1066,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: '"The Pragmatic Programmer" by David Thomas & Andrew Hunt',
-    description: 'Oferece conselhos práticos e filosofias sobre como se tornar um desenvolvedor mais eficaz e produtivo.',
+    description: 'Offers practical advice and philosophies on how to become a more effective and productive developer.',
     link: 'https://pragprog.com/titles/tpp20/the-pragmatic-programmer-20th-anniversary-edition/',
     category: 'Books & Courses',
     pricing: 'Paid',
@@ -1074,7 +1075,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: '"Designing Data-Intensive Applications" by Martin Kleppmann',
-    description: 'Essencial para arquitetos de software e engenheiros de dados, cobre os princípios por trás da construção de sistemas de dados escaláveis e resilientes.',
+    description: 'Essential for software architects and data engineers, covering the principles behind building scalable and resilient data systems.',
     link: 'https://www.oreilly.com/library/view/designing-data-intensive-applications/9781491903063/',
     category: 'Books & Courses',
     pricing: 'Paid',
@@ -1083,7 +1084,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'Coursera (Specializations/Courses)',
-    description: 'Plataforma de cursos online de universidades e empresas renomadas, com especializações e certificados pagos em diversas áreas de tecnologia.',
+    description: 'An online course platform from renowned universities and companies, with paid specializations and certificates in various tech areas.',
     link: 'https://www.coursera.org/',
     category: 'Books & Courses',
     pricing: 'Paid',
@@ -1092,7 +1093,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'Udemy',
-    description: 'Grande marketplace de cursos online com uma vasta seleção de tutoriais em vídeo sobre praticamente qualquer tecnologia ou linguagem de programação, geralmente com custo único por curso.',
+    description: 'A large marketplace of online courses with a vast selection of video tutorials on virtually any technology or programming language, usually with a one-time cost per course.',
     link: 'https://www.udemy.com/',
     category: 'Books & Courses',
     pricing: 'Paid',
@@ -1101,7 +1102,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'Pluralsight',
-    description: 'Plataforma de aprendizado online focada em tecnologia, com trilhas de aprendizado, avaliações e cursos sobre desenvolvimento de software, nuvem e DevOps.',
+    description: 'A technology-focused online learning platform with learning paths, assessments, and courses on software development, cloud, and DevOps.',
     link: 'https://www.pluralsight.com/',
     category: 'Books & Courses',
     pricing: 'Paid',
@@ -1110,7 +1111,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'Frontend Masters',
-    description: 'Oferece cursos aprofundados sobre desenvolvimento front-end com instrutores de alto nível, cobrindo JavaScript, React, Vue, Node.js e mais.',
+    description: 'Offers in-depth courses on front-end development with top-tier instructors, covering JavaScript, React, Vue, Node.js, and more.',
     link: 'https://frontendmasters.com/',
     category: 'Books & Courses',
     pricing: 'Paid',
@@ -1119,7 +1120,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'Manning Publications (Books & LiveBooks)',
-    description: 'Editora de livros técnicos de alta qualidade sobre programação, machine learning e sistemas, com opções de e-books e acesso online.',
+    description: 'A publisher of high-quality technical books on programming, machine learning, and systems, with e-book and online access options.',
     link: 'https://www.manning.com/',
     category: 'Books & Courses',
     pricing: 'Paid',
@@ -1128,7 +1129,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'Educative.io',
-    description: 'Plataforma interativa baseada em texto para aprendizado de programação, com cursos práticos e desafios de codificação.',
+    description: 'An interactive text-based platform for learning programming, with hands-on courses and coding challenges.',
     link: 'https://www.educative.io/',
     category: 'Books & Courses',
     pricing: 'Paid',
@@ -1137,7 +1138,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: '"Grokking Algorithms" by Aditya Bhargava',
-    description: 'Um guia visual e intuitivo para entender algoritmos e estruturas de dados essenciais.',
+    description: 'A visual and intuitive guide to understanding essential algorithms and data structures.',
     link: 'https://www.manning.com/books/grokking-algorithms',
     category: 'Books & Courses',
     pricing: 'Paid',
@@ -1146,7 +1147,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: '"Building Microservices" by Sam Newman',
-    description: 'Um guia prático para projetar e construir arquiteturas baseadas em microsserviços.',
+    description: 'A practical guide for designing and building microservices-based architectures.',
     link: 'https://www.oreilly.com/library/view/building-microservices/9781491950340/',
     category: 'Books & Courses',
     pricing: 'Paid',
@@ -1155,7 +1156,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'Refactoring.Guru',
-    description: 'Recurso online pago que explica padrões de refatoração, design patterns e princípios SOLID de forma visual e fácil de entender.',
+    description: 'A paid online resource that explains refactoring patterns, design patterns, and SOLID principles in a visual and easy-to-understand way.',
     link: 'https://refactoring.guru/',
     category: 'Books & Courses',
     pricing: 'Paid',
@@ -1164,7 +1165,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'Wes Bos Courses',
-    description: 'Cursos populares e bem produzidos sobre JavaScript, React, CSS Grid, Flexbox e outras tecnologias web.',
+    description: 'Popular and well-produced courses on JavaScript, React, CSS Grid, Flexbox, and other web technologies.',
     link: 'https://wesbos.com/courses/',
     category: 'Books & Courses',
     pricing: 'Paid',
@@ -1173,7 +1174,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'Egghead.io',
-    description: 'Oferece lições de vídeo concisas e focadas para desenvolvedores web, com foco em frameworks JavaScript e ferramentas modernas.',
+    description: 'Offers concise and focused video lessons for web developers, with a focus on JavaScript frameworks and modern tools.',
     link: 'https://egghead.io/',
     category: 'Books & Courses',
     pricing: 'Paid',
@@ -1182,7 +1183,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'freeCodeCamp',
-    description: 'Oferece milhares de horas de conteúdo de programação interativo e certificações gratuitas em desenvolvimento web, ciência de dados e mais.',
+    description: 'Offers thousands of hours of interactive programming content and free certifications in web development, data science, and more.',
     link: 'https://www.freecodecamp.org/',
     category: 'Books & Courses',
     pricing: 'Free',
@@ -1191,7 +1192,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'edX (Audit Track)',
-    description: 'Permite auditar cursos de universidades de renome gratuitamente, sem acesso a certificados ou avaliações graduadas.',
+    description: 'Allows auditing courses from renowned universities for free, without access to certificates or graded assignments.',
     link: 'https://www.edx.org/',
     category: 'Books & Courses',
     pricing: 'Free Tier',
@@ -1200,7 +1201,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'Codecademy (Basic Plan)',
-    description: 'Oferece lições interativas gratuitas para aprender conceitos básicos de programação em várias linguagens.',
+    description: 'Offers free interactive lessons to learn basic programming concepts in various languages.',
     link: 'https://www.codecademy.com/',
     category: 'Books & Courses',
     pricing: 'Free Tier',
@@ -1209,7 +1210,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'Coursera (Audit Track)',
-    description: 'Assim como o edX, permite auditar muitos cursos gratuitamente.',
+    description: 'Like edX, allows auditing many courses for free.',
     link: 'https://www.coursera.org/',
     category: 'Books & Courses',
     pricing: 'Free Tier',
@@ -1218,7 +1219,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'Udemy (Free Courses Filter)',
-    description: 'Possui uma seção de cursos totalmente gratuitos, geralmente introdutórios ou promocionais.',
+    description: 'Has a section of completely free courses, usually introductory or promotional.',
     link: 'https://www.udemy.com/courses/free/',
     category: 'Books & Courses',
     pricing: 'Free',
@@ -1227,7 +1228,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'Google AI for Developers',
-    description: 'Cursos e recursos gratuitos do Google para aprender sobre Machine Learning, TensorFlow e IA.',
+    description: 'Free courses and resources from Google to learn about Machine Learning, TensorFlow, and AI.',
     link: 'https://developers.google.com/machine-learning/',
     category: 'Books & Courses',
     pricing: 'Free',
@@ -1236,7 +1237,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'Microsoft Learn',
-    description: 'Oferece módulos de aprendizado e caminhos de aprendizado gratuitos sobre tecnologias Microsoft, incluindo Azure, .NET, e desenvolvimento de IA.',
+    description: 'Offers free learning modules and learning paths on Microsoft technologies, including Azure, .NET, and AI development.',
     link: 'https://learn.microsoft.com/',
     category: 'Books & Courses',
     pricing: 'Free',
@@ -1245,7 +1246,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'MIT OpenCourseware',
-    description: 'Materiais de curso de nível universitário do MIT disponíveis gratuitamente online, incluindo cursos de ciência da computação.',
+    description: 'University-level course materials from MIT available for free online, including computer science courses.',
     link: 'https://ocw.mit.edu/',
     category: 'Books & Courses',
     pricing: 'Free',
@@ -1254,7 +1255,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'W3Schools',
-    description: 'Um recurso web completo para aprender linguagens de programação web (HTML, CSS, JavaScript, SQL, Python, etc.) com tutoriais e exemplos.',
+    description: 'A complete web resource for learning web programming languages (HTML, CSS, JavaScript, SQL, Python, etc.) with tutorials and examples.',
     link: 'https://www.w3schools.com/',
     category: 'Books & Courses',
     pricing: 'Free',
@@ -1263,7 +1264,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'The Odin Project',
-    description: 'Um currículo open source de desenvolvimento web full-stack, com foco em Ruby on Rails ou JavaScript/React, que guia o aluno por projetos práticos.',
+    description: 'An open-source full-stack web development curriculum, with a focus on Ruby on Rails or JavaScript/React, that guides students through practical projects.',
     link: 'https://www.theodinproject.com/',
     category: 'Books & Courses',
     pricing: 'Open Source',
@@ -1272,7 +1273,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'Exercism',
-    description: 'Plataforma que oferece desafios de programação em dezenas de linguagens, com mentoring gratuito por voluntários.',
+    description: 'A platform that offers programming challenges in dozens of languages, with free mentoring by volunteers.',
     link: 'https://exercism.org/',
     category: 'Books & Courses',
     pricing: 'Free',
@@ -1281,7 +1282,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'Hack The Box (Free Tier)',
-    description: 'Plataforma de cibersegurança que oferece laboratórios práticos para aprender e aprimorar habilidades de ethical hacking (máquinas gratuitas para uso).',
+    description: 'A cybersecurity platform that offers hands-on labs to learn and improve ethical hacking skills (free machines for use).',
     link: 'https://www.hackthebox.com/',
     category: 'Books & Courses',
     pricing: 'Free Tier',
@@ -1290,7 +1291,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: '"You Don\'t Know JS Yet" (Book Series) by Kyle Simpson',
-    description: 'Uma série de livros open source no GitHub que aprofunda no JavaScript, cobrindo tópicos avançados.',
+    description: 'An open-source book series on GitHub that delves deep into JavaScript, covering advanced topics.',
     link: 'https://github.com/getify/You-Dont-Know-JS',
     category: 'Books & Courses',
     pricing: 'Open Source',
@@ -1299,7 +1300,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'Google\'s Python Class',
-    description: 'Um curso gratuito do Google para pessoas com pouca experiência em programação, focando em Python.',
+    description: 'A free course from Google for people with little programming experience, focusing on Python.',
     link: 'https://developers.google.com/edu/python/',
     category: 'Books & Courses',
     pricing: 'Free',
@@ -1308,7 +1309,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'Learn Git Branching',
-    description: 'Um tutorial interativo e visual para aprender Git Branching, essencial para controle de versão.',
+    description: 'An interactive and visual tutorial for learning Git Branching, essential for version control.',
     link: 'https://learngitbranching.js.org/',
     category: 'Books & Courses',
     pricing: 'Free',
@@ -1317,7 +1318,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'Open Source Society University (OSSU)',
-    description: 'Um currículo curado de cursos online gratuitos para uma educação de ciência da computação de nível universitário.',
+    description: 'A curated curriculum of free online courses for a university-level computer science education.',
     link: 'https://github.com/ossu/computer-science',
     category: 'Books & Courses',
     pricing: 'Open Source',
@@ -1326,7 +1327,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'HackerRank (Community Challenges)',
-    description: 'Plataforma com desafios de programação e algoritmos para praticar e aprimorar habilidades, com muitos problemas e cursos gratuitos.',
+    description: 'A platform with programming and algorithm challenges to practice and improve skills, with many free problems and courses.',
     link: 'https://www.hackerrank.com/',
     category: 'Books & Courses',
     pricing: 'Free Tier',
@@ -1335,7 +1336,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'LeetCode (Free Problems)',
-    description: 'Plataforma popular para praticar problemas de algoritmos e estruturas de dados, essencial para entrevistas de emprego em tecnologia (muitos problemas são gratuitos).',
+    description: 'A popular platform for practicing algorithm and data structure problems, essential for tech job interviews (many problems are free).',
     link: 'https://leetcode.com/',
     category: 'Books & Courses',
     pricing: 'Free Tier',
@@ -1344,7 +1345,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'The Missing Semester of Your CS Education (MIT)',
-    description: 'Um curso curto e gratuito do MIT focado em ferramentas e habilidades práticas que não são ensinadas nos currículos tradicionais de CS.',
+    description: 'A short, free course from MIT focused on practical tools and skills not taught in traditional CS curricula.',
     link: 'https://missing.csail.mit.edu/',
     category: 'Books & Courses',
     pricing: 'Free',
@@ -1353,7 +1354,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'Roadmap.sh',
-    description: 'Coleções de roadmaps de aprendizado para desenvolvedores, cobrindo diferentes especializações (frontend, backend, DevOps, etc.), de código aberto.',
+    description: 'Collections of learning roadmaps for developers, covering different specializations (frontend, backend, DevOps, etc.), open-source.',
     link: 'https://roadmap.sh/',
     category: 'Books & Courses',
     pricing: 'Open Source',
@@ -1362,7 +1363,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'MDN Web Docs (Mozilla)',
-    description: 'Documentação abrangente e tutoriais sobre tecnologias web (HTML, CSS, JavaScript, APIs Web), um recurso essencial e gratuito para desenvolvedores.',
+    description: 'Comprehensive documentation and tutorials on web technologies (HTML, CSS, JavaScript, Web APIs), an essential and free resource for developers.',
     link: 'https://developer.mozilla.org/',
     category: 'Books & Courses',
     pricing: 'Free',
@@ -1371,7 +1372,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'dev.to',
-    description: 'Uma comunidade de desenvolvedores onde eles compartilham artigos e tutoriais sobre diversas tecnologias, muitos deles guias passo a passo.',
+    description: 'A community of developers where they share articles and tutorials on various technologies, many of them step-by-step guides.',
     link: 'https://dev.to/',
     category: 'Books & Courses',
     pricing: 'Free',
@@ -1382,7 +1383,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   // UI & Design
   {
     name: 'Figma (Professional/Organization Plans)',
-    description: 'Uma plataforma de design colaborativa para criar interfaces de usuário, protótipos e sistemas de design. Os planos pagos oferecem recursos avançados para equipes.',
+    description: 'A collaborative design platform for creating user interfaces, prototypes, and design systems. Paid plans offer advanced features for teams.',
     link: 'https://www.figma.com/pricing/',
     category: 'UI & Design',
     pricing: 'Paid',
@@ -1391,7 +1392,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'Sketch',
-    description: 'Um editor de gráficos vetoriais exclusivo para macOS, amplamente utilizado para design de UI/UX, com um modelo de licença paga.',
+    description: 'A vector graphics editor exclusively for macOS, widely used for UI/UX design, with a paid license model.',
     link: 'https://www.sketch.com/',
     category: 'UI & Design',
     pricing: 'Paid',
@@ -1400,7 +1401,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'Adobe XD',
-    description: 'Uma ferramenta de design de experiência do usuário para projetar e prototipar interfaces de usuário para aplicativos e web, parte da Creative Cloud.',
+    description: 'A user experience design tool for designing and prototyping user interfaces for web and apps, part of the Creative Cloud.',
     link: 'https://www.adobe.com/products/xd.html',
     category: 'UI & Design',
     pricing: 'Paid',
@@ -1409,7 +1410,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'InVision',
-    description: 'Plataforma para prototipagem interativa, fluxo de trabalho de design e colaboração, com planos pagos para equipes maiores e funcionalidades avançadas.',
+    description: 'A platform for interactive prototyping, design workflow, and collaboration, with paid plans for larger teams and advanced features.',
     link: 'https://www.invisionapp.com/',
     category: 'UI & Design',
     pricing: 'Paid',
@@ -1418,7 +1419,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'Principle (macOS)',
-    description: 'Uma ferramenta de design de animação e prototipagem interativa para interfaces de usuário, simples e poderosa.',
+    description: 'A simple and powerful animation and interactive prototyping design tool for user interfaces.',
     link: 'https://principleformac.com/',
     category: 'UI & Design',
     pricing: 'Paid',
@@ -1427,7 +1428,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'Axure RP',
-    description: 'Uma ferramenta robusta para wireframing, prototipagem e especificação, focada em designs complexos e interativos.',
+    description: 'A robust tool for wireframing, prototyping, and specification, focused on complex and interactive designs.',
     link: 'https://www.axure.com/',
     category: 'UI & Design',
     pricing: 'Paid',
@@ -1436,7 +1437,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'Zeplin',
-    description: 'Uma ferramenta de colaboração que conecta designers e desenvolvedores, exportando designs e fornecendo especificações, assets e trechos de código.',
+    description: 'A collaboration tool that connects designers and developers, exporting designs and providing specifications, assets, and code snippets.',
     link: 'https://zeplin.io/',
     category: 'UI & Design',
     pricing: 'Paid',
@@ -1445,7 +1446,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'UXPin',
-    description: 'Plataforma de design de produto de ponta a ponta que permite projetar, prototipar e documentar experiências de usuário.',
+    description: 'An end-to-end product design platform that allows you to design, prototype, and document user experiences.',
     link: 'https://www.uxpin.com/',
     category: 'UI & Design',
     pricing: 'Paid',
@@ -1454,7 +1455,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'Affinity Designer',
-    description: 'Um editor de gráficos vetoriais e raster alternativo ao Adobe Illustrator, conhecido por seu desempenho e preço único.',
+    description: 'A vector and raster graphics editor alternative to Adobe Illustrator, known for its performance and one-time price.',
     link: 'https://affinity.serif.com/en-us/designer/',
     category: 'UI & Design',
     pricing: 'Paid',
@@ -1463,7 +1464,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'Flinto (macOS)',
-    description: 'Uma ferramenta para criar protótipos interativos e micro-interações para iOS, Android e web.',
+    description: 'A tool for creating interactive prototypes and micro-interactions for iOS, Android, and web.',
     link: 'https://www.flinto.com/',
     category: 'UI & Design',
     pricing: 'Paid',
@@ -1472,7 +1473,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'Figma (Starter Plan)',
-    description: 'Oferece um plano gratuito para uso individual com recursos essenciais de design e prototipagem.',
+    description: 'Offers a free plan for individual use with essential design and prototyping features.',
     link: 'https://www.figma.com/pricing/',
     category: 'UI & Design',
     pricing: 'Free Tier',
@@ -1481,7 +1482,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'Canva (Free Plan)',
-    description: 'Uma ferramenta de design gráfico online para criar uma variedade de materiais visuais, incluindo gráficos para redes sociais e apresentações, com muitos templates gratuitos.',
+    description: 'An online graphic design tool for creating a variety of visual materials, including social media graphics and presentations, with many free templates.',
     link: 'https://www.canva.com/pricing/',
     category: 'UI & Design',
     pricing: 'Free Tier',
@@ -1490,7 +1491,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'Miro (Free Plan)',
-    description: 'Um quadro branco online colaborativo para brainstorming, diagramação, planejamento e workshops de design thinking. O plano gratuito é limitado.',
+    description: 'A collaborative online whiteboard for brainstorming, diagramming, planning, and design thinking workshops. The free plan is limited.',
     link: 'https://miro.com/pricing/',
     category: 'UI & Design',
     pricing: 'Free Tier',
@@ -1499,7 +1500,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'Whimsical',
-    description: 'Combina wireframes, fluxogramas, notas adesivas e documentos em uma ferramenta de colaboração visual rápida. Oferece um plano gratuito limitado.',
+    description: 'Combines wireframes, flowcharts, sticky notes, and documents in a fast visual collaboration tool. Offers a limited free plan.',
     link: 'https://whimsical.com/pricing',
     category: 'UI & Design',
     pricing: 'Free Tier',
@@ -1508,7 +1509,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'Marvel',
-    description: 'Uma plataforma de prototipagem e colaboração de design que permite transformar mockups em protótipos interativos. Tem um plano gratuito para um projeto.',
+    description: 'A design prototyping and collaboration platform that allows you to turn mockups into interactive prototypes. Has a free plan for one project.',
     link: 'https://marvelapp.com/pricing/',
     category: 'UI & Design',
     pricing: 'Free Tier',
@@ -1517,7 +1518,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'Font Awesome (Free Icons)',
-    description: 'Uma biblioteca popular de ícones escaláveis baseados em vetor que podem ser personalizados com CSS. A versão gratuita tem muitos ícones.',
+    description: 'A popular library of scalable vector-based icons that can be customized with CSS. The free version has many icons.',
     link: 'https://fontawesome.com/',
     category: 'UI & Design',
     pricing: 'Free Tier',
@@ -1526,7 +1527,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'Google Fonts',
-    description: 'Uma vasta biblioteca de fontes gratuitas e de código aberto otimizadas para web, que podem ser usadas livremente em qualquer projeto.',
+    description: 'A vast library of free and open-source fonts optimized for the web, which can be used freely in any project.',
     link: 'https://fonts.google.com/',
     category: 'UI & Design',
     pricing: 'Free',
@@ -1535,7 +1536,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'GIMP (GNU Image Manipulation Program)',
-    description: 'Um editor de imagens de código aberto poderoso, uma alternativa gratuita ao Photoshop, para manipulação de fotos, composição de imagens e criação de arte.',
+    description: 'A powerful open-source image editor, a free alternative to Photoshop, for photo manipulation, image composition, and art creation.',
     link: 'https://www.gimp.org/',
     category: 'UI & Design',
     pricing: 'Open Source',
@@ -1544,7 +1545,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'Inkscape',
-    description: 'Um editor de gráficos vetoriais de código aberto, ideal para criar ilustrações, diagramas, arte de linha, gráficos web e muito mais.',
+    description: 'An open-source vector graphics editor, ideal for creating illustrations, diagrams, line art, web graphics, and more.',
     link: 'https://inkscape.org/',
     category: 'UI & Design',
     pricing: 'Open Source',
@@ -1553,7 +1554,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'Blender',
-    description: 'Software de modelagem 3D, animação, renderização, composição, rastreamento de movimento, edição de vídeo e pipeline de animação 2D, tudo de código aberto.',
+    description: 'Open-source software for 3D modeling, animation, rendering, compositing, motion tracking, video editing, and 2D animation pipeline.',
     link: 'https://www.blender.org/',
     category: 'UI & Design',
     pricing: 'Open Source',
@@ -1562,7 +1563,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'Penpot',
-    description: 'Uma plataforma de prototipagem e design de código aberto, baseada na web, concorrente do Figma.',
+    description: 'An open-source, web-based prototyping and design platform, a competitor to Figma.',
     link: 'https://penpot.app/',
     category: 'UI & Design',
     pricing: 'Open Source',
@@ -1571,7 +1572,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'UI Libraries & Component Frameworks',
-    description: 'Bibliotecas de componentes de UI de código aberto que fornecem blocos de construção prontos para uso para interfaces web (ex: Material-UI, Ant Design, Bootstrap).',
+    description: 'Open-source UI component libraries that provide ready-to-use building blocks for web interfaces (e.g., Material-UI, Ant Design, Bootstrap).',
     link: 'https://mui.com/',
     category: 'UI & Design',
     pricing: 'Open Source',
@@ -1580,7 +1581,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'Unsplash',
-    description: 'Um vasto banco de dados de fotos de alta resolução gratuitas para uso em projetos de design.',
+    description: 'A vast database of high-resolution photos free to use in design projects.',
     link: 'https://unsplash.com/',
     category: 'UI & Design',
     pricing: 'Free',
@@ -1589,7 +1590,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'Pexels',
-    description: 'Semelhante ao Unsplash, oferece fotos e vídeos de estoque de alta qualidade, gratuitos para uso.',
+    description: 'Similar to Unsplash, offers high-quality stock photos and videos, free to use.',
     link: 'https://www.pexels.com/',
     category: 'UI & Design',
     pricing: 'Free',
@@ -1598,7 +1599,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'Open Peeps',
-    description: 'Uma biblioteca de ilustrações desenhadas à mão de pessoas, combináveis para criar diversas poses e cenários. Gratuito para uso pessoal e comercial.',
+    description: 'A library of hand-drawn illustrations of people, combinable to create various poses and scenarios. Free for personal and commercial use.',
     link: 'https://www.openpeeps.com/',
     category: 'UI & Design',
     pricing: 'Free',
@@ -1607,7 +1608,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   },
   {
     name: 'Lucide Icons',
-    description: 'Uma biblioteca de ícones de código aberto, limpos, personalizáveis e consistentes, ideal para interfaces de usuário.',
+    description: 'An open-source library of clean, customizable, and consistent icons, ideal for user interfaces.',
     link: 'https://lucide.dev/',
     category: 'UI & Design',
     pricing: 'Open Source',
@@ -1615,118 +1616,4 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     createdAt: new Date('2024-05-17T05:50:00Z'),
   },
 ];
-
-export async function getResources(): Promise<Resource[]> {
-  if (!db) {
-    console.warn("Firestore is not initialized. Returning sample resources.");
-    // Sort local data by date before returning
-    return sampleResources
-      .map((r, i) => ({ ...r, id: `local-${i}`})) // Add a temporary local id
-      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
-  }
-
-  try {
-    const resourcesCollection = collection(db, 'resources');
-    const q = query(resourcesCollection, orderBy('createdAt', 'desc'));
-    const querySnapshot = await getDocs(q);
-    
-    if (querySnapshot.empty) {
-        console.log("No resources found in Firestore, populating with sample data.");
-        const batch = (await import('firebase/firestore')).writeBatch(db);
-        sampleResources.forEach(resource => {
-            const docRef = doc(collection(db, 'resources')); // Firestore will generate ID
-            batch.set(docRef, { ...resource, createdAt: Timestamp.fromDate(resource.createdAt) });
-        });
-        await batch.commit();
-        
-        // After populating, fetch again to get correct IDs and sorted data
-        const newSnapshot = await getDocs(q);
-        return newSnapshot.docs.map(doc => {
-            const data = doc.data();
-            return {
-                id: doc.id,
-                ...data,
-                createdAt: (data.createdAt as Timestamp).toDate(),
-            } as Resource;
-        });
-    }
-    
-    return querySnapshot.docs.map(doc => {
-      const data = doc.data();
-      return {
-        id: doc.id,
-        ...data,
-        createdAt: (data.createdAt as Timestamp).toDate(),
-      } as Resource;
-    });
-  } catch (error) {
-    console.error("Error fetching resources:", error);
-    // Fallback to local sample data on error
-    return sampleResources
-      .map((r, i) => ({ ...r, id: `local-${i}`}))
-      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
-  }
-}
-
-export async function getResourceById(id: string): Promise<Resource | null> {
-    if (!db) {
-        console.warn("Firestore is not initialized.");
-        // Find by the custom 'id' field in the local sample data, although it's not present anymore.
-        // This will likely not work for local data, but is fine as it's a fallback.
-        const localResource = sampleResources.find((r: any) => r.id === id);
-        return localResource ? { ...localResource, id } as Resource : null;
-    }
-
-    try {
-        const resourceRef = doc(db, 'resources', id);
-        const docSnap = await getDoc(resourceRef);
-
-        if (!docSnap.exists()) {
-            return null;
-        }
-
-        const data = docSnap.data();
-        return {
-            id: docSnap.id,
-            ...data,
-            createdAt: (data.createdAt as Timestamp).toDate(),
-        } as Resource;
-
-    } catch (error) {
-        console.error("Error fetching resource by id:", error);
-        return null;
-    }
-}
-
-export async function addResource(resourceData: Omit<Resource, 'id' | 'createdAt'>) {
-    if (!db) throw new Error("Firestore is not initialized.");
-
-    const newResource = {
-        ...resourceData,
-        createdAt: serverTimestamp(),
-    };
-    
-    await addDoc(collection(db, 'resources'), newResource);
-    revalidatePath('/dashboard/resources');
-    revalidatePath('/resources');
-}
-
-export async function updateResource(id: string, resourceData: Partial<Omit<Resource, 'id' | 'createdAt'>>) {
-    if (!db) throw new Error("Firestore is not initialized.");
-    
-    const resourceRef = doc(db, 'resources', id);
-    await updateDoc(resourceRef, resourceData);
-
-    revalidatePath('/dashboard/resources');
-    revalidatePath('/resources');
-}
-
-export async function deleteResource(id: string) {
-    if (!db) throw new Error("Firestore is not initialized.");
-    
-    const resourceRef = doc(db, 'resources', id);
-    await deleteDoc(resourceRef);
-
-    revalidatePath('/dashboard/resources');
-    revalidatePath('/resources');
-}
+Obrigado pelo seu tempo e atenção. Sem pressa, quando tiver um tempo para analisar e implementar, será ótimo.
