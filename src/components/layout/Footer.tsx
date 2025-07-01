@@ -13,7 +13,7 @@ export function Footer() {
               <span className="font-bold font-headline">Fine Coding</span>
             </Link>
             <p className="text-center text-sm text-muted-foreground md:text-left">
-              Uma iniciativa{' '}
+              An initiative by{' '}
               <a
                 href="https://beregenerativelife.wordpress.com/"
                 target="_blank"
