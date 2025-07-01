@@ -17,3 +17,22 @@ export interface Comment {
   comment: string;
   createdAt: Date;
 }
+
+// --- New Types for Resources ---
+
+export const resourceCategories = ['AI & Machine Learning', 'Developer Tools', 'DevOps & Hosting', 'Productivity', 'Books & Courses', 'UI & Design'] as const;
+export type ResourceCategory = typeof resourceCategories[number];
+
+export const pricingModels = ['Free', 'Free Tier', 'Paid', 'Open Source'] as const;
+export type PricingModel = typeof pricingModels[number];
+
+export interface Resource {
+  id?: string;
+  name: string;
+  description: string;
+  link: string;
+  category: ResourceCategory;
+  pricing: PricingModel;
+  icon?: string; // Optional: for a lucide-react icon
+  createdAt: Date;
+}
