@@ -375,41 +375,26 @@ body {
 
 /* Glowing Button from Uiverse.io - Adapted for Theming */
 .glowing-btn {
-  /* Default (Light Theme) variables */
+  /* Base styles for both themes */
   --glow-color: hsl(var(--primary));
-  --glow-spread-color: hsl(var(--primary) / 0.75);
- 
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
   text-decoration: none;
-
-  border: .25em solid var(--glow-color);
   padding: 1em 3em;
-  color: var(--glow-color);
   font-size: 13px;
   font-weight: bold;
-  background-color: hsl(var(--background));
   border-radius: 1em;
   outline: none;
-  /* Reduced glow for light theme for subtlety */
-  box-shadow: 0 0 0.5em 0.125em var(--glow-color),
-         0 0 1em 0.25em var(--glow-spread-color),
-         inset 0 0 0.25em 0.125em var(--glow-color);
-  text-shadow: 0 0 .25em var(--glow-color);
   position: relative;
   transition: all 0.3s;
-}
 
-.dark .glowing-btn {
-  /* Override for Dark Theme for a more prominent glow */
-  --glow-color: hsl(151 45% 45%); /* Brighter green for dark mode */
-  --glow-spread-color: hsl(151 45% 45% / 0.78);
-  /* Full glow for dark mode */
-  box-shadow: 0 0 1em .25em var(--glow-color),
-         0 0 4em 1em var(--glow-spread-color),
-         inset 0 0 .75em .25em var(--glow-color);
-  text-shadow: 0 0 .5em var(--glow-color);
+  /* Light theme specific styles */
+  border: .25em solid var(--glow-color);
+  color: var(--glow-color);
+  background-color: transparent;
+  box-shadow: none;
+  text-shadow: none;
 }
 
 .glowing-btn svg {
@@ -417,9 +402,38 @@ body {
   width: 1em;
 }
 
+/* Light theme hover: fill with accent color */
+.glowing-btn:hover {
+  color: hsl(var(--accent-foreground));
+  background-color: hsl(var(--accent));
+  border-color: hsl(var(--accent));
+  box-shadow: none;
+}
+
+/* Light theme active state */
+.glowing-btn:active {
+  box-shadow: none;
+}
+
+/* Ensure no ::after in light mode */
 .glowing-btn::after {
+  content: none;
+}
+
+/* --- Dark Theme Overrides --- */
+
+.dark .glowing-btn {
+  --glow-spread-color: hsl(151 45% 45% / 0.78);
+  background-color: hsl(var(--background));
+  box-shadow: 0 0 1em .25em var(--glow-color),
+         0 0 4em 1em var(--glow-spread-color),
+         inset 0 0 .75em .25em var(--glow-color);
+  text-shadow: 0 0 .5em var(--glow-color);
+}
+
+.dark .glowing-btn::after {
   pointer-events: none;
-  content: "";
+  content: ""; /* Re-enable content for dark mode */
   position: absolute;
   top: 120%;
   left: 0;
@@ -431,15 +445,16 @@ body {
   transform: perspective(1.5em) rotateX(35deg) scale(1, .6);
 }
 
-.glowing-btn:hover {
+.dark .glowing-btn:hover {
   color: hsl(var(--primary-foreground));
   background-color: var(--glow-color);
+  border-color: var(--glow-color);
   box-shadow: 0 0 1em .25em var(--glow-color),
          0 0 4em 2em var(--glow-spread-color),
          inset 0 0 .75em .25em var(--glow-color);
 }
 
-.glowing-btn:active {
+.dark .glowing-btn:active {
   box-shadow: 0 0 0.6em .25em var(--glow-color),
          0 0 2.5em 2em var(--glow-spread-color),
          inset 0 0 .5em .25em var(--glow-color);
