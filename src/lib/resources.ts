@@ -1053,7 +1053,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     icon: 'Zap',
     createdAt: new Date('2024-05-19T05:10:00Z'),
   },
-  
+
   // Books & Courses
   {
     name: '"Clean Code" by Robert C. Martin',
@@ -1616,4 +1616,3 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     createdAt: new Date('2024-05-17T05:50:00Z'),
   },
 ];
-Obrigado pelo seu tempo e atenção. Sem pressa, quando tiver um tempo para analisar e implementar, será ótimo.
