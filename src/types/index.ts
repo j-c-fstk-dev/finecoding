@@ -33,6 +33,6 @@ export interface Resource {
   link: string;
   category: ResourceCategory;
   pricing: PricingModel;
-  icon?: string; // Optional: for a lucide-react icon
+  icon?: string; // Optional: for a lucide-react icon name e.g., 'BrainCircuit'
   createdAt: Date;
 }
