@@ -4,7 +4,7 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut, type User, type Auth } from 'firebase/auth';
 import { firebaseApp } from '@/lib/firebase';
-import { Loader2 } from 'lucide-react';
+import { LoadingSpinner } from '@/components/layout/LoadingSpinner';
 
 let auth: Auth | null = null;
 if (firebaseApp) {
@@ -31,7 +31,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (!auth) {
       setLoading(false);
-      // You could render an error message to the user here
       return;
     }
 
@@ -59,7 +58,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     <AuthContext.Provider value={value}>
       {loading ? (
         <div className="flex h-screen items-center justify-center bg-background">
-          <Loader2 className="h-12 w-12 animate-spin text-primary" />
+          <LoadingSpinner />
         </div>
       ) : (
         children
@@ -89,7 +88,7 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
   if (loading || !user) {
     return (
       <div className="flex h-screen items-center justify-center bg-background">
-        <Loader2 className="h-12 w-12 animate-spin text-primary" />
+        <LoadingSpinner />
       </div>
     );
   }

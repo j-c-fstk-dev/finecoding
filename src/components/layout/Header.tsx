@@ -3,12 +3,13 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import { Code2, Menu } from 'lucide-react';
+import { Menu } from 'lucide-react';
 import { ThemeSwitch } from '@/components/ui/ThemeSwitch';
 import { useState, useEffect, useRef } from 'react';
 import { Sheet, SheetContent, SheetTrigger, SheetClose } from '@/components/ui/sheet';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Button } from '@/components/ui/button';
+import { IconFC } from '../icons/IconFC';
 
 const navLinks = [
   { href: '/', label: 'Home' },
@@ -57,7 +58,7 @@ export function Header() {
         <div className="mb-4 flex items-center justify-center">
           <Link href="/" className="flex items-center space-x-2">
             <span className={cn('glitch-icon', { 'is-glitching': isGlitching })}>
-                <Code2 className="h-8 w-8 text-primary transition-colors" />
+                <IconFC className="h-8 w-8 text-primary transition-colors" />
             </span>
             <span className="font-headline text-2xl font-bold sm:text-3xl">
               Fine{' '}
@@ -119,7 +120,7 @@ export function Header() {
                     <div className="mb-8">
                        <Link href="/" className="flex items-center space-x-2" onClick={() => setIsMobileMenuOpen(false)}>
                           <span className={cn('glitch-icon', { 'is-glitching': isGlitching })}>
-                              <Code2 className="h-6 w-6 text-primary" />
+                              <IconFC className="h-6 w-6 text-primary" />
                           </span>
                           <span className="font-headline text-xl font-bold">
                             Fine{' '}

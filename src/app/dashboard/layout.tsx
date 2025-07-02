@@ -7,7 +7,8 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { ThemeSwitch } from "@/components/ui/ThemeSwitch";
-import { Code2, LogOut, Menu, Newspaper, Library } from "lucide-react";
+import { IconFC } from "@/components/icons/IconFC";
+import { LogOut, Menu, Newspaper, Library } from "lucide-react";
 
 const navItems = [
     { href: "/dashboard", label: "Posts", icon: Newspaper },
@@ -48,7 +49,7 @@ function DashboardLayout({ children }: { children: React.ReactNode }) {
                 <div className="flex h-full max-h-screen flex-col gap-2">
                     <div className="flex h-14 items-center border-b px-4 lg:h-[60px] lg:px-6">
                         <Link href="/dashboard" className="flex items-center gap-2 font-semibold font-headline">
-                            <Code2 className="h-6 w-6 text-primary" />
+                            <IconFC className="h-6 w-6 text-primary" />
                             <span>Dashboard</span>
                         </Link>
                     </div>

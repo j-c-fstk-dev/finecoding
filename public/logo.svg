@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160">
+    <g stroke="#2C6E49" fill="none">
+        <circle cx="80" cy="80" r="75" stroke-width="3" />
+        <circle cx="80" cy="80" r="71" stroke-width="1" />
+        <g stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M45 40 v 80 M45 75 h 30" />
+            <path d="M45 48 h -8" />
+            <path d="M45 60 h -8" />
+            <path d="M45 90 h -8" />
+            <path d="M45 102 h -8" />
+            <path d="M45 114 h -8" />
+            <path d="M55 75 v -8" />
+            <path d="M65 75 v -8" />
+        </g>
+        <g fill="#2C6E49">
+            <circle cx="45" cy="40" r="2.5" />
+            <circle cx="45" cy="75" r="2.5" />
+            <circle cx="75" cy="75" r="2.5" />
+            <circle cx="45" cy="120" r="2.5" />
+            <circle cx="37" cy="48" r="1.5" />
+            <circle cx="37" cy="60" r="1.5" />
+            <circle cx="37" cy="90" r="1.5" />
+            <circle cx="37" cy="102" r="1.5" />
+            <circle cx="37" cy="114" r="1.5" />
+            <circle cx="55" cy="67" r="1.5" />
+            <circle cx="65" cy="67" r="1.5" />
+        </g>
+        <path d="M125 45 A 35 35 90 0 0 125 115" stroke-width="12" stroke-linecap="round" />
+    </g>
+    <text x="105" y="86" font-family="monospace" font-size="20" fill="#2C6E49" font-weight="bold">&lt;/&gt;</text>
+</svg>
