@@ -12,6 +12,16 @@ jest.mock('firebase/firestore', () => ({
   collection: jest.fn(),
   query: jest.fn(),
   orderBy: jest.fn(),
+  doc: jest.fn(),
+  where: jest.fn(),
+  limit: jest.fn(),
+  increment: jest.fn(),
+  deleteDoc: jest.fn(),
+  updateDoc: jest.fn(),
+  addDoc: jest.fn(),
+  getDoc: jest.fn(),
+  Timestamp: { fromDate: jest.fn() },
+  serverTimestamp: jest.fn(),
 }));
 
 // Type assertion for the mocked functions
@@ -21,10 +31,7 @@ describe('Resource Library Functions', () => {
 
   beforeEach(() => {
     // Clear all mocks before each test
-    mockedGetDocs.mockClear();
-    (collection as jest.Mock).mockClear();
-    (query as jest.Mock).mockClear();
-    (orderBy as jest.Mock).mockClear();
+    jest.clearAllMocks();
   });
 
   describe('getResources', () => {
