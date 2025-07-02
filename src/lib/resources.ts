@@ -30,7 +30,7 @@ export async function getResources(): Promise<Resource[]> {
     const q = query(resourcesCollection, orderBy('createdAt', 'desc'));
     const querySnapshot = await getDocs(q);
 
-    // If the database is missing items, perform a full reset and repopulate.
+    // If the database is missing items or is outdated, perform a full reset and repopulate.
     // This ensures the DB is always in sync with the sample data list.
     if (querySnapshot.docs.length < sampleResources.length) {
       console.log("Resource list is outdated or incomplete, repopulating with full data...");
@@ -147,7 +147,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
   // AI & Machine Learning - Paid
   {
     name: 'OpenAI GPT-4 API',
-    description: "Access to the API of OpenAI's most advanced language model for various applications, from text generation to analysis.",
+    description: 'Access to the API of OpenAI\'s most advanced language model for various applications, from text generation to analysis.',
     link: 'https://openai.com/gpt-4/',
     category: 'AI & Machine Learning',
     pricing: 'Paid',
@@ -1743,4 +1743,4 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     createdAt: new Date('2024-05-17T05:50:00Z'),
   },
 ];
-Obrigado pelo seu tempo e atenção. Sem pressa, quando tiver um tempo para analisar e implementar, será ótimo.
+
