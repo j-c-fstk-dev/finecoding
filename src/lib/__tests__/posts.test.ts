@@ -1,0 +1,95 @@
+import { getPosts } from '../posts';
+import { getDocs, collection, query, orderBy, Timestamp } from 'firebase/firestore';
+
+// Mock the entire 'firebase/firestore' module and the db object
+jest.mock('@/lib/firebase', () => ({
+  db: {}, // Provide a mock db object
+}));
+
+jest.mock('firebase/firestore', () => ({
+  ...jest.requireActual('firebase/firestore'),
+  getDocs: jest.fn(),
+  collection: jest.fn(),
+  query: jest.fn(),
+  orderBy: jest.fn(),
+}));
+
+// Type assertion for the mocked functions
+const mockedGetDocs = getDocs as jest.Mock;
+
+describe('Post Library Functions', () => {
+
+  beforeEach(() => {
+    // Clear all mocks before each test
+    mockedGetDocs.mockClear();
+    (collection as jest.Mock).mockClear();
+    (query as jest.Mock).mockClear();
+    (orderBy as jest.Mock).mockClear();
+  });
+
+  describe('getPosts', () => {
+    it('should return an array of posts on successful fetch', async () => {
+      // Arrange: Set up the mock return value for getDocs
+      const mockDate = new Date();
+      const mockTimestamp = Timestamp.fromDate(mockDate);
+
+      const mockDocs = {
+        docs: [
+          {
+            id: '1',
+            data: () => ({
+              title: 'Test Post 1',
+              slug: 'test-post-1',
+              tags: ['testing', 'jest'],
+              excerpt: 'This is a test post.',
+              imageUrl: 'http://example.com/image.png',
+              imageHint: 'test image',
+              likes: 10,
+              content: 'test content',
+              date: mockTimestamp,
+            }),
+          },
+        ],
+      };
+      mockedGetDocs.mockResolvedValue(mockDocs);
+
+      // Act: Call the function we are testing
+      const posts = await getPosts();
+
+      // Assert: Check if the function returned the correct data
+      expect(posts).toHaveLength(1);
+      expect(posts[0].title).toBe('Test Post 1');
+      expect(posts[0].date).toEqual(mockDate); // The function should convert Timestamp to Date
+      expect(collection).toHaveBeenCalledWith(expect.anything(), 'posts');
+      expect(orderBy).toHaveBeenCalledWith('date', 'desc');
+    });
+
+    it('should return an empty array when Firestore returns no documents', async () => {
+        // Arrange
+        mockedGetDocs.mockResolvedValue({ docs: [] });
+
+        // Act
+        const posts = await getPosts();
+
+        // Assert
+        expect(posts).toEqual([]);
+    });
+
+    it('should return an empty array and log an error on failure', async () => {
+        // Arrange
+        const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+        const error = new Error('Firestore connection failed');
+        mockedGetDocs.mockRejectedValue(error);
+
+        // Act
+        const posts = await getPosts();
+
+        // Assert
+        expect(posts).toEqual([]);
+        expect(consoleErrorSpy).toHaveBeenCalledWith("Error fetching posts:", error);
+        
+        // Clean up spy
+        consoleErrorSpy.mockRestore();
+    });
+  });
+});
