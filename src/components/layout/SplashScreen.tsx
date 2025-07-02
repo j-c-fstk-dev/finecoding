@@ -20,7 +20,6 @@ export function SplashScreen() {
                     width={256}
                     height={256}
                     priority={true}
-                    unoptimized={true} // Using unoptimized because this is a critical, static asset
                     data-ai-hint="logo tech"
                 />
             </div>
