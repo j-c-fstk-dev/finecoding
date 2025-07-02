@@ -1,5 +1,5 @@
 import { getPosts } from '../posts';
-import { getDocs, collection, query, orderBy, Timestamp } from 'firebase/firestore';
+import { getDocs, collection, query, orderBy } from 'firebase/firestore';
 
 // Mock the entire 'firebase/firestore' module and the db object
 jest.mock('@/lib/firebase', () => ({
@@ -7,11 +7,11 @@ jest.mock('@/lib/firebase', () => ({
 }));
 
 jest.mock('firebase/firestore', () => ({
-  ...jest.requireActual('firebase/firestore'),
   getDocs: jest.fn(),
   collection: jest.fn(),
   query: jest.fn(),
   orderBy: jest.fn(),
+  // We don't need to mock Timestamp if we construct the mock data correctly
 }));
 
 // Type assertion for the mocked functions
@@ -29,10 +29,8 @@ describe('Post Library Functions', () => {
 
   describe('getPosts', () => {
     it('should return an array of posts on successful fetch', async () => {
-      // Arrange: Set up the mock return value for getDocs
+      // Arrange
       const mockDate = new Date();
-      const mockTimestamp = Timestamp.fromDate(mockDate);
-
       const mockDocs = {
         docs: [
           {
@@ -46,20 +44,20 @@ describe('Post Library Functions', () => {
               imageHint: 'test image',
               likes: 10,
               content: 'test content',
-              date: mockTimestamp,
+              date: { toDate: () => mockDate }, // Simple mock for Timestamp
             }),
           },
         ],
       };
       mockedGetDocs.mockResolvedValue(mockDocs);
 
-      // Act: Call the function we are testing
+      // Act
       const posts = await getPosts();
 
-      // Assert: Check if the function returned the correct data
+      // Assert
       expect(posts).toHaveLength(1);
       expect(posts[0].title).toBe('Test Post 1');
-      expect(posts[0].date).toEqual(mockDate); // The function should convert Timestamp to Date
+      expect(posts[0].date).toEqual(mockDate);
       expect(collection).toHaveBeenCalledWith(expect.anything(), 'posts');
       expect(orderBy).toHaveBeenCalledWith('date', 'desc');
     });

@@ -1,5 +1,5 @@
 import { getResources } from '../resources';
-import { getDocs, collection, query, orderBy, Timestamp } from 'firebase/firestore';
+import { getDocs, collection, query, orderBy } from 'firebase/firestore';
 import type { ResourceCategory, PricingModel } from '@/types';
 
 // Mock the entire 'firebase/firestore' module and the db object
@@ -8,7 +8,6 @@ jest.mock('@/lib/firebase', () => ({
 }));
 
 jest.mock('firebase/firestore', () => ({
-  ...jest.requireActual('firebase/firestore'),
   getDocs: jest.fn(),
   collection: jest.fn(),
   query: jest.fn(),
@@ -32,8 +31,6 @@ describe('Resource Library Functions', () => {
     it('should return an array of resources on successful fetch', async () => {
       // Arrange
       const mockDate = new Date();
-      const mockTimestamp = Timestamp.fromDate(mockDate);
-
       const mockDocs = {
         docs: [
           {
@@ -45,7 +42,7 @@ describe('Resource Library Functions', () => {
               category: 'Developer Tools' as ResourceCategory,
               pricing: 'Free' as PricingModel,
               favorites: 5,
-              createdAt: mockTimestamp,
+              createdAt: { toDate: () => mockDate }, // Simple mock for Timestamp
             }),
           },
         ],
