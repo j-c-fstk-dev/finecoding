@@ -35,4 +35,12 @@ export interface Resource {
   pricing: PricingModel;
   icon?: string; // Optional: for a lucide-react icon name e.g., 'BrainCircuit'
   createdAt: Date;
+  favorites: number;
+}
+
+export interface ResourceComment {
+  id: string;
+  name: string;
+  comment: string;
+  createdAt: Date;
 }

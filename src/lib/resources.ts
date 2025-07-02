@@ -15,6 +15,7 @@ import {
   Timestamp,
   serverTimestamp,
   query,
+  increment,
 } from 'firebase/firestore';
 import { revalidatePath } from 'next/cache';
 
@@ -62,9 +63,10 @@ export async function getResourceById(id: string): Promise<Resource | null> {
     }
 }
 
-export async function addResource(resourceData: Omit<Resource, 'id' | 'createdAt'>) {
+export async function addResource(resourceData: Omit<Resource, 'id' | 'createdAt' | 'favorites'>) {
     const newResource = {
         ...resourceData,
+        favorites: 0,
         createdAt: serverTimestamp(),
     };
     
@@ -74,7 +76,7 @@ export async function addResource(resourceData: Omit<Resource, 'id' | 'createdAt
     revalidatePath('/dashboard/resources');
 }
 
-export async function updateResource(id: string, resourceData: Partial<Resource>) {
+export async function updateResource(id: string, resourceData: Partial<Omit<Resource, 'favorites'>>) {
     const resourceRef = doc(db, 'resources', id);
     await updateDoc(resourceRef, resourceData);
     revalidatePath('/resources');
@@ -86,4 +88,12 @@ export async function deleteResource(id: string) {
     await deleteDoc(resourceRef);
     revalidatePath('/resources');
     revalidatePath('/dashboard/resources');
+}
+
+export async function likeResource(id: string) {
+    const resourceRef = doc(db, 'resources', id);
+    await updateDoc(resourceRef, {
+        favorites: increment(1)
+    });
+    revalidatePath('/resources');
 }
