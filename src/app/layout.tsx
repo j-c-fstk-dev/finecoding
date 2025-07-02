@@ -16,22 +16,14 @@ export default function RootLayout({
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // This helps prevent the splash screen from showing on every page navigation
-    // in development with fast refresh. In production, it runs once.
-    if (sessionStorage.getItem('splashSeen')) {
-      setIsLoading(false);
-      return;
-    }
-
+    // This simplified logic ensures the splash screen always shows for a brief period on load,
+    // avoiding hydration issues with sessionStorage.
     const timer = setTimeout(() => {
       setIsLoading(false);
-      if (typeof window !== 'undefined') {
-        sessionStorage.setItem('splashSeen', 'true');
-      }
-    }, 3000); // 3 seconds delay
+    }, 2500); // A bit shorter duration
 
     return () => clearTimeout(timer);
-  }, []);
+  }, []); // Empty dependency array ensures this runs only once on mount.
   
   return (
     <html lang="en" suppressHydrationWarning>
@@ -50,19 +42,21 @@ export default function RootLayout({
       <body className="font-body antialiased">
         <AuthProvider>
           <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
-            <AnimatePresence>
-              {isLoading && <SplashScreen />}
+            {/* Using AnimatePresence to handle the transition between the splash screen and the main content */}
+            <AnimatePresence mode="wait">
+              {isLoading ? (
+                <SplashScreen key="splash" />
+              ) : (
+                <motion.div
+                  key="content"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.75, ease: 'easeInOut' }}
+                >
+                  {children}
+                </motion.div>
+              )}
             </AnimatePresence>
-             
-            {!isLoading && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.75, ease: 'easeInOut' }}
-              >
-                {children}
-              </motion.div>
-            )}
             <Toaster />
           </ThemeProvider>
         </AuthProvider>
