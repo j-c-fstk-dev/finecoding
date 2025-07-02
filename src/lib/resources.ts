@@ -30,22 +30,31 @@ export async function getResources(): Promise<Resource[]> {
     const q = query(resourcesCollection, orderBy('createdAt', 'desc'));
     const querySnapshot = await getDocs(q);
 
-    // If the database is empty, populate it with sample data.
-    if (querySnapshot.empty && sampleResources.length > 0) {
-      console.log("No resources found, populating with sample data...");
+    // If the database is missing items, perform a full reset and repopulate.
+    // This ensures the DB is always in sync with the sample data list.
+    if (querySnapshot.docs.length < sampleResources.length) {
+      console.log("Resource list is outdated or incomplete, repopulating with full data...");
       const batch = writeBatch(db);
+      
+      // First, delete all existing documents to prevent duplicates.
+      querySnapshot.docs.forEach(existingDoc => {
+        batch.delete(existingDoc.ref);
+      });
+
+      // Then, add all the new sample resources.
       sampleResources.forEach(resource => {
         const docRef = doc(collection(db, 'resources'));
         const dataWithTimestamp = {
             ...resource,
-            createdAt: Timestamp.fromDate(resource.createdAt || new Date()),
+            createdAt: resource.createdAt ? Timestamp.fromDate(new Date(resource.createdAt)) : serverTimestamp(),
         };
         batch.set(docRef, dataWithTimestamp);
       });
+      
       await batch.commit();
-      console.log("Sample data populated.");
+      console.log("Full resource list populated successfully.");
 
-      // Re-fetch after populating
+      // Re-fetch after populating to return the correct data.
       const newQuerySnapshot = await getDocs(q);
       const resources = newQuerySnapshot.docs.map(doc => {
         const data = doc.data();
@@ -58,6 +67,7 @@ export async function getResources(): Promise<Resource[]> {
       return resources;
     }
     
+    // If the database is already up-to-date, map and return the existing documents.
     const resources = querySnapshot.docs.map(doc => {
       const data = doc.data();
       return {
@@ -134,7 +144,7 @@ export async function deleteResource(id: string) {
 }
 
 const sampleResources: Omit<Resource, 'id'>[] = [
-  // AI & Machine Learning
+  // AI & Machine Learning - Paid
   {
     name: 'OpenAI GPT-4 API',
     description: "Access to the API of OpenAI's most advanced language model for various applications, from text generation to analysis.",
@@ -225,6 +235,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     icon: 'BrainCircuit',
     createdAt: new Date('2024-05-22T08:30:00Z'),
   },
+  // AI & Machine Learning - Free Tier
   {
     name: 'Google Colab',
     description: 'Allows you to write and execute Python code in your browser, with free access to GPUs and TPUs for ML.',
@@ -315,6 +326,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     icon: 'BrainCircuit',
     createdAt: new Date('2024-05-22T06:50:00Z'),
   },
+  // AI & Machine Learning - Open Source
   {
     name: 'TensorFlow',
     description: 'A complete open-source library for machine learning, developed by Google, widely used for research and production.',
@@ -406,7 +418,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     createdAt: new Date('2024-05-22T05:10:00Z'),
   },
 
-  // Developer Tools
+  // Developer Tools - Paid
   {
     name: 'JetBrains IntelliJ IDEA Ultimate',
     description: 'A powerful IDE for Java, Kotlin, Scala, and other languages, with advanced features for Spring, databases, etc.',
@@ -497,6 +509,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     icon: 'TerminalSquare',
     createdAt: new Date('2024-05-21T08:30:00Z'),
   },
+  // Developer Tools - Free Tier
   {
     name: 'Postman (Free Tier)',
     description: 'Allows basic use for individuals and small teams, including API collections, testing, and limited documentation.',
@@ -560,6 +573,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     icon: 'TerminalSquare',
     createdAt: new Date('2024-05-21T07:20:00Z'),
   },
+  // Developer Tools - Open Source
   {
     name: 'VS Code (Visual Studio Code)',
     description: 'A lightweight yet powerful source-code editor with support for thousands of extensions, making it extremely versatile for any language.',
@@ -651,7 +665,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     createdAt: new Date('2024-05-21T05:40:00Z'),
   },
   
-  // DevOps & Hosting
+  // DevOps & Hosting - Paid
   {
     name: 'AWS (Amazon Web Services)',
     description: "The world's largest cloud platform, offering a vast range of services for computing, storage, databases, analytics, machine learning, and more.",
@@ -742,6 +756,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     icon: 'Server',
     createdAt: new Date('2024-05-20T08:30:00Z'),
   },
+  // DevOps & Hosting - Free Tier
   {
     name: 'Netlify',
     description: 'Offers a generous free plan for hosting static sites and SPAs, with CI/CD, HTTPS, and limited serverless functions.',
@@ -823,6 +838,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     icon: 'Server',
     createdAt: new Date('2024-05-20T07:00:00Z'),
   },
+  // DevOps & Hosting - Open Source
   {
     name: 'Jenkins',
     description: 'A leading open-source automation server for CI/CD, flexible and with thousands of plugins.',
@@ -896,7 +912,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     createdAt: new Date('2024-05-20T05:40:00Z'),
   },
   
-  // Productivity
+  // Productivity - Paid
   {
     name: 'Notion',
     description: 'An all-in-one workspace for notes, project management, databases, wikis, and collaboration, widely used by developers and teams.',
@@ -970,15 +986,6 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     createdAt: new Date('2024-05-19T08:50:00Z'),
   },
   {
-    name: 'Figma (Professional/Organization Plans)',
-    description: 'While it has a free tier, paid plans offer advanced collaboration, prototyping, and design system features for larger teams.',
-    link: 'https://www.figma.com/pricing/',
-    category: 'Productivity',
-    pricing: 'Paid',
-    icon: 'Palette',
-    createdAt: new Date('2024-05-19T08:40:00Z'),
-  },
-  {
     name: 'Linear',
     description: 'An issue tracker and project management tool focused on high-performance software teams, known for its speed and simplicity.',
     link: 'https://linear.app/',
@@ -987,6 +994,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     icon: 'Zap',
     createdAt: new Date('2024-05-19T08:30:00Z'),
   },
+  // Productivity - Free Tier
   {
     name: 'Asana (Basic Plan)',
     description: 'A project and task management tool that allows teams to organize, track, and manage their work. The basic plan is free for smaller teams.',
@@ -1077,6 +1085,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     icon: 'Zap',
     createdAt: new Date('2024-05-19T06:50:00Z'),
   },
+  // Productivity - Open Source
   {
     name: 'Joplin',
     description: 'An open-source note-taking and to-do list app with cloud sync and Markdown support.',
@@ -1168,7 +1177,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     createdAt: new Date('2024-05-19T05:10:00Z'),
   },
 
-  // Books & Courses
+  // Books & Courses - Paid
   {
     name: '"Clean Code" by Robert C. Martin',
     description: 'A classic book that covers the principles of writing clean, maintainable code.',
@@ -1295,6 +1304,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     icon: 'BookOpen',
     createdAt: new Date('2024-05-18T07:50:00Z'),
   },
+  // Books & Courses - Free Tier
   {
     name: 'freeCodeCamp',
     description: 'Offers thousands of hours of interactive programming content and free certifications in web development, data science, and more.',
@@ -1376,6 +1386,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     icon: 'BookOpen',
     createdAt: new Date('2024-05-18T06:20:00Z'),
   },
+  // Books & Courses - Open Source
   {
     name: 'The Odin Project',
     description: 'An open-source full-stack web development curriculum, with a focus on Ruby on Rails or JavaScript/React, that guides students through practical projects.',
@@ -1494,7 +1505,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     createdAt: new Date('2024-05-18T04:10:00Z'),
   },
   
-  // UI & Design
+  // UI & Design - Paid
   {
     name: 'Figma (Professional/Organization Plans)',
     description: 'A collaborative design platform for creating user interfaces, prototypes, and design systems. Paid plans offer advanced features for teams.',
@@ -1585,6 +1596,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     icon: 'Palette',
     createdAt: new Date('2024-05-17T08:30:00Z'),
   },
+  // UI & Design - Free Tier
   {
     name: 'Figma (Starter Plan)',
     description: 'Offers a free plan for individual use with essential design and prototyping features.',
@@ -1648,6 +1660,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     icon: 'Palette',
     createdAt: new Date('2024-05-17T07:20:00Z'),
   },
+  // UI & Design - Open Source
   {
     name: 'GIMP (GNU Image Manipulation Program)',
     description: 'A powerful open-source image editor, a free alternative to Photoshop, for photo manipulation, image composition, and art creation.',
@@ -1730,3 +1743,4 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     createdAt: new Date('2024-05-17T05:50:00Z'),
   },
 ];
+Obrigado pelo seu tempo e atenção. Sem pressa, quando tiver um tempo para analisar e implementar, será ótimo.
