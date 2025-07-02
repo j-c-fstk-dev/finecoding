@@ -1,5 +1,5 @@
 import { getPosts } from '../posts';
-import { getDocs, collection, query, orderBy } from 'firebase/firestore';
+import { getDocs, collection, query, orderBy, where, limit, addDoc, updateDoc, deleteDoc, doc, Timestamp, serverTimestamp, increment } from 'firebase/firestore';
 
 // Mock the entire 'firebase/firestore' module and the db object
 jest.mock('@/lib/firebase', () => ({
@@ -19,7 +19,7 @@ jest.mock('firebase/firestore', () => ({
   updateDoc: jest.fn(),
   addDoc: jest.fn(),
   getDoc: jest.fn(),
-  Timestamp: { fromDate: jest.fn() },
+  Timestamp: { fromDate: (date: Date) => date },
   serverTimestamp: jest.fn(),
 }));
 
@@ -50,7 +50,7 @@ describe('Post Library Functions', () => {
               imageHint: 'test image',
               likes: 10,
               content: 'test content',
-              date: { toDate: () => mockDate }, // Simple mock for Timestamp
+              date: mockDate, // Firestore Timestamps are mocked to return Dates
             }),
           },
         ],

@@ -1,5 +1,5 @@
 import { getResources } from '../resources';
-import { getDocs, collection, query, orderBy } from 'firebase/firestore';
+import { getDocs, collection, query, orderBy, where, limit, addDoc, updateDoc, deleteDoc, doc, Timestamp, serverTimestamp, increment } from 'firebase/firestore';
 import type { ResourceCategory, PricingModel } from '@/types';
 
 // Mock the entire 'firebase/firestore' module and the db object
@@ -8,20 +8,20 @@ jest.mock('@/lib/firebase', () => ({
 }));
 
 jest.mock('firebase/firestore', () => ({
-  getDocs: jest.fn(),
-  collection: jest.fn(),
-  query: jest.fn(),
-  orderBy: jest.fn(),
-  doc: jest.fn(),
-  where: jest.fn(),
-  limit: jest.fn(),
-  increment: jest.fn(),
-  deleteDoc: jest.fn(),
-  updateDoc: jest.fn(),
-  addDoc: jest.fn(),
-  getDoc: jest.fn(),
-  Timestamp: { fromDate: jest.fn() },
-  serverTimestamp: jest.fn(),
+    getDocs: jest.fn(),
+    collection: jest.fn(),
+    query: jest.fn(),
+    orderBy: jest.fn(),
+    doc: jest.fn(),
+    where: jest.fn(),
+    limit: jest.fn(),
+    increment: jest.fn(),
+    deleteDoc: jest.fn(),
+    updateDoc: jest.fn(),
+    addDoc: jest.fn(),
+    getDoc: jest.fn(),
+    Timestamp: { fromDate: (date: Date) => date },
+    serverTimestamp: jest.fn(),
 }));
 
 // Type assertion for the mocked functions
@@ -49,7 +49,7 @@ describe('Resource Library Functions', () => {
               category: 'Developer Tools' as ResourceCategory,
               pricing: 'Free' as PricingModel,
               favorites: 5,
-              createdAt: { toDate: () => mockDate }, // Simple mock for Timestamp
+              createdAt: mockDate, // Firestore Timestamps are mocked to return Dates
             }),
           },
         ],
