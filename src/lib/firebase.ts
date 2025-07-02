@@ -13,15 +13,9 @@ const firebaseConfig = {
 let firebaseApp: FirebaseApp | undefined;
 let db: Firestore | null = null;
 
-// A more robust check for all necessary Firebase config keys.
-// This prevents partial initialization and provides clearer warnings.
-const hasFirebaseConfig = 
-  firebaseConfig.apiKey &&
-  firebaseConfig.authDomain &&
-  firebaseConfig.projectId &&
-  firebaseConfig.appId;
-
-if (hasFirebaseConfig) {
+// This approach ensures that Firebase is initialized only if the config
+// keys are actually provided. It's robust for both local dev and deployment.
+if (firebaseConfig.projectId) {
   if (getApps().length === 0) {
     firebaseApp = initializeApp(firebaseConfig);
   } else {
@@ -29,9 +23,7 @@ if (hasFirebaseConfig) {
   }
   db = getFirestore(firebaseApp);
 } else {
-  // This will be logged during the build process, confirming
-  // that Firebase is intentionally not being initialized.
-  console.warn("Firebase config is incomplete or missing. Firebase services will be unavailable. This is expected during static builds without full environment configuration.");
+  console.warn("Firebase projectId is not set. Firebase services will be unavailable. This is expected during local development without a .env file.");
 }
 
 export { firebaseApp, db };

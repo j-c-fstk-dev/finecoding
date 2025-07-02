@@ -9,8 +9,6 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
 import { format } from 'date-fns';
 import { DeletePostButton } from "@/components/admin/DeletePostButton";
 
-export const dynamic = 'force-dynamic';
-
 export default async function DashboardPage() {
     const posts = await getPosts();
 

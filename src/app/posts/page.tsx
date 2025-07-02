@@ -3,8 +3,6 @@ import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { FilterablePostGrid } from '@/components/blog/FilterablePostGrid';
 
-export const dynamic = 'force-dynamic';
-
 export default async function AllPostsPage() {
   const posts = await getPosts();
   const allTags = [...new Set(posts.flatMap(post => post.tags))].sort();

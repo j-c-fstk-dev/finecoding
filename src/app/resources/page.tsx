@@ -4,8 +4,6 @@ import { Footer } from '@/components/layout/Footer';
 import { FilterableResourceList } from '@/components/resources/FilterableResourceList';
 import { WishlistForm } from '@/components/resources/WishlistForm';
 
-export const dynamic = 'force-dynamic';
-
 export default async function ResourcesPage() {
   const resources = await getResources();
 
