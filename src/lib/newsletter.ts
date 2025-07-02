@@ -10,16 +10,16 @@ const SubscribeSchema = z.object({
   email: z.string().email(),
 });
 
-export async function subscribeToNewsletter(email: string) {
-  if (!db) {
-    console.warn('Firebase is not initialized. Newsletter subscription is disabled during build.');
-    return { error: 'Service is temporarily unavailable.' };
-  }
-  
-  const result = SubscribeSchema.safeParse({ email });
+export async function subscribeToNewsletter(email: string): Promise<{ success: boolean; error?: string }> {
+  const validationResult = SubscribeSchema.safeParse({ email });
 
-  if (!result.success) {
-    return { error: 'Invalid email address.' };
+  if (!validationResult.success) {
+    return { success: false, error: 'Invalid email address.' };
+  }
+
+  if (!db) {
+    console.warn('Firebase is not initialized. Newsletter subscription is disabled.');
+    return { success: false, error: 'Service is temporarily unavailable. Please configure your environment variables.' };
   }
 
   try {
@@ -30,7 +30,7 @@ export async function subscribeToNewsletter(email: string) {
     const q = query(newsletterCollection, where('email', '==', email));
     const querySnapshot = await getDocs(q);
     if (!querySnapshot.empty) {
-      return { error: 'This email is already subscribed.' };
+      return { success: false, error: 'This email is already subscribed.' };
     }
 
     await addDoc(newsletterCollection, {
@@ -61,6 +61,6 @@ export async function subscribeToNewsletter(email: string) {
     return { success: true };
   } catch (error) {
     console.error('Error subscribing to newsletter:', error);
-    return { error: 'An unexpected error occurred. Please try again later.' };
+    return { success: false, error: 'An unexpected error occurred. Please try again later.' };
   }
 }

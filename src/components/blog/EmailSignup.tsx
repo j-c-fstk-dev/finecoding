@@ -27,7 +27,7 @@ export function EmailSignup() {
     const result = await subscribeToNewsletter(email);
     setIsLoading(false);
 
-    if (result.success) {
+    if (result?.success) {
       toast({
         title: 'Subscription successful!',
         description: `Thanks for subscribing, ${email}.`,
@@ -36,7 +36,7 @@ export function EmailSignup() {
     } else {
       toast({
         title: 'Subscription Failed',
-        description: result.error || 'An unexpected error occurred.',
+        description: result?.error || 'An unexpected error occurred.',
         variant: 'destructive',
       });
     }
