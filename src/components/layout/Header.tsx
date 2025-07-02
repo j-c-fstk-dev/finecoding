@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import { Menu } from 'lucide-react';
+import { Menu, CodeXml } from 'lucide-react';
 import { ThemeSwitch } from '@/components/ui/ThemeSwitch';
 import { useState, useEffect, useRef } from 'react';
 import { Sheet, SheetContent, SheetTrigger, SheetClose } from '@/components/ui/sheet';
@@ -58,7 +58,7 @@ export function Header() {
         <div className="mb-4 flex items-center justify-center">
           <Link href="/" className="flex items-center space-x-2">
             <span className={cn('glitch-icon', { 'is-glitching': isGlitching })}>
-                <IconFC className="h-8 w-8 text-primary transition-colors" />
+                <CodeXml className="h-8 w-8 text-primary transition-colors" />
             </span>
             <span className="font-headline text-2xl font-bold sm:text-3xl">
               Fine{' '}
@@ -120,7 +120,7 @@ export function Header() {
                     <div className="mb-8">
                        <Link href="/" className="flex items-center space-x-2" onClick={() => setIsMobileMenuOpen(false)}>
                           <span className={cn('glitch-icon', { 'is-glitching': isGlitching })}>
-                              <IconFC className="h-6 w-6 text-primary" />
+                              <CodeXml className="h-6 w-6 text-primary" />
                           </span>
                           <span className="font-headline text-xl font-bold">
                             Fine{' '}

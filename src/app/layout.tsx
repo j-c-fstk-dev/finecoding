@@ -37,8 +37,7 @@ export default function RootLayout({
     return () => clearTimeout(timer);
   }, []);
   
-  // A simplified SVG for the favicon to keep the data URI small
-  const faviconSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><g stroke="%232C6E49" fill="none"><circle cx="50" cy="50" r="48" stroke-width="3"/><path d="M30 25 v 50 M30 50 h 20" stroke-width="4.5" stroke-linecap="round"/><path d="M80 28 A 22 22 90 0 0 80 72" stroke-width="8" stroke-linecap="round"/></g><text x="68" y="55" font-family="monospace" font-size="16" fill="%232C6E49" font-weight="bold">&lt;/&gt;</text></svg>`;
+  const faviconSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="50" fill="%231A1A1A"/><circle cx="50" cy="50" r="48" fill="none" stroke="%236B7280" stroke-width="3"/><path d="M28 25 V 75 H 38 V 57 H 48 V 47 H 38 V 35 H 52 V 25 H 28 Z" fill="%239CA3AF" /><path d="M78 28 C 68 28, 58 36, 58 50 C 58 64, 68 72, 78 72 L 78 62 C 72 62, 68 57, 68 50 C 68 43, 72 38, 78 38 Z" fill="%232C6E49" /><path d="M72 42 L 65 50 L 72 58" stroke="%239CA3AF" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-linejoin="round" /><path d="M62 58 L 75 42" stroke="%239CA3AF" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-linejoin="round" /></svg>`;
   const faviconDataUri = `data:image/svg+xml,${encodeURIComponent(faviconSvg)}`;
 
   return (
