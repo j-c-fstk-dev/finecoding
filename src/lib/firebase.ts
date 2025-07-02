@@ -13,9 +13,13 @@ const firebaseConfig = {
 let firebaseApp: FirebaseApp | undefined;
 let db: Firestore | null = null;
 
-// This is a more robust check. It ensures the projectId is a non-empty string.
-// In CI/CD environments for static export, env vars can be undefined or empty strings.
-const hasFirebaseConfig = firebaseConfig.projectId && typeof firebaseConfig.projectId === 'string' && firebaseConfig.projectId.length > 0;
+// A more robust check for all necessary Firebase config keys.
+// This prevents partial initialization and provides clearer warnings.
+const hasFirebaseConfig = 
+  firebaseConfig.apiKey &&
+  firebaseConfig.authDomain &&
+  firebaseConfig.projectId &&
+  firebaseConfig.appId;
 
 if (hasFirebaseConfig) {
   if (getApps().length === 0) {
@@ -25,7 +29,7 @@ if (hasFirebaseConfig) {
   }
   db = getFirestore(firebaseApp);
 } else {
-  // This will be logged during the build process in GitHub Actions, confirming
+  // This will be logged during the build process, confirming
   // that Firebase is intentionally not being initialized.
   console.warn("Firebase config is incomplete or missing. Firebase services will be unavailable. This is expected during static builds without full environment configuration.");
 }
