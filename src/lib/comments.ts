@@ -1,7 +1,7 @@
 'use server';
 
 import { db } from '@/lib/firebase';
-import type { Comment, ResourceComment } from '@/types';
+import type { Comment } from '@/types';
 import { collection, addDoc, getDocs, query, orderBy, Timestamp, serverTimestamp } from 'firebase/firestore';
 import { revalidatePath } from 'next/cache';
 
@@ -35,36 +35,4 @@ export async function addComment(postId: string, slug: string, commentData: { na
     createdAt: serverTimestamp(),
   });
   revalidatePath(`/posts/${slug}`);
-}
-
-export async function getResourceComments(resourceId: string): Promise<ResourceComment[]> {
-  try {
-    const commentsRef = collection(db, 'resources', resourceId, 'comments');
-    const q = query(commentsRef, orderBy('createdAt', 'desc'));
-    const querySnapshot = await getDocs(q);
-    return querySnapshot.docs.map(doc => {
-      const data = doc.data();
-      return {
-        id: doc.id,
-        name: data.name,
-        comment: data.comment,
-        createdAt: (data.createdAt as Timestamp).toDate(),
-      } as ResourceComment;
-    });
-  } catch (error) {
-    if (error instanceof Error && error.message.includes('No document to update')) {
-        return [];
-    }
-    console.error("Error fetching resource comments:", error);
-    return [];
-  }
-}
-
-export async function addResourceComment(resourceId: string, commentData: { name: string; comment: string }) {
-  const commentsRef = collection(db, 'resources', resourceId, 'comments');
-  await addDoc(commentsRef, {
-    ...commentData,
-    createdAt: serverTimestamp(),
-  });
-  revalidatePath(`/resources`);
 }

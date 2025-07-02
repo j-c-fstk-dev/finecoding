@@ -1,10 +1,9 @@
 import type { Resource } from '@/types';
 import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ExternalLink } from 'lucide-react';
 import { DynamicIcon } from '@/components/icons';
 import type { IconName } from '@/components/icons';
-import { ResourceCardActions } from './ResourceCardActions';
 
 export function ResourceCard({ resource }: { resource: Resource }) {
   return (
@@ -16,7 +15,9 @@ export function ResourceCard({ resource }: { resource: Resource }) {
               <DynamicIcon name={resource.icon as IconName} className="h-6 w-6 text-muted-foreground" />
             </div>
             <div>
-              <CardTitle className="text-base font-semibold leading-tight">{resource.name}</CardTitle>
+              <a href={resource.link} target="_blank" rel="noopener noreferrer" className="hover:underline">
+                <CardTitle className="text-base font-semibold leading-tight">{resource.name}</CardTitle>
+              </a>
               <Badge variant="outline" className="mt-2 font-mono text-xs">{resource.pricing}</Badge>
             </div>
           </div>
@@ -34,9 +35,6 @@ export function ResourceCard({ resource }: { resource: Resource }) {
       <CardContent className="flex-grow">
         <CardDescription className="text-sm">{resource.description}</CardDescription>
       </CardContent>
-      <CardFooter>
-        <ResourceCardActions resource={resource} />
-      </CardFooter>
     </Card>
   );
 }

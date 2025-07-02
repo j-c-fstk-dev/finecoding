@@ -34,13 +34,5 @@ export interface Resource {
   category: ResourceCategory;
   pricing: PricingModel;
   icon?: string; // Optional: for a lucide-react icon name e.g., 'BrainCircuit'
-  favorites: number;
-  createdAt: Date;
-}
-
-export interface ResourceComment {
-  id: string;
-  name: string;
-  comment: string;
   createdAt: Date;
 }
