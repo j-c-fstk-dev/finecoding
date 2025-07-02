@@ -20,11 +20,6 @@ import {
 import { revalidatePath } from 'next/cache';
 
 export async function getResources(): Promise<Resource[]> {
-  if (!db) {
-    console.warn("Firestore is not initialized. Returning empty resources array.");
-    return [];
-  }
-
   try {
     const resourcesCollection = collection(db, 'resources');
     const q = query(resourcesCollection, orderBy('createdAt', 'desc'));
@@ -47,11 +42,6 @@ export async function getResources(): Promise<Resource[]> {
 }
 
 export async function getResourceById(id: string): Promise<Resource | null> {
-    if (!db) {
-        console.warn("Firestore is not initialized.");
-        return null;
-    }
-
     try {
         const resourceRef = doc(db, 'resources', id);
         const docSnap = await getDoc(resourceRef);
@@ -74,8 +64,6 @@ export async function getResourceById(id: string): Promise<Resource | null> {
 }
 
 export async function addResource(resourceData: Omit<Resource, 'id' | 'createdAt' | 'favorites'>) {
-    if (!db) throw new Error("Firestore is not initialized.");
-
     const newResource = {
         ...resourceData,
         favorites: 0,
@@ -89,8 +77,6 @@ export async function addResource(resourceData: Omit<Resource, 'id' | 'createdAt
 }
 
 export async function updateResource(id: string, resourceData: Partial<Resource>) {
-    if (!db) throw new Error("Firestore is not initialized.");
-    
     const resourceRef = doc(db, 'resources', id);
     await updateDoc(resourceRef, resourceData);
     revalidatePath('/resources');
@@ -98,8 +84,6 @@ export async function updateResource(id: string, resourceData: Partial<Resource>
 }
 
 export async function deleteResource(id: string) {
-    if (!db) throw new Error("Firestore is not initialized.");
-    
     const resourceRef = doc(db, 'resources', id);
     await deleteDoc(resourceRef);
     revalidatePath('/resources');
@@ -107,8 +91,6 @@ export async function deleteResource(id: string) {
 }
 
 export async function likeResource(id: string) {
-  if (!db) throw new Error("Firestore is not initialized.");
-  
   const resourceRef = doc(db, 'resources', id);
   await updateDoc(resourceRef, {
       favorites: increment(1)

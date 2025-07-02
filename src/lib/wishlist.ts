@@ -20,16 +20,11 @@ export async function addToWishlist(toolName: string): Promise<{ success: boolea
   }
 
   try {
-    // First, try to save to DB. This is the most critical part.
-    if (db) {
-      const wishlistCollection = collection(db, 'wishlist');
-      await addDoc(wishlistCollection, {
-        name: toolName,
-        requestedAt: serverTimestamp(),
-      });
-    } else {
-      console.warn('Firestore is not initialized. Wishlist item will not be saved to the database.');
-    }
+    const wishlistCollection = collection(db, 'wishlist');
+    await addDoc(wishlistCollection, {
+      name: toolName,
+      requestedAt: serverTimestamp(),
+    });
 
     // Now, attempt to send the email notification. This is a secondary action.
     if (!resend) {

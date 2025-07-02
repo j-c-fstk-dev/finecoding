@@ -3,6 +3,7 @@
 import { db } from '@/lib/firebase';
 import { z } from 'zod';
 import { Resend } from 'resend';
+import { collection, addDoc, serverTimestamp, query, where, getDocs } from 'firebase/firestore';
 
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
@@ -17,14 +18,7 @@ export async function subscribeToNewsletter(email: string): Promise<{ success: b
     return { success: false, error: 'Invalid email address.' };
   }
 
-  if (!db) {
-    console.warn('Firebase is not initialized. Newsletter subscription is disabled.');
-    return { success: false, error: 'Service is temporarily unavailable. Please configure your environment variables.' };
-  }
-
   try {
-    const { collection, addDoc, serverTimestamp, query, where, getDocs } = await import('firebase/firestore');
-
     const newsletterCollection = collection(db, 'subscribers');
 
     const q = query(newsletterCollection, where('email', '==', email));

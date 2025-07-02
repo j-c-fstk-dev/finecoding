@@ -5,11 +5,7 @@ import type { Comment, ResourceComment } from '@/types';
 import { collection, addDoc, getDocs, query, orderBy, Timestamp, serverTimestamp } from 'firebase/firestore';
 import { revalidatePath } from 'next/cache';
 
-export async function getPostComments(postId: string): Promise<Comment[]> {
-  if (!db) {
-    console.warn("Firestore is not initialized. Cannot fetch comments.");
-    return [];
-  }
+export async function getComments(postId: string): Promise<Comment[]> {
   try {
     const commentsRef = collection(db, 'posts', postId, 'comments');
     const q = query(commentsRef, orderBy('createdAt', 'desc'));
@@ -32,9 +28,7 @@ export async function getPostComments(postId: string): Promise<Comment[]> {
   }
 }
 
-export async function addPostComment(postId: string, slug: string, commentData: { name: string; comment: string }) {
-  if (!db) throw new Error("Firestore is not initialized.");
-
+export async function addComment(postId: string, slug: string, commentData: { name: string; comment: string }) {
   const commentsRef = collection(db, 'posts', postId, 'comments');
   await addDoc(commentsRef, {
     ...commentData,
@@ -44,10 +38,6 @@ export async function addPostComment(postId: string, slug: string, commentData: 
 }
 
 export async function getResourceComments(resourceId: string): Promise<ResourceComment[]> {
-  if (!db) {
-    console.warn("Firestore is not initialized. Cannot fetch resource comments.");
-    return [];
-  }
   try {
     const commentsRef = collection(db, 'resources', resourceId, 'comments');
     const q = query(commentsRef, orderBy('createdAt', 'desc'));
@@ -71,8 +61,6 @@ export async function getResourceComments(resourceId: string): Promise<ResourceC
 }
 
 export async function addResourceComment(resourceId: string, commentData: { name: string; comment: string }) {
-  if (!db) throw new Error("Firestore is not initialized.");
-
   const commentsRef = collection(db, 'resources', resourceId, 'comments');
   await addDoc(commentsRef, {
     ...commentData,

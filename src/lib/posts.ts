@@ -27,11 +27,6 @@ function createSlug(title: string): string {
 }
 
 export async function getPosts(): Promise<Post[]> {
-  if (!db) {
-    console.warn("Firestore is not initialized. Returning empty posts array.");
-    return [];
-  }
-
   try {
     const postsCollection = collection(db, 'posts');
     const q = query(postsCollection, orderBy('date', 'desc'));
@@ -49,16 +44,13 @@ export async function getPosts(): Promise<Post[]> {
     return posts;
   } catch (error) {
     console.error("Error fetching posts:", error);
+    // In a production environment, you might want to handle this more gracefully
+    // For now, we return an empty array and log the error.
     return [];
   }
 }
 
 export async function getPostBySlug(slug: string): Promise<Post | null> {
-    if (!db) {
-        console.warn("Firestore is not initialized.");
-        return null;
-    }
-
     try {
         const postsCollection = collection(db, 'posts');
         const q = query(postsCollection, where('slug', '==', slug), limit(1));
@@ -84,8 +76,6 @@ export async function getPostBySlug(slug: string): Promise<Post | null> {
 }
 
 export async function addPost(postData: Omit<Post, 'id' | 'slug' | 'date' | 'likes'>) {
-    if (!db) throw new Error("Firestore is not initialized.");
-
     const slug = createSlug(postData.title);
     
     const newPost = {
@@ -104,8 +94,6 @@ export async function addPost(postData: Omit<Post, 'id' | 'slug' | 'date' | 'lik
 }
 
 export async function updatePost(id: string, postData: Partial<Post>) {
-    if (!db) throw new Error("Firestore is not initialized.");
-    
     const postRef = doc(db, 'posts', id);
     const updatedData: Partial<Post> = { ...postData };
     
@@ -126,8 +114,6 @@ export async function updatePost(id: string, postData: Partial<Post>) {
 }
 
 export async function deletePost(id: string) {
-    if (!db) throw new Error("Firestore is not initialized.");
-    
     const postRef = doc(db, 'posts', id);
     await deleteDoc(postRef);
     revalidatePath('/');
@@ -136,8 +122,6 @@ export async function deletePost(id: string) {
 }
 
 export async function likePost(id: string, slug: string) {
-    if (!db) throw new Error("Firestore is not initialized.");
-    
     const postRef = doc(db, 'posts', id);
     await updateDoc(postRef, {
         likes: increment(1)

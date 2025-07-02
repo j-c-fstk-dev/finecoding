@@ -1,5 +1,5 @@
-import { initializeApp, getApps, FirebaseApp } from 'firebase/app';
-import { getFirestore, Firestore } from 'firebase/firestore';
+import { initializeApp, getApp, getApps, type FirebaseApp } from 'firebase/app';
+import { getFirestore, type Firestore } from 'firebase/firestore';
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -10,20 +10,9 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
-let firebaseApp: FirebaseApp | undefined;
-let db: Firestore | null = null;
+// Initialize Firebase. This will throw an error if the config is invalid,
+// which is the desired behavior to prevent silent failures.
+const app: FirebaseApp = getApps().length ? getApp() : initializeApp(firebaseConfig);
+const db: Firestore = getFirestore(app);
 
-// This approach ensures that Firebase is initialized only if the config
-// keys are actually provided. It's robust for both local dev and deployment.
-if (firebaseConfig.projectId) {
-  if (getApps().length === 0) {
-    firebaseApp = initializeApp(firebaseConfig);
-  } else {
-    firebaseApp = getApps()[0];
-  }
-  db = getFirestore(firebaseApp);
-} else {
-  console.warn("Firebase projectId is not set. Firebase services will be unavailable. This is expected during local development without a .env file.");
-}
-
-export { firebaseApp, db };
+export { app as firebaseApp, db };
