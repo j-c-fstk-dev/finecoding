@@ -1,37 +1,37 @@
 'use client';
 
-import { AnimatePresence, motion } from 'framer-motion';
-import { IconFC } from '@/components/icons/IconFC';
+import { motion } from 'framer-motion';
+import Image from 'next/image';
 
-interface SplashScreenProps {
-  isLoading: boolean;
-}
-
-export function SplashScreen({ isLoading }: SplashScreenProps) {
-  return (
-    <AnimatePresence>
-      {isLoading && (
+// The animation is controlled by layout.tsx using AnimatePresence
+export function SplashScreen() {
+    return (
         <motion.div
-          className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-background"
-          initial={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.5, ease: 'easeInOut' }}
+            className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-[#1A1A1A]"
+            initial={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.75, ease: 'easeInOut' }}
         >
-          {/* Main content area, positioned slightly above center */}
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-3/4">
-            <div className="flex h-48 w-48 items-center justify-center rounded-full bg-primary/10">
-              <IconFC className="h-32 w-32 animate-pulse-glow text-primary" />
+            {/* Centered Content: Logo is positioned a bit above the absolute center */}
+            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-2/3">
+                <Image
+                    src="https://res.cloudinary.com/dr0weongo/image/upload/v1751543333/fine-coding-logo.png"
+                    alt="Fine Coding Logo"
+                    width={256}
+                    height={256}
+                    priority={true}
+                    unoptimized={true} // Using unoptimized because this is a critical, static asset
+                    data-ai-hint="logo tech"
+                />
             </div>
-          </div>
 
-          {/* Footer text at the bottom */}
-          <div className="absolute bottom-12 text-center">
-            <p className="bg-gradient-to-r from-[hsl(var(--primary))] to-yellow-500 bg-clip-text text-lg font-semibold text-transparent">
-              Powered by BeRegen ®
-            </p>
-          </div>
+            {/* Footer text at the bottom */}
+            <div className="absolute bottom-12 text-center">
+                <p className="bg-gradient-to-r from-green-400 via-yellow-400 to-green-500 bg-clip-text text-lg font-semibold text-transparent">
+                    Powered by BeRegen ®
+                </p>
+                <p className="text-xs text-gray-500 mt-1">All rights reserved</p>
+            </div>
         </motion.div>
-      )}
-    </AnimatePresence>
-  );
+    );
 }

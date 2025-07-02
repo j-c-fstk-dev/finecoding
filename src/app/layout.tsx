@@ -1,17 +1,12 @@
 'use client';
 
 import './globals.css';
-import type { Metadata } from 'next';
 import { ThemeProvider } from '@/components/theme-provider';
 import { Toaster } from '@/components/ui/toaster';
 import { AuthProvider } from '@/lib/auth';
 import { useState, useEffect } from 'react';
 import { SplashScreen } from '@/components/layout/SplashScreen';
 import { AnimatePresence, motion } from 'framer-motion';
-import { IconFC } from '@/components/icons/IconFC';
-
-// Metadata is now a client-side object, not exported
-// export const metadata: Metadata = { ... };
 
 export default function RootLayout({
   children,
@@ -43,7 +38,7 @@ export default function RootLayout({
       <head>
         <title>Fine Coding Blog</title>
         <meta name="description" content="A blog about software development, AI, and Fine Coding." />
-        <meta name="theme-color" content="#1a1a1a" />
+        <meta name="theme-color" content="#1A1A1A" />
         <link rel="manifest" href="/manifest.json" />
         <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
         <link rel="icon" href="/favicon.ico" sizes="any" />
@@ -55,18 +50,19 @@ export default function RootLayout({
       <body className="font-body antialiased">
         <AuthProvider>
           <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
-            <SplashScreen isLoading={isLoading} />
-             <AnimatePresence>
-              {!isLoading && (
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ duration: 0.75, ease: 'easeInOut' }}
-                >
-                  {children}
-                </motion.div>
-              )}
+            <AnimatePresence>
+              {isLoading && <SplashScreen />}
             </AnimatePresence>
+             
+            {!isLoading && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.75, ease: 'easeInOut' }}
+              >
+                {children}
+              </motion.div>
+            )}
             <Toaster />
           </ThemeProvider>
         </AuthProvider>
