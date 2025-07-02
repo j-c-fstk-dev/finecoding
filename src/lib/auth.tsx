@@ -6,7 +6,14 @@ import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut, type 
 import { firebaseApp } from '@/lib/firebase';
 import { Loader2 } from 'lucide-react';
 
-const auth: Auth = getAuth(firebaseApp);
+let auth: Auth | null = null;
+if (firebaseApp) {
+  try {
+    auth = getAuth(firebaseApp);
+  } catch (error) {
+    console.error("Firebase Auth could not be initialized:", error);
+  }
+}
 
 interface AuthContextType {
   user: User | null;
@@ -22,6 +29,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (!auth) {
+      setLoading(false);
+      // You could render an error message to the user here
+      return;
+    }
+
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setUser(user);
       setLoading(false);
@@ -31,10 +44,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const login = (email: string, password: string) => {
+    if (!auth) return Promise.reject(new Error("Auth is not initialized."));
     return signInWithEmailAndPassword(auth, email, password);
   };
 
   const logout = () => {
+    if (!auth) return Promise.reject(new Error("Auth is not initialized."));
     return signOut(auth);
   };
 
