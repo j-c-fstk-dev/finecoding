@@ -1,0 +1,24 @@
+{
+  "name": "Fine Coding",
+  "short_name": "FineCoding",
+  "description": "A blog about software development, AI, and Fine Coding.",
+  "icons": [
+    {
+      "src": "https://placehold.co/192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "https://placehold.co/512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "theme_color": "#1a1a1a",
+  "background_color": "#1a1a1a",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait"
+}
