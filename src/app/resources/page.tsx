@@ -2,6 +2,7 @@ import { getResources } from '@/lib/resources';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { FilterableResourceList } from '@/components/resources/FilterableResourceList';
+import { WishlistForm } from '@/components/resources/WishlistForm';
 
 export const dynamic = 'force-dynamic';
 
@@ -23,6 +24,9 @@ export default async function ResourcesPage() {
           </section>
           <section className="mt-12">
             <FilterableResourceList resources={resources} />
+          </section>
+          <section className="mt-16">
+            <WishlistForm />
           </section>
         </div>
       </main>

@@ -15,7 +15,8 @@ import {
   Timestamp,
   serverTimestamp,
   query,
-  writeBatch
+  writeBatch,
+  increment
 } from 'firebase/firestore';
 import { revalidatePath } from 'next/cache';
 
@@ -30,18 +31,14 @@ export async function getResources(): Promise<Resource[]> {
     const q = query(resourcesCollection, orderBy('createdAt', 'desc'));
     const querySnapshot = await getDocs(q);
 
-    // If the database is missing items or is outdated, perform a full reset and repopulate.
-    // This ensures the DB is always in sync with the sample data list.
     if (querySnapshot.docs.length < sampleResources.length) {
       console.log("Resource list is outdated or incomplete, repopulating with full data...");
       const batch = writeBatch(db);
       
-      // First, delete all existing documents to prevent duplicates.
       querySnapshot.docs.forEach(existingDoc => {
         batch.delete(existingDoc.ref);
       });
 
-      // Then, add all the new sample resources.
       sampleResources.forEach(resource => {
         const docRef = doc(collection(db, 'resources'));
         const dataWithTimestamp = {
@@ -54,7 +51,6 @@ export async function getResources(): Promise<Resource[]> {
       await batch.commit();
       console.log("Full resource list populated successfully.");
 
-      // Re-fetch after populating to return the correct data.
       const newQuerySnapshot = await getDocs(q);
       const resources = newQuerySnapshot.docs.map(doc => {
         const data = doc.data();
@@ -67,7 +63,6 @@ export async function getResources(): Promise<Resource[]> {
       return resources;
     }
     
-    // If the database is already up-to-date, map and return the existing documents.
     const resources = querySnapshot.docs.map(doc => {
       const data = doc.data();
       return {
@@ -111,11 +106,12 @@ export async function getResourceById(id: string): Promise<Resource | null> {
     }
 }
 
-export async function addResource(resourceData: Omit<Resource, 'id' | 'createdAt'>) {
+export async function addResource(resourceData: Omit<Resource, 'id' | 'createdAt' | 'favorites'>) {
     if (!db) throw new Error("Firestore is not initialized.");
 
     const newResource = {
         ...resourceData,
+        favorites: 0,
         createdAt: serverTimestamp(),
     };
     
@@ -143,8 +139,18 @@ export async function deleteResource(id: string) {
     revalidatePath('/dashboard/resources');
 }
 
+export async function likeResource(id: string) {
+  if (!db) throw new Error("Firestore is not initialized.");
+  
+  const resourceRef = doc(db, 'resources', id);
+  await updateDoc(resourceRef, {
+      favorites: increment(1)
+  });
+  revalidatePath(`/resources`);
+}
+
 const sampleResources: Omit<Resource, 'id'>[] = [
-  // AI & Machine Learning - Paid
+  // AI & Machine Learning
   {
     name: 'OpenAI GPT-4 API',
     description: 'Access to the API of OpenAI\'s most advanced language model for various applications, from text generation to analysis.',
@@ -152,6 +158,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'AI & Machine Learning',
     pricing: 'Paid',
     icon: 'BrainCircuit',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-22T10:00:00Z'),
   },
   {
@@ -161,6 +168,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'AI & Machine Learning',
     pricing: 'Paid',
     icon: 'BrainCircuit',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-22T09:50:00Z'),
   },
   {
@@ -170,6 +178,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'AI & Machine Learning',
     pricing: 'Paid',
     icon: 'BrainCircuit',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-22T09:40:00Z'),
   },
   {
@@ -179,6 +188,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'AI & Machine Learning',
     pricing: 'Paid',
     icon: 'BrainCircuit',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-22T09:30:00Z'),
   },
   {
@@ -188,6 +198,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'AI & Machine Learning',
     pricing: 'Paid',
     icon: 'BrainCircuit',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-22T09:20:00Z'),
   },
   {
@@ -197,6 +208,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'AI & Machine Learning',
     pricing: 'Paid',
     icon: 'BrainCircuit',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-22T09:10:00Z'),
   },
   {
@@ -206,6 +218,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'AI & Machine Learning',
     pricing: 'Paid',
     icon: 'BrainCircuit',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-22T09:00:00Z'),
   },
   {
@@ -215,6 +228,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'AI & Machine Learning',
     pricing: 'Paid',
     icon: 'BrainCircuit',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-22T08:50:00Z'),
   },
   {
@@ -224,6 +238,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'AI & Machine Learning',
     pricing: 'Paid',
     icon: 'BrainCircuit',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-22T08:40:00Z'),
   },
   {
@@ -233,9 +248,9 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'AI & Machine Learning',
     pricing: 'Paid',
     icon: 'BrainCircuit',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-22T08:30:00Z'),
   },
-  // AI & Machine Learning - Free Tier
   {
     name: 'Google Colab',
     description: 'Allows you to write and execute Python code in your browser, with free access to GPUs and TPUs for ML.',
@@ -243,6 +258,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'AI & Machine Learning',
     pricing: 'Free Tier',
     icon: 'BrainCircuit',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-22T08:20:00Z'),
   },
   {
@@ -252,6 +268,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'AI & Machine Learning',
     pricing: 'Free Tier',
     icon: 'BrainCircuit',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-22T08:10:00Z'),
   },
   {
@@ -261,6 +278,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'AI & Machine Learning',
     pricing: 'Free Tier',
     icon: 'BrainCircuit',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-22T08:00:00Z'),
   },
   {
@@ -270,6 +288,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'AI & Machine Learning',
     pricing: 'Free Tier',
     icon: 'BrainCircuit',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-22T07:50:00Z'),
   },
   {
@@ -279,6 +298,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'AI & Machine Learning',
     pricing: 'Free Tier',
     icon: 'BrainCircuit',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-22T07:40:00Z'),
   },
   {
@@ -288,6 +308,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'AI & Machine Learning',
     pricing: 'Free Tier',
     icon: 'BrainCircuit',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-22T07:30:00Z'),
   },
   {
@@ -297,6 +318,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'AI & Machine Learning',
     pricing: 'Free Tier',
     icon: 'BrainCircuit',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-22T07:20:00Z'),
   },
   {
@@ -306,6 +328,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'AI & Machine Learning',
     pricing: 'Free Tier',
     icon: 'BrainCircuit',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-22T07:10:00Z'),
   },
   {
@@ -315,6 +338,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'AI & Machine Learning',
     pricing: 'Free Tier',
     icon: 'BrainCircuit',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-22T07:00:00Z'),
   },
   {
@@ -324,9 +348,9 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'AI & Machine Learning',
     pricing: 'Free Tier',
     icon: 'BrainCircuit',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-22T06:50:00Z'),
   },
-  // AI & Machine Learning - Open Source
   {
     name: 'TensorFlow',
     description: 'A complete open-source library for machine learning, developed by Google, widely used for research and production.',
@@ -334,6 +358,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'AI & Machine Learning',
     pricing: 'Open Source',
     icon: 'BrainCircuit',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-22T06:40:00Z'),
   },
   {
@@ -343,6 +368,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'AI & Machine Learning',
     pricing: 'Open Source',
     icon: 'BrainCircuit',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-22T06:30:00Z'),
   },
   {
@@ -352,6 +378,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'AI & Machine Learning',
     pricing: 'Open Source',
     icon: 'BrainCircuit',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-22T06:20:00Z'),
   },
   {
@@ -361,6 +388,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'AI & Machine Learning',
     pricing: 'Open Source',
     icon: 'BrainCircuit',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-22T06:10:00Z'),
   },
   {
@@ -370,6 +398,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'AI & Machine Learning',
     pricing: 'Open Source',
     icon: 'BrainCircuit',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-22T06:00:00Z'),
   },
   {
@@ -379,6 +408,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'AI & Machine Learning',
     pricing: 'Open Source',
     icon: 'BrainCircuit',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-22T05:50:00Z'),
   },
   {
@@ -388,6 +418,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'AI & Machine Learning',
     pricing: 'Open Source',
     icon: 'BrainCircuit',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-22T05:40:00Z'),
   },
   {
@@ -397,6 +428,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'AI & Machine Learning',
     pricing: 'Open Source',
     icon: 'BrainCircuit',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-22T05:30:00Z'),
   },
   {
@@ -406,6 +438,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'AI & Machine Learning',
     pricing: 'Open Source',
     icon: 'BrainCircuit',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-22T05:20:00Z'),
   },
   {
@@ -415,10 +448,11 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'AI & Machine Learning',
     pricing: 'Open Source',
     icon: 'BrainCircuit',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-22T05:10:00Z'),
   },
 
-  // Developer Tools - Paid
+  // Developer Tools
   {
     name: 'JetBrains IntelliJ IDEA Ultimate',
     description: 'A powerful IDE for Java, Kotlin, Scala, and other languages, with advanced features for Spring, databases, etc.',
@@ -426,6 +460,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'Developer Tools',
     pricing: 'Paid',
     icon: 'TerminalSquare',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-21T10:00:00Z'),
   },
   {
@@ -435,6 +470,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'Developer Tools',
     pricing: 'Paid',
     icon: 'TerminalSquare',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-21T09:50:00Z'),
   },
   {
@@ -444,6 +480,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'Developer Tools',
     pricing: 'Paid',
     icon: 'TerminalSquare',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-21T09:40:00Z'),
   },
   {
@@ -453,6 +490,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'Developer Tools',
     pricing: 'Paid',
     icon: 'TerminalSquare',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-21T09:30:00Z'),
   },
   {
@@ -462,6 +500,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'Developer Tools',
     pricing: 'Paid',
     icon: 'TerminalSquare',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-21T09:20:00Z'),
   },
   {
@@ -471,6 +510,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'Developer Tools',
     pricing: 'Paid',
     icon: 'TerminalSquare',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-21T09:10:00Z'),
   },
   {
@@ -480,6 +520,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'Developer Tools',
     pricing: 'Paid',
     icon: 'TerminalSquare',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-21T09:00:00Z'),
   },
   {
@@ -489,6 +530,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'Developer Tools',
     pricing: 'Paid',
     icon: 'TerminalSquare',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-21T08:50:00Z'),
   },
   {
@@ -498,6 +540,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'Developer Tools',
     pricing: 'Paid',
     icon: 'TerminalSquare',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-21T08:40:00Z'),
   },
   {
@@ -507,9 +550,9 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'Developer Tools',
     pricing: 'Paid',
     icon: 'TerminalSquare',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-21T08:30:00Z'),
   },
-  // Developer Tools - Free Tier
   {
     name: 'Postman (Free Tier)',
     description: 'Allows basic use for individuals and small teams, including API collections, testing, and limited documentation.',
@@ -517,6 +560,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'Developer Tools',
     pricing: 'Free Tier',
     icon: 'TerminalSquare',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-21T08:20:00Z'),
   },
   {
@@ -526,6 +570,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'Developer Tools',
     pricing: 'Free Tier',
     icon: 'TerminalSquare',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-21T08:10:00Z'),
   },
   {
@@ -535,6 +580,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'Developer Tools',
     pricing: 'Free Tier',
     icon: 'TerminalSquare',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-21T08:00:00Z'),
   },
   {
@@ -544,6 +590,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'Developer Tools',
     pricing: 'Free Tier',
     icon: 'TerminalSquare',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-21T07:50:00Z'),
   },
   {
@@ -553,6 +600,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'Developer Tools',
     pricing: 'Free Tier',
     icon: 'Component',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-21T07:40:00Z'),
   },
   {
@@ -562,6 +610,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'Developer Tools',
     pricing: 'Free Tier',
     icon: 'TerminalSquare',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-21T07:30:00Z'),
   },
   {
@@ -571,9 +620,9 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'Developer Tools',
     pricing: 'Free Tier',
     icon: 'TerminalSquare',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-21T07:20:00Z'),
   },
-  // Developer Tools - Open Source
   {
     name: 'VS Code (Visual Studio Code)',
     description: 'A lightweight yet powerful source-code editor with support for thousands of extensions, making it extremely versatile for any language.',
@@ -581,6 +630,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'Developer Tools',
     pricing: 'Open Source',
     icon: 'TerminalSquare',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-21T07:10:00Z'),
   },
   {
@@ -590,6 +640,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'Developer Tools',
     pricing: 'Open Source',
     icon: 'TerminalSquare',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-21T07:00:00Z'),
   },
   {
@@ -599,6 +650,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'Developer Tools',
     pricing: 'Open Source',
     icon: 'Server',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-21T06:50:00Z'),
   },
   {
@@ -608,6 +660,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'Developer Tools',
     pricing: 'Open Source',
     icon: 'TerminalSquare',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-21T06:40:00Z'),
   },
   {
@@ -617,6 +670,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'Developer Tools',
     pricing: 'Open Source',
     icon: 'TerminalSquare',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-21T06:30:00Z'),
   },
   {
@@ -626,6 +680,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'Developer Tools',
     pricing: 'Open Source',
     icon: 'Server',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-21T06:20:00Z'),
   },
   {
@@ -635,6 +690,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'Developer Tools',
     pricing: 'Open Source',
     icon: 'TerminalSquare',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-21T06:10:00Z'),
   },
   {
@@ -644,6 +700,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'Developer Tools',
     pricing: 'Open Source',
     icon: 'TerminalSquare',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-21T06:00:00Z'),
   },
   {
@@ -653,6 +710,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'Developer Tools',
     pricing: 'Open Source',
     icon: 'TerminalSquare',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-21T05:50:00Z'),
   },
   {
@@ -662,10 +720,11 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'Developer Tools',
     pricing: 'Open Source',
     icon: 'TerminalSquare',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-21T05:40:00Z'),
   },
   
-  // DevOps & Hosting - Paid
+  // DevOps & Hosting
   {
     name: 'AWS (Amazon Web Services)',
     description: "The world's largest cloud platform, offering a vast range of services for computing, storage, databases, analytics, machine learning, and more.",
@@ -673,6 +732,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'DevOps & Hosting',
     pricing: 'Paid',
     icon: 'Server',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-20T10:00:00Z'),
   },
   {
@@ -682,6 +742,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'DevOps & Hosting',
     pricing: 'Paid',
     icon: 'Server',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-20T09:50:00Z'),
   },
   {
@@ -691,6 +752,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'DevOps & Hosting',
     pricing: 'Paid',
     icon: 'Server',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-20T09:40:00Z'),
   },
   {
@@ -700,6 +762,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'DevOps & Hosting',
     pricing: 'Paid',
     icon: 'Server',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-20T09:30:00Z'),
   },
   {
@@ -709,6 +772,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'DevOps & Hosting',
     pricing: 'Paid',
     icon: 'Server',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-20T09:20:00Z'),
   },
   {
@@ -718,6 +782,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'DevOps & Hosting',
     pricing: 'Paid',
     icon: 'Server',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-20T09:10:00Z'),
   },
   {
@@ -727,6 +792,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'DevOps & Hosting',
     pricing: 'Paid',
     icon: 'Server',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-20T09:00:00Z'),
   },
   {
@@ -736,6 +802,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'DevOps & Hosting',
     pricing: 'Paid',
     icon: 'Server',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-20T08:50:00Z'),
   },
   {
@@ -745,6 +812,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'DevOps & Hosting',
     pricing: 'Paid',
     icon: 'Server',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-20T08:40:00Z'),
   },
   {
@@ -754,9 +822,9 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'DevOps & Hosting',
     pricing: 'Paid',
     icon: 'Server',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-20T08:30:00Z'),
   },
-  // DevOps & Hosting - Free Tier
   {
     name: 'Netlify',
     description: 'Offers a generous free plan for hosting static sites and SPAs, with CI/CD, HTTPS, and limited serverless functions.',
@@ -764,6 +832,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'DevOps & Hosting',
     pricing: 'Free Tier',
     icon: 'Server',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-20T08:20:00Z'),
   },
   {
@@ -773,6 +842,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'DevOps & Hosting',
     pricing: 'Free Tier',
     icon: 'Server',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-20T08:10:00Z'),
   },
   {
@@ -782,6 +852,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'DevOps & Hosting',
     pricing: 'Free Tier',
     icon: 'Server',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-20T08:00:00Z'),
   },
   {
@@ -791,6 +862,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'DevOps & Hosting',
     pricing: 'Free Tier',
     icon: 'Server',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-20T07:50:00Z'),
   },
   {
@@ -800,6 +872,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'DevOps & Hosting',
     pricing: 'Free Tier',
     icon: 'Server',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-20T07:40:00Z'),
   },
   {
@@ -809,6 +882,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'DevOps & Hosting',
     pricing: 'Free Tier',
     icon: 'Server',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-20T07:30:00Z'),
   },
   {
@@ -818,6 +892,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'DevOps & Hosting',
     pricing: 'Free Tier',
     icon: 'Server',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-20T07:20:00Z'),
   },
   {
@@ -827,6 +902,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'DevOps & Hosting',
     pricing: 'Free Tier',
     icon: 'Server',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-20T07:10:00Z'),
   },
   {
@@ -836,9 +912,9 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'DevOps & Hosting',
     pricing: 'Free Tier',
     icon: 'Server',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-20T07:00:00Z'),
   },
-  // DevOps & Hosting - Open Source
   {
     name: 'Jenkins',
     description: 'A leading open-source automation server for CI/CD, flexible and with thousands of plugins.',
@@ -846,6 +922,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'DevOps & Hosting',
     pricing: 'Open Source',
     icon: 'Server',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-20T06:50:00Z'),
   },
   {
@@ -855,6 +932,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'DevOps & Hosting',
     pricing: 'Open Source',
     icon: 'Server',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-20T06:40:00Z'),
   },
   {
@@ -864,6 +942,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'DevOps & Hosting',
     pricing: 'Open Source',
     icon: 'Server',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-20T06:30:00Z'),
   },
   {
@@ -873,6 +952,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'DevOps & Hosting',
     pricing: 'Open Source',
     icon: 'Server',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-20T06:20:00Z'),
   },
   {
@@ -882,6 +962,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'DevOps & Hosting',
     pricing: 'Open Source',
     icon: 'Server',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-20T06:10:00Z'),
   },
   {
@@ -891,6 +972,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'DevOps & Hosting',
     pricing: 'Open Source',
     icon: 'Server',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-20T06:00:00Z'),
   },
   {
@@ -900,6 +982,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'DevOps & Hosting',
     pricing: 'Open Source',
     icon: 'Server',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-20T05:50:00Z'),
   },
   {
@@ -909,10 +992,11 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'DevOps & Hosting',
     pricing: 'Open Source',
     icon: 'Server',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-20T05:40:00Z'),
   },
   
-  // Productivity - Paid
+  // Productivity
   {
     name: 'Notion',
     description: 'An all-in-one workspace for notes, project management, databases, wikis, and collaboration, widely used by developers and teams.',
@@ -920,6 +1004,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'Productivity',
     pricing: 'Paid',
     icon: 'Zap',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-19T10:00:00Z'),
   },
   {
@@ -929,6 +1014,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'Productivity',
     pricing: 'Paid',
     icon: 'Zap',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-19T09:50:00Z'),
   },
   {
@@ -938,6 +1024,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'Productivity',
     pricing: 'Paid',
     icon: 'Zap',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-19T09:40:00Z'),
   },
   {
@@ -947,6 +1034,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'Productivity',
     pricing: 'Paid',
     icon: 'Zap',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-19T09:30:00Z'),
   },
   {
@@ -956,6 +1044,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'Productivity',
     pricing: 'Paid',
     icon: 'Zap',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-19T09:20:00Z'),
   },
   {
@@ -965,6 +1054,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'Productivity',
     pricing: 'Paid',
     icon: 'Zap',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-19T09:10:00Z'),
   },
   {
@@ -974,6 +1064,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'Productivity',
     pricing: 'Paid',
     icon: 'Zap',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-19T09:00:00Z'),
   },
   {
@@ -983,6 +1074,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'Productivity',
     pricing: 'Paid',
     icon: 'Zap',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-19T08:50:00Z'),
   },
   {
@@ -992,9 +1084,9 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'Productivity',
     pricing: 'Paid',
     icon: 'Zap',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-19T08:30:00Z'),
   },
-  // Productivity - Free Tier
   {
     name: 'Asana (Basic Plan)',
     description: 'A project and task management tool that allows teams to organize, track, and manage their work. The basic plan is free for smaller teams.',
@@ -1002,6 +1094,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'Productivity',
     pricing: 'Free Tier',
     icon: 'Zap',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-19T08:20:00Z'),
   },
   {
@@ -1011,6 +1104,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'Productivity',
     pricing: 'Free Tier',
     icon: 'Zap',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-19T08:10:00Z'),
   },
   {
@@ -1020,6 +1114,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'Productivity',
     pricing: 'Free Tier',
     icon: 'Zap',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-19T08:00:00Z'),
   },
   {
@@ -1029,6 +1124,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'Productivity',
     pricing: 'Free Tier',
     icon: 'Zap',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-19T07:50:00Z'),
   },
   {
@@ -1038,6 +1134,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'Productivity',
     pricing: 'Free',
     icon: 'Zap',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-19T07:40:00Z'),
   },
   {
@@ -1047,6 +1144,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'Productivity',
     pricing: 'Free Tier',
     icon: 'Zap',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-19T07:30:00Z'),
   },
   {
@@ -1056,6 +1154,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'Productivity',
     pricing: 'Free',
     icon: 'Zap',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-19T07:20:00Z'),
   },
   {
@@ -1065,6 +1164,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'Productivity',
     pricing: 'Free Tier',
     icon: 'Zap',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-19T07:10:00Z'),
   },
   {
@@ -1074,6 +1174,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'Productivity',
     pricing: 'Free Tier',
     icon: 'Zap',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-19T07:00:00Z'),
   },
   {
@@ -1083,9 +1184,9 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'Productivity',
     pricing: 'Free Tier',
     icon: 'Zap',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-19T06:50:00Z'),
   },
-  // Productivity - Open Source
   {
     name: 'Joplin',
     description: 'An open-source note-taking and to-do list app with cloud sync and Markdown support.',
@@ -1093,6 +1194,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'Productivity',
     pricing: 'Open Source',
     icon: 'Zap',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-19T06:40:00Z'),
   },
   {
@@ -1102,6 +1204,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'Productivity',
     pricing: 'Open Source',
     icon: 'Zap',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-19T06:30:00Z'),
   },
   {
@@ -1111,6 +1214,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'Productivity',
     pricing: 'Open Source',
     icon: 'Zap',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-19T06:20:00Z'),
   },
   {
@@ -1120,6 +1224,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'Productivity',
     pricing: 'Open Source',
     icon: 'Zap',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-19T06:10:00Z'),
   },
   {
@@ -1129,6 +1234,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'Productivity',
     pricing: 'Open Source',
     icon: 'Zap',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-19T06:00:00Z'),
   },
   {
@@ -1138,6 +1244,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'Productivity',
     pricing: 'Open Source',
     icon: 'Server',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-19T05:50:00Z'),
   },
   {
@@ -1147,6 +1254,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'Productivity',
     pricing: 'Free Tier',
     icon: 'Zap',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-19T05:40:00Z'),
   },
   {
@@ -1156,6 +1264,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'Productivity',
     pricing: 'Open Source',
     icon: 'Zap',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-19T05:30:00Z'),
   },
   {
@@ -1165,6 +1274,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'Productivity',
     pricing: 'Open Source',
     icon: 'Zap',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-19T05:20:00Z'),
   },
   {
@@ -1174,10 +1284,11 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'Productivity',
     pricing: 'Open Source',
     icon: 'Zap',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-19T05:10:00Z'),
   },
 
-  // Books & Courses - Paid
+  // Books & Courses
   {
     name: '"Clean Code" by Robert C. Martin',
     description: 'A classic book that covers the principles of writing clean, maintainable code.',
@@ -1185,6 +1296,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'Books & Courses',
     pricing: 'Paid',
     icon: 'BookOpen',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-18T10:00:00Z'),
   },
   {
@@ -1194,6 +1306,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'Books & Courses',
     pricing: 'Paid',
     icon: 'BookOpen',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-18T09:50:00Z'),
   },
   {
@@ -1203,6 +1316,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'Books & Courses',
     pricing: 'Paid',
     icon: 'BookOpen',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-18T09:40:00Z'),
   },
   {
@@ -1212,6 +1326,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'Books & Courses',
     pricing: 'Paid',
     icon: 'BookOpen',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-18T09:30:00Z'),
   },
   {
@@ -1221,6 +1336,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'Books & Courses',
     pricing: 'Paid',
     icon: 'BookOpen',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-18T09:20:00Z'),
   },
   {
@@ -1230,6 +1346,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'Books & Courses',
     pricing: 'Paid',
     icon: 'BookOpen',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-18T09:10:00Z'),
   },
   {
@@ -1239,6 +1356,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'Books & Courses',
     pricing: 'Paid',
     icon: 'BookOpen',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-18T09:00:00Z'),
   },
   {
@@ -1248,6 +1366,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'Books & Courses',
     pricing: 'Paid',
     icon: 'BookOpen',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-18T08:50:00Z'),
   },
   {
@@ -1257,6 +1376,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'Books & Courses',
     pricing: 'Paid',
     icon: 'BookOpen',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-18T08:40:00Z'),
   },
   {
@@ -1266,6 +1386,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'Books & Courses',
     pricing: 'Paid',
     icon: 'BookOpen',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-18T08:30:00Z'),
   },
   {
@@ -1275,6 +1396,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'Books & Courses',
     pricing: 'Paid',
     icon: 'BookOpen',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-18T08:20:00Z'),
   },
   {
@@ -1284,6 +1406,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'Books & Courses',
     pricing: 'Paid',
     icon: 'BookOpen',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-18T08:10:00Z'),
   },
   {
@@ -1293,6 +1416,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'Books & Courses',
     pricing: 'Paid',
     icon: 'BookOpen',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-18T08:00:00Z'),
   },
   {
@@ -1302,9 +1426,9 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'Books & Courses',
     pricing: 'Paid',
     icon: 'BookOpen',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-18T07:50:00Z'),
   },
-  // Books & Courses - Free Tier
   {
     name: 'freeCodeCamp',
     description: 'Offers thousands of hours of interactive programming content and free certifications in web development, data science, and more.',
@@ -1312,6 +1436,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'Books & Courses',
     pricing: 'Free',
     icon: 'BookOpen',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-18T07:40:00Z'),
   },
   {
@@ -1321,6 +1446,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'Books & Courses',
     pricing: 'Free Tier',
     icon: 'BookOpen',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-18T07:30:00Z'),
   },
   {
@@ -1330,6 +1456,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'Books & Courses',
     pricing: 'Free Tier',
     icon: 'BookOpen',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-18T07:20:00Z'),
   },
   {
@@ -1339,6 +1466,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'Books & Courses',
     pricing: 'Free Tier',
     icon: 'BookOpen',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-18T07:10:00Z'),
   },
   {
@@ -1348,6 +1476,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'Books & Courses',
     pricing: 'Free',
     icon: 'BookOpen',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-18T07:00:00Z'),
   },
   {
@@ -1357,6 +1486,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'Books & Courses',
     pricing: 'Free',
     icon: 'BookOpen',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-18T06:50:00Z'),
   },
   {
@@ -1366,6 +1496,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'Books & Courses',
     pricing: 'Free',
     icon: 'BookOpen',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-18T06:40:00Z'),
   },
   {
@@ -1375,6 +1506,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'Books & Courses',
     pricing: 'Free',
     icon: 'BookOpen',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-18T06:30:00Z'),
   },
   {
@@ -1384,9 +1516,9 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'Books & Courses',
     pricing: 'Free',
     icon: 'BookOpen',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-18T06:20:00Z'),
   },
-  // Books & Courses - Open Source
   {
     name: 'The Odin Project',
     description: 'An open-source full-stack web development curriculum, with a focus on Ruby on Rails or JavaScript/React, that guides students through practical projects.',
@@ -1394,6 +1526,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'Books & Courses',
     pricing: 'Open Source',
     icon: 'BookOpen',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-18T06:10:00Z'),
   },
   {
@@ -1403,6 +1536,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'Books & Courses',
     pricing: 'Free',
     icon: 'BookOpen',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-18T06:00:00Z'),
   },
   {
@@ -1412,6 +1546,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'Books & Courses',
     pricing: 'Free Tier',
     icon: 'BookOpen',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-18T05:50:00Z'),
   },
   {
@@ -1421,6 +1556,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'Books & Courses',
     pricing: 'Open Source',
     icon: 'BookOpen',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-18T05:40:00Z'),
   },
   {
@@ -1430,6 +1566,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'Books & Courses',
     pricing: 'Free',
     icon: 'BookOpen',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-18T05:30:00Z'),
   },
   {
@@ -1439,6 +1576,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'Books & Courses',
     pricing: 'Free',
     icon: 'BookOpen',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-18T05:20:00Z'),
   },
   {
@@ -1448,6 +1586,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'Books & Courses',
     pricing: 'Open Source',
     icon: 'BookOpen',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-18T05:10:00Z'),
   },
   {
@@ -1457,6 +1596,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'Books & Courses',
     pricing: 'Free Tier',
     icon: 'BookOpen',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-18T05:00:00Z'),
   },
   {
@@ -1466,6 +1606,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'Books & Courses',
     pricing: 'Free Tier',
     icon: 'BookOpen',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-18T04:50:00Z'),
   },
   {
@@ -1475,6 +1616,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'Books & Courses',
     pricing: 'Free',
     icon: 'BookOpen',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-18T04:40:00Z'),
   },
   {
@@ -1484,6 +1626,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'Books & Courses',
     pricing: 'Open Source',
     icon: 'BookOpen',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-18T04:30:00Z'),
   },
   {
@@ -1493,6 +1636,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'Books & Courses',
     pricing: 'Free',
     icon: 'BookOpen',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-18T04:20:00Z'),
   },
   {
@@ -1502,10 +1646,11 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'Books & Courses',
     pricing: 'Free',
     icon: 'BookOpen',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-18T04:10:00Z'),
   },
   
-  // UI & Design - Paid
+  // UI & Design
   {
     name: 'Figma (Professional/Organization Plans)',
     description: 'A collaborative design platform for creating user interfaces, prototypes, and design systems. Paid plans offer advanced features for teams.',
@@ -1513,6 +1658,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'UI & Design',
     pricing: 'Paid',
     icon: 'Palette',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-17T10:00:00Z'),
   },
   {
@@ -1522,6 +1668,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'UI & Design',
     pricing: 'Paid',
     icon: 'Palette',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-17T09:50:00Z'),
   },
   {
@@ -1531,6 +1678,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'UI & Design',
     pricing: 'Paid',
     icon: 'Palette',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-17T09:40:00Z'),
   },
   {
@@ -1540,6 +1688,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'UI & Design',
     pricing: 'Paid',
     icon: 'Palette',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-17T09:30:00Z'),
   },
   {
@@ -1549,6 +1698,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'UI & Design',
     pricing: 'Paid',
     icon: 'Palette',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-17T09:20:00Z'),
   },
   {
@@ -1558,6 +1708,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'UI & Design',
     pricing: 'Paid',
     icon: 'Palette',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-17T09:10:00Z'),
   },
   {
@@ -1567,6 +1718,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'UI & Design',
     pricing: 'Paid',
     icon: 'Palette',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-17T09:00:00Z'),
   },
   {
@@ -1576,6 +1728,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'UI & Design',
     pricing: 'Paid',
     icon: 'Palette',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-17T08:50:00Z'),
   },
   {
@@ -1585,6 +1738,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'UI & Design',
     pricing: 'Paid',
     icon: 'Palette',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-17T08:40:00Z'),
   },
   {
@@ -1594,9 +1748,9 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'UI & Design',
     pricing: 'Paid',
     icon: 'Palette',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-17T08:30:00Z'),
   },
-  // UI & Design - Free Tier
   {
     name: 'Figma (Starter Plan)',
     description: 'Offers a free plan for individual use with essential design and prototyping features.',
@@ -1604,6 +1758,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'UI & Design',
     pricing: 'Free Tier',
     icon: 'Palette',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-17T08:20:00Z'),
   },
   {
@@ -1613,6 +1768,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'UI & Design',
     pricing: 'Free Tier',
     icon: 'Palette',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-17T08:10:00Z'),
   },
   {
@@ -1622,6 +1778,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'UI & Design',
     pricing: 'Free Tier',
     icon: 'Palette',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-17T08:00:00Z'),
   },
   {
@@ -1631,6 +1788,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'UI & Design',
     pricing: 'Free Tier',
     icon: 'Palette',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-17T07:50:00Z'),
   },
   {
@@ -1640,6 +1798,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'UI & Design',
     pricing: 'Free Tier',
     icon: 'Palette',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-17T07:40:00Z'),
   },
   {
@@ -1649,6 +1808,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'UI & Design',
     pricing: 'Free Tier',
     icon: 'Palette',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-17T07:30:00Z'),
   },
   {
@@ -1658,9 +1818,9 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'UI & Design',
     pricing: 'Free',
     icon: 'Palette',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-17T07:20:00Z'),
   },
-  // UI & Design - Open Source
   {
     name: 'GIMP (GNU Image Manipulation Program)',
     description: 'A powerful open-source image editor, a free alternative to Photoshop, for photo manipulation, image composition, and art creation.',
@@ -1668,6 +1828,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'UI & Design',
     pricing: 'Open Source',
     icon: 'Palette',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-17T07:10:00Z'),
   },
   {
@@ -1677,6 +1838,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'UI & Design',
     pricing: 'Open Source',
     icon: 'Palette',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-17T07:00:00Z'),
   },
   {
@@ -1686,6 +1848,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'UI & Design',
     pricing: 'Open Source',
     icon: 'Palette',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-17T06:50:00Z'),
   },
   {
@@ -1695,6 +1858,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'UI & Design',
     pricing: 'Open Source',
     icon: 'Palette',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-17T06:40:00Z'),
   },
   {
@@ -1704,6 +1868,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'UI & Design',
     pricing: 'Open Source',
     icon: 'Palette',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-17T06:30:00Z'),
   },
   {
@@ -1713,6 +1878,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'UI & Design',
     pricing: 'Free',
     icon: 'Palette',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-17T06:20:00Z'),
   },
   {
@@ -1722,6 +1888,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'UI & Design',
     pricing: 'Free',
     icon: 'Palette',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-17T06:10:00Z'),
   },
   {
@@ -1731,6 +1898,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'UI & Design',
     pricing: 'Free',
     icon: 'Palette',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-17T06:00:00Z'),
   },
   {
@@ -1740,7 +1908,7 @@ const sampleResources: Omit<Resource, 'id'>[] = [
     category: 'UI & Design',
     pricing: 'Open Source',
     icon: 'Palette',
+    favorites: Math.floor(Math.random() * 250),
     createdAt: new Date('2024-05-17T05:50:00Z'),
   },
 ];
-

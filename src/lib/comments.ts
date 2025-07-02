@@ -1,11 +1,11 @@
 'use server';
 
 import { db } from '@/lib/firebase';
-import type { Comment } from '@/types';
+import type { Comment, ResourceComment } from '@/types';
 import { collection, addDoc, getDocs, query, orderBy, Timestamp, serverTimestamp } from 'firebase/firestore';
 import { revalidatePath } from 'next/cache';
 
-export async function getComments(postId: string): Promise<Comment[]> {
+export async function getPostComments(postId: string): Promise<Comment[]> {
   if (!db) {
     console.warn("Firestore is not initialized. Cannot fetch comments.");
     return [];
@@ -24,7 +24,6 @@ export async function getComments(postId: string): Promise<Comment[]> {
       } as Comment;
     });
   } catch (error) {
-    // This can happen if a post is new and the subcollection doesn't exist yet.
     if (error instanceof Error && error.message.includes('No document to update')) {
         return [];
     }
@@ -33,7 +32,7 @@ export async function getComments(postId: string): Promise<Comment[]> {
   }
 }
 
-export async function addComment(postId: string, slug: string, commentData: { name: string; comment: string }) {
+export async function addPostComment(postId: string, slug: string, commentData: { name: string; comment: string }) {
   if (!db) throw new Error("Firestore is not initialized.");
 
   const commentsRef = collection(db, 'posts', postId, 'comments');
@@ -42,4 +41,42 @@ export async function addComment(postId: string, slug: string, commentData: { na
     createdAt: serverTimestamp(),
   });
   revalidatePath(`/posts/${slug}`);
+}
+
+export async function getResourceComments(resourceId: string): Promise<ResourceComment[]> {
+  if (!db) {
+    console.warn("Firestore is not initialized. Cannot fetch resource comments.");
+    return [];
+  }
+  try {
+    const commentsRef = collection(db, 'resources', resourceId, 'comments');
+    const q = query(commentsRef, orderBy('createdAt', 'desc'));
+    const querySnapshot = await getDocs(q);
+    return querySnapshot.docs.map(doc => {
+      const data = doc.data();
+      return {
+        id: doc.id,
+        name: data.name,
+        comment: data.comment,
+        createdAt: (data.createdAt as Timestamp).toDate(),
+      } as ResourceComment;
+    });
+  } catch (error) {
+    if (error instanceof Error && error.message.includes('No document to update')) {
+        return [];
+    }
+    console.error("Error fetching resource comments:", error);
+    return [];
+  }
+}
+
+export async function addResourceComment(resourceId: string, commentData: { name: string; comment: string }) {
+  if (!db) throw new Error("Firestore is not initialized.");
+
+  const commentsRef = collection(db, 'resources', resourceId, 'comments');
+  await addDoc(commentsRef, {
+    ...commentData,
+    createdAt: serverTimestamp(),
+  });
+  revalidatePath(`/resources`);
 }

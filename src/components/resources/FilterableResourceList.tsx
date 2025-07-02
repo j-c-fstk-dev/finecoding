@@ -82,7 +82,7 @@ export function FilterableResourceList({ resources }: FilterableResourceListProp
                       <Badge variant="secondary">{groupedAndFilteredResources[category]?.length}</Badge>
                     </div>
                   </AccordionTrigger>
-                  <AccordionContent className="bg-card px-6 pb-6">
+                  <AccordionContent className="bg-background px-6 pb-6">
                     <div className="pt-4 grid gap-4 md:grid-cols-2">
                       {groupedAndFilteredResources[category]?.map(resource => (
                         <ResourceCard key={resource.id} resource={resource} />

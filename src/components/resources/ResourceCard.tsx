@@ -1,9 +1,10 @@
 import type { Resource } from '@/types';
 import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { ExternalLink } from 'lucide-react';
 import { DynamicIcon } from '@/components/icons';
 import type { IconName } from '@/components/icons';
+import { ResourceCardActions } from './ResourceCardActions';
 
 export function ResourceCard({ resource }: { resource: Resource }) {
   return (
@@ -33,6 +34,9 @@ export function ResourceCard({ resource }: { resource: Resource }) {
       <CardContent className="flex-grow">
         <CardDescription className="text-sm">{resource.description}</CardDescription>
       </CardContent>
+      <CardFooter>
+        <ResourceCardActions resource={resource} />
+      </CardFooter>
     </Card>
   );
 }
