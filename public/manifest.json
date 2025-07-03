@@ -1,6 +1,6 @@
 {
-  "name": "Matrix Coder",
-  "short_name": "Matrix Coder",
+  "name": "Fine Coding",
+  "short_name": "Fine Coding",
   "description": "A blog about software development, AI, and Fine Coding.",
   "start_url": "/",
   "display": "standalone",
@@ -8,9 +8,10 @@
   "theme_color": "#1A1A1A",
   "icons": [
     {
-      "src": "/logo.svg",
+      "src": "https://res.cloudinary.com/dr0weongo/image/upload/v1751503667/20250702_212403_0000_2_pp63nm.svg",
       "sizes": "any",
-      "type": "image/svg+xml"
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
     }
   ]
 }

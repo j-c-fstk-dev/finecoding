@@ -1,7 +1,6 @@
 import Link from 'next/link';
 import { Github, Twitter } from 'lucide-react';
 import { EmailSignup } from '@/components/blog/EmailSignup';
-import { IconFC } from '../icons/IconFC';
 
 export function Footer() {
   return (
@@ -10,7 +9,7 @@ export function Footer() {
         <div className="grid gap-8 md:grid-cols-3">
           <div className="flex flex-col items-center md:items-start">
             <Link href="/" className="mb-4 flex items-center space-x-2">
-              <IconFC className="h-6 w-6 text-primary" />
+              <img src="https://res.cloudinary.com/dr0weongo/image/upload/v1751503667/20250702_212403_0000_2_pp63nm.svg" alt="Fine Coding Logo" className="h-6 w-6" />
               <span className="font-bold font-headline">Fine Coding</span>
             </Link>
             <p className="text-center text-sm text-muted-foreground md:text-left">
