@@ -11,14 +11,13 @@ export function SplashScreen() {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.75, ease: 'easeInOut' }}
         >
-            {/* Centered Content: Logo is positioned a bit above the absolute center */}
-            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-2/3">
-                {/* Using a standard <img> tag with the correct URL to ensure it loads reliably. */}
+            {/* Centered Content: This div now acts as the circular frame */}
+            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-2/3 h-56 w-56 rounded-full overflow-hidden border-2 border-gray-700">
                 <img
                     src="https://res.cloudinary.com/dr0weongo/image/upload/v1751503667/20250702_212403_0000_2_pp63nm.svg"
                     alt="Fine Coding Logo"
-                    className="h-64 w-64" // Equivalent to width/height 256
-                    loading="eager" // Similar to priority=true
+                    className="h-full w-full"
+                    loading="eager"
                     data-ai-hint="logo tech"
                 />
             </div>
