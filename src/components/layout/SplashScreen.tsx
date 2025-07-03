@@ -39,14 +39,14 @@ const textVariants = {
 export function SplashScreen() {
     return (
         <motion.div
-            className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-[#1A1A1A]"
+            className="fixed inset-0 z-[100] bg-[#1A1A1A]"
             initial={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.75, ease: 'easeInOut' }}
         >
             {/* Centered Content: This div now acts as the circular frame */}
             <motion.div
-              className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-2/3 h-36 w-36 rounded-full overflow-hidden border-2 border-gray-700"
+              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-2/3 h-36 w-36 rounded-full overflow-hidden border-2 border-gray-700"
               variants={logoVariants}
               initial="hidden"
               animate="visible"
@@ -60,9 +60,9 @@ export function SplashScreen() {
                 />
             </motion.div>
 
-            {/* Footer text at the bottom */}
+            {/* Footer text at the bottom, also centered horizontally */}
             <motion.div
-              className="absolute bottom-12 text-center"
+              className="absolute bottom-12 left-1/2 -translate-x-1/2 text-center"
               variants={textVariants}
               initial="hidden"
               animate="visible"
