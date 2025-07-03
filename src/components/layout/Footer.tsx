@@ -7,23 +7,17 @@ export function Footer() {
     <footer className="w-full border-t border-border/40 bg-background/95">
       <div className="container mx-auto max-w-5xl px-4 py-8">
         <div className="grid gap-8 md:grid-cols-3">
-          <div className="flex flex-col items-center md:items-start">
+          <div className="flex flex-col items-center">
             <Link href="/" className="mb-4 flex items-center space-x-2">
               <img src="https://res.cloudinary.com/dr0weongo/image/upload/v1751503667/20250702_212403_0000_2_pp63nm.svg" alt="Fine Coding Logo" className="h-6 w-6" />
               <span className="font-bold font-headline">Fine Coding</span>
             </Link>
-            <p className="text-center text-sm text-muted-foreground md:text-left">
-              An initiative by{' '}
-              <a
-                href="https://beregenerativelife.wordpress.com/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="font-semibold text-foreground hover:text-primary hover:underline"
-              >
-                @BeRegen
-              </a>
-              . © {new Date().getFullYear()}
-            </p>
+            <div className="text-center">
+                <p className="animate-text-shine bg-gradient-to-r from-gray-400 via-white to-gray-400 bg-clip-text text-lg font-semibold text-transparent">
+                    Powered by BeRegen ®
+                </p>
+                <p className="text-xs text-gray-500 mt-1">All rights reserved</p>
+            </div>
             <div className="mt-4 flex space-x-4">
               <a href="https://github.com/j-c-fstk-dev/finecoding" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary">
                 <Github size={20} />
