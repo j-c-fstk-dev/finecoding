@@ -46,7 +46,7 @@ export function SplashScreen() {
         >
             {/* Centered Content: This div now acts as the circular frame */}
             <motion.div
-              className="relative top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-2/3 h-36 w-36 rounded-full overflow-hidden border-2 border-gray-700"
+              className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-2/3 h-36 w-36 rounded-full overflow-hidden border-2 border-gray-700"
               variants={logoVariants}
               initial="hidden"
               animate="visible"
