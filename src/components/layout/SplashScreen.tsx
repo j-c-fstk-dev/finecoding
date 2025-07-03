@@ -44,36 +44,38 @@ export function SplashScreen() {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.75, ease: 'easeInOut' }}
         >
-            {/* Centered Content: This div now acts as the circular frame */}
-            <motion.div
-              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-2/3"
-              variants={logoVariants}
-              initial="hidden"
-              animate="visible"
-            >
-                <div className="h-36 w-36 rounded-full overflow-hidden border-2 border-gray-700">
-                    <img
-                        src="https://res.cloudinary.com/dr0weongo/image/upload/v1751503667/20250702_212403_0000_2_pp63nm.svg"
-                        alt="Fine Coding Logo"
-                        className="h-full w-full scale-110"
-                        loading="eager"
-                        data-ai-hint="logo tech"
-                    />
-                </div>
-            </motion.div>
+            {/* Positioning Wrapper for Logo */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-2/3">
+              <motion.div
+                variants={logoVariants}
+                initial="hidden"
+                animate="visible"
+              >
+                  <div className="h-36 w-36 rounded-full overflow-hidden border-2 border-gray-700">
+                      <img
+                          src="https://res.cloudinary.com/dr0weongo/image/upload/v1751503667/20250702_212403_0000_2_pp63nm.svg"
+                          alt="Fine Coding Logo"
+                          className="h-full w-full scale-110"
+                          loading="eager"
+                          data-ai-hint="logo tech"
+                      />
+                  </div>
+              </motion.div>
+            </div>
 
-            {/* Footer text at the bottom, also centered horizontally */}
-            <motion.div
-              className="absolute bottom-12 left-1/2 -translate-x-1/2 text-center"
-              variants={textVariants}
-              initial="hidden"
-              animate="visible"
-            >
-                <p className="bg-gradient-to-r from-green-400 via-yellow-400 to-green-500 bg-clip-text text-lg font-semibold text-transparent">
-                    Powered by BeRegen ®
-                </p>
-                <p className="text-xs text-gray-500 mt-1">All rights reserved</p>
-            </motion.div>
+            {/* Positioning Wrapper for Footer Text */}
+            <div className="absolute bottom-12 left-1/2 -translate-x-1/2 text-center">
+              <motion.div
+                variants={textVariants}
+                initial="hidden"
+                animate="visible"
+              >
+                  <p className="bg-gradient-to-r from-green-400 via-yellow-400 to-green-500 bg-clip-text text-lg font-semibold text-transparent">
+                      Powered by BeRegen ®
+                  </p>
+                  <p className="text-xs text-gray-500 mt-1">All rights reserved</p>
+              </motion.div>
+            </div>
         </motion.div>
     );
 }
