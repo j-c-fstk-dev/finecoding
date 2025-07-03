@@ -1,7 +1,6 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import Image from 'next/image';
 
 // The animation is controlled by layout.tsx using AnimatePresence
 export function SplashScreen() {
@@ -14,12 +13,12 @@ export function SplashScreen() {
         >
             {/* Centered Content: Logo is positioned a bit above the absolute center */}
             <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-2/3">
-                <Image
+                {/* Using a standard <img> tag to bypass Next.js Image optimization for reliability */}
+                <img
                     src="https://res.cloudinary.com/dr0weongo/image/upload/v1751543333/fine-coding-logo.png"
                     alt="Fine Coding Logo"
-                    width={256}
-                    height={256}
-                    priority={true}
+                    className="h-64 w-64" // Equivalent to width/height 256
+                    loading="eager" // Similar to priority=true
                     data-ai-hint="logo tech"
                 />
             </div>
