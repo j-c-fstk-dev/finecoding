@@ -56,13 +56,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <AuthContext.Provider value={value}>
-      {loading ? (
-        <div className="flex h-screen items-center justify-center bg-background">
-          <LoadingSpinner />
-        </div>
-      ) : (
-        children
-      )}
+      {/* 
+        The initial loading UI is now handled exclusively by the SplashScreen 
+        in the root layout to prevent conflicting loaders.
+      */}
+      {children}
     </AuthContext.Provider>
   );
 }
