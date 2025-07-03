@@ -45,13 +45,13 @@ export function SplashScreen() {
             transition={{ duration: 0.75, ease: 'easeInOut' }}
         >
             {/* Positioning Wrapper for Logo */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-2/3">
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-[70%]">
               <motion.div
                 variants={logoVariants}
                 initial="hidden"
                 animate="visible"
               >
-                  <div className="h-36 w-36 rounded-full overflow-hidden border-2 border-gray-700">
+                  <div className="h-32 w-32 rounded-full overflow-hidden border-2 border-gray-700">
                       <img
                           src="https://res.cloudinary.com/dr0weongo/image/upload/v1751503667/20250702_212403_0000_2_pp63nm.svg"
                           alt="Fine Coding Logo"
@@ -70,7 +70,7 @@ export function SplashScreen() {
                 initial="hidden"
                 animate="visible"
               >
-                  <p className="bg-gradient-to-r from-green-400 via-yellow-400 to-green-500 bg-clip-text text-lg font-semibold text-transparent">
+                  <p className="animate-text-shine bg-gradient-to-r from-gray-400 via-white to-gray-400 bg-clip-text text-lg font-semibold text-transparent">
                       Powered by BeRegen ®
                   </p>
                   <p className="text-xs text-gray-500 mt-1">All rights reserved</p>

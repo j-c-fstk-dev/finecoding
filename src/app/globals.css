@@ -479,3 +479,19 @@ body {
 .animate-pulse-glow {
   animation: pulse-glow 2.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
+
+/* --- New Text Shine Animation --- */
+@keyframes text-shine {
+  0% {
+    background-position: 200% center;
+  }
+  100% {
+    background-position: -200% center;
+  }
+}
+
+.animate-text-shine {
+  background-size: 200% auto;
+  animation: text-shine 3s linear infinite;
+  animation-delay: 1.5s; /* Delay so it starts after text appears */
+}
