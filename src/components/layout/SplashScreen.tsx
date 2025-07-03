@@ -12,11 +12,11 @@ export function SplashScreen() {
             transition={{ duration: 0.75, ease: 'easeInOut' }}
         >
             {/* Centered Content: This div now acts as the circular frame */}
-            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-2/3 h-56 w-56 rounded-full overflow-hidden border-2 border-gray-700">
+            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-2/3 h-48 w-48 rounded-full overflow-hidden border-2 border-gray-700">
                 <img
                     src="https://res.cloudinary.com/dr0weongo/image/upload/v1751503667/20250702_212403_0000_2_pp63nm.svg"
                     alt="Fine Coding Logo"
-                    className="h-full w-full"
+                    className="h-full w-full scale-110"
                     loading="eager"
                     data-ai-hint="logo tech"
                 />
