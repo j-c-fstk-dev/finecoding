@@ -13,7 +13,7 @@ export function SplashScreen() {
         >
             {/* Centered Content: Logo is positioned a bit above the absolute center */}
             <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-2/3">
-                {/* Using a standard <img> tag to bypass Next.js Image optimization for reliability */}
+                {/* Using a standard <img> tag with the correct URL to ensure it loads reliably. */}
                 <img
                     src="https://res.cloudinary.com/dr0weongo/image/upload/v1751543333/fine-coding-logo.png"
                     alt="Fine Coding Logo"
