@@ -15,7 +15,7 @@ export function SplashScreen() {
             <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-2/3">
                 {/* Using a standard <img> tag with the correct URL to ensure it loads reliably. */}
                 <img
-                    src="https://res.cloudinary.com/dr0weongo/image/upload/v1751543333/fine-coding-logo.png"
+                    src="https://res.cloudinary.com/dr0weongo/image/upload/v1751503667/20250702_212403_0000_2_pp63nm.svg"
                     alt="Fine Coding Logo"
                     className="h-64 w-64" // Equivalent to width/height 256
                     loading="eager" // Similar to priority=true
