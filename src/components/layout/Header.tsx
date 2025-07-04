@@ -52,7 +52,7 @@ export function Header() {
 
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/90 backdrop-blur-sm py-4">
+    <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-muted/90 backdrop-blur-sm py-4">
       <div className="container flex max-w-screen-2xl flex-col items-center">
         {/* ROW 1: Title */}
         <div className="mb-4 flex items-center justify-center">
@@ -115,7 +115,7 @@ export function Header() {
                     <span className="sr-only">Open menu</span>
                   </Button>
                 </SheetTrigger>
-                <SheetContent side="left" className="flex flex-col">
+                <SheetContent side="left" className="flex flex-col bg-background/90 backdrop-blur-sm">
                   <div>
                     <div className="mb-8">
                        <Link href="/" className="flex items-center space-x-2" onClick={() => setIsMobileMenuOpen(false)}>
