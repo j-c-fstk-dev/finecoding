@@ -41,7 +41,7 @@ export function FilterableResourceList({ resources }: FilterableResourceListProp
   ).filter(cat => groupedAndFilteredResources[cat] && groupedAndFilteredResources[cat]!.length > 0);
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 bg-background">
       {/* Category Filter Buttons */}
       <div className="flex flex-wrap gap-2">
         <Button
