@@ -505,7 +505,7 @@
 
 .animate-text-shine {
   background-size: 200% auto;
-  animation: text-shine 3s linear infinite;
+  animation: text-shine 6s linear infinite;
   animation-delay: 1.5s; /* Delay so it starts after text appears */
 }
 

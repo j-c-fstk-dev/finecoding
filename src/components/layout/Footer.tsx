@@ -15,7 +15,6 @@ export function Footer({ style }: { style?: CSSProperties }) {
           <div className="flex flex-col items-center">
             <Link href="/" className="mb-4 flex items-center space-x-2">
               <img src="https://res.cloudinary.com/dr0weongo/image/upload/v1751503667/20250702_212403_0000_2_pp63nm.svg" alt="Fine Coding Logo" className="h-6 w-6" />
-              <span className="font-bold font-headline">Fine Coding</span>
             </Link>
             <div className="text-center">
                 <p className="animate-text-shine bg-gradient-to-r from-gray-400 via-white to-gray-400 bg-clip-text text-lg font-semibold text-transparent">
