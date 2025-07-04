@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import type { CSSProperties } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import './globals.css';
 import { ThemeProvider } from '@/components/theme-provider';
@@ -16,6 +17,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   const [isLoading, setIsLoading] = useState(true);
+  const [footerStyle, setFooterStyle] = useState<CSSProperties>({ transform: 'translateY(100%)' });
 
   useEffect(() => {
     // This timer simulates a loading process.
@@ -24,6 +26,40 @@ export default function RootLayout({
     }, 2500); // Duration of the splash screen animation
 
     return () => clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
+    // This effect runs only on the client, after hydration.
+    const footer = document.getElementById("main-footer");
+    if (!footer) return;
+
+    const updateFooterPosition = () => {
+      const documentHeight = document.documentElement.scrollHeight;
+      const scrollPosition = window.scrollY;
+      const viewportHeight = window.innerHeight;
+      const footerHeight = footer.offsetHeight;
+
+      const revealBuffer = 200; 
+      const revealStartPoint = documentHeight - viewportHeight - footerHeight - revealBuffer;
+
+      if (scrollPosition >= revealStartPoint) {
+        const scrollProgress = (scrollPosition - revealStartPoint) / (footerHeight + revealBuffer);
+        const translateYValue = (1 - Math.min(1, scrollProgress)) * 100;
+        setFooterStyle({ transform: `translateY(${translateYValue}%)` });
+      } else {
+        setFooterStyle({ transform: 'translateY(100%)' });
+      }
+    };
+    
+    window.addEventListener('scroll', updateFooterPosition, { passive: true });
+    window.addEventListener('resize', updateFooterPosition);
+
+    updateFooterPosition();
+
+    return () => {
+      window.removeEventListener('scroll', updateFooterPosition);
+      window.removeEventListener('resize', updateFooterPosition);
+    };
   }, []);
 
   return (
@@ -50,53 +86,11 @@ export default function RootLayout({
               <main className="flex-1 w-full relative z-10">
                 {children}
               </main>
-              <Footer />
+              <Footer style={footerStyle} />
             </div>
             <Toaster />
           </ThemeProvider>
         </AuthProvider>
-        <script dangerouslySetInnerHTML={{
-          __html: `
-            document.addEventListener("DOMContentLoaded", function () {
-              const footer = document.getElementById("main-footer");
-              if (!footer) return;
-
-              let isScrolling = null;
-
-              function updateFooterPosition() {
-                const documentHeight = document.documentElement.scrollHeight;
-                const scrollPosition = window.scrollY;
-                const viewportHeight = window.innerHeight;
-                
-                // If content is shorter than or equal to viewport, just show the footer.
-                if (documentHeight <= viewportHeight + 5) {
-                    footer.style.transform = 'translateY(0%)';
-                    return;
-                }
-                
-                const isAtBottom = scrollPosition + viewportHeight >= documentHeight - 2;
-
-                if (isAtBottom) {
-                    footer.style.transform = 'translateY(0%)';
-                } else {
-                    footer.style.transform = 'translateY(100%)';
-                }
-              }
-
-              window.addEventListener('scroll', function() {
-                if (isScrolling) {
-                  window.clearTimeout(isScrolling);
-                }
-                isScrolling = setTimeout(updateFooterPosition, 50);
-              }, false);
-              
-              window.addEventListener('resize', updateFooterPosition);
-              
-              // Initial check after a short delay for content to render
-              setTimeout(updateFooterPosition, 100);
-            });
-          `
-        }}></script>
       </body>
     </html>
   );

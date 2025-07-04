@@ -77,12 +77,6 @@
   }
 }
 
-#main-footer {
-  flex-shrink: 0;
-  transform: translateY(100%);
-  transition: transform 0.4s ease-out;
-}
-
 /* Styles for the new Theme Switch */
 .theme-switch-placeholder {
   width: calc(5.625 * 8px);

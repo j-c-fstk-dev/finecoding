@@ -1,10 +1,15 @@
 import Link from 'next/link';
+import type { CSSProperties } from 'react';
 import { Github, Twitter } from 'lucide-react';
 import { EmailSignup } from '@/components/blog/EmailSignup';
 
-export function Footer() {
+export function Footer({ style }: { style?: CSSProperties }) {
   return (
-    <footer id="main-footer" className="w-full border-t border-border/40 bg-muted flex-shrink-0">
+    <footer 
+      id="main-footer" 
+      className="w-full border-t border-border/40 bg-muted flex-shrink-0 transition-transform duration-300 ease-out shadow-lg"
+      style={style}
+    >
       <div className="container mx-auto max-w-5xl px-4 py-8">
         <div className="grid gap-8 md:grid-cols-3">
           <div className="flex flex-col items-center">
