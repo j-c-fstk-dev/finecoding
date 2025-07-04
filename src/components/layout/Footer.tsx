@@ -4,8 +4,8 @@ import { EmailSignup } from '@/components/blog/EmailSignup';
 
 export function Footer() {
   return (
-    <footer className="w-full border-t border-border/40 bg-muted flex-1 flex flex-col">
-      <div className="container mx-auto max-w-5xl px-4 py-8 mt-auto">
+    <footer className="w-full border-t border-border/40 bg-muted">
+      <div className="container mx-auto max-w-5xl px-4 py-8">
         <div className="grid gap-8 md:grid-cols-3">
           <div className="flex flex-col items-center">
             <Link href="/" className="mb-4 flex items-center space-x-2">

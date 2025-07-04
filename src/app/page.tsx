@@ -14,7 +14,7 @@ export default async function Home() {
       <CodeRain />
       <Header />
       <div className="relative z-10 flex flex-1 flex-col bg-background">
-        <main>
+        <main className="flex-1">
           <div className="container mx-auto max-w-5xl px-4 py-16">
             <section className="text-center">
               <h1 className="font-headline text-4xl font-bold tracking-tight text-foreground sm:text-5xl lg:text-6xl">

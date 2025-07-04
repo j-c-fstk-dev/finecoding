@@ -11,7 +11,7 @@ export default async function ResourcesPage() {
   return (
     <div className="flex min-h-screen flex-col">
       <Header />
-      <main>
+      <main className="flex-1">
         <div className="container mx-auto max-w-5xl px-4 py-16">
           <section>
             <h1 className="font-headline text-4xl font-bold tracking-tight text-foreground sm:text-5xl">

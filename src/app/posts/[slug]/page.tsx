@@ -29,7 +29,7 @@ export default async function PostPage({ params }: { params: { slug: string } })
   return (
     <div className="flex min-h-screen flex-col">
       <Header />
-      <main className="py-12 md:py-20">
+      <main className="flex-1 py-12 md:py-20">
         <article className="container mx-auto max-w-3xl px-4">
           <header className="mb-8">
             <h1 className="font-headline text-3xl font-extrabold tracking-tight md:text-5xl">
