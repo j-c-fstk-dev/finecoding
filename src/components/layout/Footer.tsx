@@ -10,11 +10,17 @@ export function Footer({ style }: { style?: CSSProperties }) {
       className="w-full border-t border-border/40 bg-muted flex-shrink-0 transition-transform duration-300 ease-out shadow-lg"
       style={style}
     >
-      <div className="container mx-auto max-w-5xl px-4 py-16">
+      <div className="container mx-auto max-w-5xl px-4 py-12">
         <div className="grid gap-8 md:grid-cols-3">
           <div className="flex flex-col items-center">
-            <Link href="/" className="mb-4 flex items-center space-x-2">
-              <img src="https://res.cloudinary.com/dr0weongo/image/upload/v1751503667/20250702_212403_0000_2_pp63nm.svg" alt="Fine Coding Logo" className="h-6 w-6" />
+            <Link href="/" className="mb-4">
+              <div className="h-10 w-10 rounded-full overflow-hidden border-2 border-muted-foreground/30">
+                <img
+                  src="https://res.cloudinary.com/dr0weongo/image/upload/v1751503667/20250702_212403_0000_2_pp63nm.svg"
+                  alt="Fine Coding Logo"
+                  className="h-full w-full object-cover"
+                />
+              </div>
             </Link>
             <div className="text-center">
                 <p className="animate-text-shine bg-gradient-to-r from-gray-400 via-white to-gray-400 bg-clip-text text-lg font-semibold text-transparent">
