@@ -27,7 +27,7 @@ export default async function PostPage({ params }: { params: { slug: string } })
   const comments = await getComments(post.id);
 
   return (
-    <div className="flex min-h-screen flex-col">
+    <>
       <Header />
       <main className="flex-1 py-12 md:py-20">
         <article className="container mx-auto max-w-3xl px-4">
@@ -61,6 +61,6 @@ export default async function PostPage({ params }: { params: { slug: string } })
         </article>
       </main>
       <Footer />
-    </div>
+    </>
   );
 }

@@ -10,7 +10,7 @@ export default async function Home() {
   const posts = await getPosts();
 
   return (
-    <div className="flex min-h-screen flex-col">
+    <>
       <CodeRain />
       <Header />
       <main className="relative z-10 flex-1">
@@ -42,6 +42,6 @@ export default async function Home() {
         </div>
       </main>
       <Footer />
-    </div>
+    </>
   );
 }

@@ -8,7 +8,7 @@ export default async function AllPostsPage() {
   const allTags = [...new Set(posts.flatMap(post => post.tags))].sort();
 
   return (
-    <div className="flex min-h-screen flex-col">
+    <>
       <Header />
       <main className="flex-1">
         <div className="container mx-auto max-w-5xl px-4 py-16">
@@ -26,6 +26,6 @@ export default async function AllPostsPage() {
         </div>
       </main>
       <Footer />
-    </div>
+    </>
   );
 }

@@ -25,6 +25,42 @@ export default function RootLayout({
     return () => clearTimeout(timer);
   }, []);
 
+  useEffect(() => {
+    const footer = document.getElementById('main-footer');
+    if (!footer) return;
+
+    const onScroll = () => {
+      const documentHeight = document.documentElement.scrollHeight;
+      const scrollPosition = window.scrollY;
+      const viewportHeight = window.innerHeight;
+
+      // If content is shorter than or equal to viewport, just show the footer.
+      if (documentHeight <= viewportHeight) {
+        footer.style.transform = 'translateY(0%)';
+        return;
+      }
+      
+      const isAtBottom = scrollPosition + viewportHeight >= documentHeight - 2; // 2px buffer
+
+      if (isAtBottom) {
+        footer.style.transform = 'translateY(0%)';
+      } else {
+        footer.style.transform = 'translateY(100%)';
+      }
+    };
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll);
+    
+    // Initial check in case the page is not scrollable
+    onScroll();
+
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onScroll);
+    };
+  }, []);
+
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
@@ -38,7 +74,7 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Source+Code+Pro:wght@400;500&display=swap" rel="stylesheet" />
       </head>
-      <body className="font-body antialiased">
+      <body className="flex flex-col font-body antialiased">
         <AuthProvider>
           <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
             <AnimatePresence>

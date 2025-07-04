@@ -31,8 +31,6 @@
     --foreground: 0 0% 88%;
     --card: 0 0% 13%;
     --card-foreground: 0 0% 88%;
-    --popover: 0 0% 13%;
-    --popover-foreground: 0 0% 88%;
     --primary: 151 51% 21%;
     --primary-foreground: 0 0% 100%;
     --secondary: 0 0% 15%;
@@ -50,6 +48,12 @@
 }
 
 @layer base {
+  html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+  }
   * {
     @apply border-border;
   }
@@ -72,6 +76,12 @@
   .prose strong {
     @apply text-foreground;
   }
+}
+
+#main-footer {
+  flex-shrink: 0;
+  transform: translateY(100%);
+  transition: transform 0.4s ease-out;
 }
 
 /* Styles for the new Theme Switch */
@@ -502,8 +512,9 @@
 
 .animate-text-shine {
   background-size: 200% auto;
-  animation: text-shine 5s linear infinite;
+  animation: text-shine 3s linear infinite;
   animation-delay: 1.5s; /* Delay so it starts after text appears */
 }
 
     
+

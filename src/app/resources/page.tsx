@@ -9,7 +9,7 @@ export default async function ResourcesPage() {
   const resources = await getResources();
 
   return (
-    <div className="flex min-h-screen flex-col">
+    <>
       <Header />
       <main className="flex-1">
         <div className="container mx-auto max-w-5xl px-4 py-16">
@@ -31,6 +31,6 @@ export default async function ResourcesPage() {
         </div>
       </main>
       <Footer />
-    </div>
+    </>
   );
 }

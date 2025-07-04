@@ -4,7 +4,7 @@ import Image from 'next/image';
 
 export default function AboutPage() {
   return (
-    <div className="flex min-h-screen flex-col">
+    <>
       <Header />
       <main className="flex-1">
         <div className="container mx-auto max-w-3xl px-4 py-16">
@@ -50,6 +50,6 @@ export default function AboutPage() {
         </div>
       </main>
       <Footer />
-    </div>
+    </>
   );
 }
