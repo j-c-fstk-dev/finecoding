@@ -33,19 +33,19 @@
     --card-foreground: 0 0% 88%;
     --popover: 0 0% 13%;
     --popover-foreground: 0 0% 88%;
-    --primary: 165 100% 20%; /* #00674F */
-    --primary-foreground: 0 0% 100%; /* White text for contrast */
+    --primary: 151 51% 21%;
+    --primary-foreground: 0 0% 100%;
     --secondary: 0 0% 15%;
     --secondary-foreground: 0 0% 88%;
     --muted: 0 0% 15%;
     --muted-foreground: 0 0% 63%;
-    --accent: 165 100% 20%; /* #00674F */
-    --accent-foreground: 0 0% 100%; /* White text for contrast */
+    --accent: 151 51% 21%;
+    --accent-foreground: 0 0% 100%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
     --border: 0 0% 20%;
     --input: 0 0% 20%;
-    --ring: 165 100% 20%; /* #00674F */
+    --ring: 151 51% 21%;
   }
 }
 
@@ -502,7 +502,7 @@
 
 .animate-text-shine {
   background-size: 200% auto;
-  animation: text-shine 3s linear infinite;
+  animation: text-shine 5s linear infinite;
   animation-delay: 1.5s; /* Delay so it starts after text appears */
 }
 

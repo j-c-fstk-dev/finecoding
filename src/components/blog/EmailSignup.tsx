@@ -43,7 +43,7 @@ export function EmailSignup() {
   };
 
   return (
-    <div className="rounded-lg border bg-card p-6 shadow-md">
+    <div className="rounded-lg border bg-card p-6 shadow-lg">
       <h3 className="font-headline text-lg font-semibold text-card-foreground">Stay Updated</h3>
       <p className="mt-2 text-sm text-muted-foreground">
         Get the latest posts, tutorials, and insights delivered to your inbox.
