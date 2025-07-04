@@ -52,7 +52,7 @@ export function Header() {
 
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 py-4 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background py-4">
       <div className="container flex max-w-screen-2xl flex-col items-center">
         {/* ROW 1: Title */}
         <div className="mb-4 flex items-center justify-center">
