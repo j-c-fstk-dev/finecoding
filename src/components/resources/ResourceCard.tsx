@@ -9,7 +9,7 @@ import { ResourceCardActions } from './ResourceCardActions';
 export function ResourceCard({ resource }: { resource: Resource }) {
   return (
     <Card className="h-full flex flex-col transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
-      <CardHeader className="bg-muted/25 p-4">
+      <CardHeader className="bg-secondary p-4">
         <div className="flex items-start justify-between gap-4">
           <div className="flex items-center gap-4">
             <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-background flex-shrink-0 border">

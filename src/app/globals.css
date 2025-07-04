@@ -9,24 +9,24 @@ body {
 
 @layer base {
   :root {
-    --background: 210 40% 98%; /* Natural off-white */
-    --foreground: 0 0% 15%;
+    --background: 220 20% 98%; /* Natural off-white */
+    --foreground: 220 10% 15%;
     --card: 0 0% 100%;
-    --card-foreground: 0 0% 15%;
+    --card-foreground: 220 10% 15%;
     --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 15%;
+    --popover-foreground: 220 10% 15%;
     --primary: 151 45% 45%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 0 0% 96.1%; /* Light grey for header/footer */
-    --secondary-foreground: 0 0% 9%;
-    --muted: 0 0% 96.1%;
-    --muted-foreground: 0 0% 40%;
+    --secondary: 220 15% 96.1%; /* Light grey for header/footer */
+    --secondary-foreground: 220 10% 9%;
+    --muted: 220 15% 96.1%;
+    --muted-foreground: 220 10% 40%;
     --accent: 151 45% 45%;
     --accent-foreground: 0 0% 100%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 89.8%;
-    --input: 0 0% 89.8%;
+    --border: 220 10% 89.8%;
+    --input: 220 10% 89.8%;
     --ring: 151 45% 45%;
     --radius: 0.5rem;
   }
@@ -61,6 +61,21 @@ body {
   body {
     @apply bg-background text-foreground;
     @apply min-h-screen font-body antialiased;
+  }
+  .prose {
+    @apply text-foreground;
+  }
+  .prose a {
+    @apply text-primary hover:text-primary/80;
+  }
+  .prose blockquote {
+    @apply border-primary;
+  }
+  .prose h1, .prose h2, .prose h3, .prose h4 {
+    @apply text-foreground;
+  }
+  .prose strong {
+    @apply text-foreground;
   }
 }
 

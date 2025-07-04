@@ -10,11 +10,10 @@ export default async function Home() {
   const posts = await getPosts();
 
   return (
-    <div className="relative flex min-h-screen flex-col">
+    <div className="flex min-h-screen flex-col">
       <CodeRain />
-      <div className="pointer-events-none absolute inset-0 z-10 bg-background/80 backdrop-blur-sm"></div>
-      <div className="relative z-20 flex flex-1 flex-col">
-        <Header />
+      <Header />
+      <div className="relative z-10 flex flex-1 flex-col bg-background">
         <main className="flex-1">
           <div className="container mx-auto max-w-5xl px-4 py-16">
             <section className="text-center">
