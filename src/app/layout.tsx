@@ -1,15 +1,30 @@
 'use client';
 
+import { useState, useEffect } from 'react';
+import { AnimatePresence } from 'framer-motion';
 import './globals.css';
 import { ThemeProvider } from '@/components/theme-provider';
 import { Toaster } from '@/components/ui/toaster';
 import { AuthProvider } from '@/lib/auth';
+import { SplashScreen } from '@/components/layout/SplashScreen';
 
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    // This timer simulates a loading process.
+    // In a real app, you might wait for data fetching or other async operations.
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 2500); // Duration of the splash screen animation
+
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
@@ -26,6 +41,9 @@ export default function RootLayout({
       <body className="font-body antialiased">
         <AuthProvider>
           <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
+            <AnimatePresence>
+              {isLoading && <SplashScreen />}
+            </AnimatePresence>
             {children}
             <Toaster />
           </ThemeProvider>
