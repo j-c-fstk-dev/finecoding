@@ -1,17 +1,23 @@
 "use client";
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useTheme } from 'next-themes';
 
 export function CodeRain() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const { resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  // This effect runs only on the client, after the component has mounted.
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
-    // Only run the effect if the theme is dark
-    if (resolvedTheme !== 'dark') {
+    // We wait until the component is mounted and the theme is confirmed to be dark.
+    if (!mounted || resolvedTheme !== 'dark') {
         const canvas = canvasRef.current;
-        // If canvas exists, clear it to handle theme switching
+        // If the theme changes away from dark, clear the canvas.
         if (canvas) {
             const ctx = canvas.getContext('2d');
             ctx?.clearRect(0, 0, canvas.width, canvas.height);
@@ -62,12 +68,14 @@ export function CodeRain() {
       clearInterval(interval);
       window.removeEventListener('resize', handleResize);
     };
-  }, [resolvedTheme]); // Rerun effect when theme changes
+  }, [resolvedTheme, mounted]); // Rerun effect when theme or mounted status changes
 
-  // Don't render the canvas on light theme
-  if (resolvedTheme !== 'dark') {
+  // On the initial server render and the first client render, `mounted` is false, so we render nothing.
+  // This ensures the server and client HTML match.
+  if (!mounted || resolvedTheme !== 'dark') {
     return null;
   }
 
+  // Once mounted on the client, if the theme is dark, we render the canvas.
   return <canvas ref={canvasRef} className="fixed top-0 left-0 w-full h-full z-0 opacity-20"></canvas>;
 }
