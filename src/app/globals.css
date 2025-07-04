@@ -59,7 +59,6 @@
   }
   body {
     @apply bg-background text-foreground;
-    @apply min-h-screen font-body antialiased;
   }
   .prose {
     @apply text-foreground;
@@ -517,4 +516,3 @@
 }
 
     
-

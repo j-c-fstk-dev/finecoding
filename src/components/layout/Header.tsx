@@ -52,7 +52,7 @@ export function Header() {
 
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-transparent backdrop-blur-sm py-4 dark:bg-muted/90 dark:backdrop-blur-sm">
+    <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/80 backdrop-blur-sm py-4 dark:bg-muted/90 flex-shrink-0">
       <div className="container flex max-w-screen-2xl flex-col items-center">
         {/* ROW 1: Title */}
         <div className="mb-4 flex items-center justify-center">
@@ -170,5 +170,3 @@ export function Header() {
     </header>
   );
 }
-
-    

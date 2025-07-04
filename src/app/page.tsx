@@ -1,7 +1,5 @@
 import { getPosts } from '@/lib/posts';
 import { PostCard } from '@/components/blog/PostCard';
-import { Header } from '@/components/layout/Header';
-import { Footer } from '@/components/layout/Footer';
 import { CodeRain } from '@/components/layout/CodeRain';
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
@@ -12,8 +10,7 @@ export default async function Home() {
   return (
     <>
       <CodeRain />
-      <Header />
-      <main className="relative z-10 flex-1">
+      <div className="relative z-10">
         <div className="container mx-auto max-w-5xl px-4 py-16">
           <section className="text-center">
             <h1 className="font-headline text-4xl font-bold tracking-tight text-foreground sm:text-5xl lg:text-6xl">
@@ -40,8 +37,7 @@ export default async function Home() {
             )}
           </section>
         </div>
-      </main>
-      <Footer />
+      </div>
     </>
   );
 }

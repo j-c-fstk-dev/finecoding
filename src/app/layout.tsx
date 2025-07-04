@@ -7,6 +7,8 @@ import { ThemeProvider } from '@/components/theme-provider';
 import { Toaster } from '@/components/ui/toaster';
 import { AuthProvider } from '@/lib/auth';
 import { SplashScreen } from '@/components/layout/SplashScreen';
+import { Header } from '@/components/layout/Header';
+import { Footer } from '@/components/layout/Footer';
 
 export default function RootLayout({
   children,
@@ -17,48 +19,11 @@ export default function RootLayout({
 
   useEffect(() => {
     // This timer simulates a loading process.
-    // In a real app, you might wait for data fetching or other async operations.
     const timer = setTimeout(() => {
       setIsLoading(false);
     }, 2500); // Duration of the splash screen animation
 
     return () => clearTimeout(timer);
-  }, []);
-
-  useEffect(() => {
-    const footer = document.getElementById('main-footer');
-    if (!footer) return;
-
-    const onScroll = () => {
-      const documentHeight = document.documentElement.scrollHeight;
-      const scrollPosition = window.scrollY;
-      const viewportHeight = window.innerHeight;
-
-      // If content is shorter than or equal to viewport, just show the footer.
-      if (documentHeight <= viewportHeight) {
-        footer.style.transform = 'translateY(0%)';
-        return;
-      }
-      
-      const isAtBottom = scrollPosition + viewportHeight >= documentHeight - 2; // 2px buffer
-
-      if (isAtBottom) {
-        footer.style.transform = 'translateY(0%)';
-      } else {
-        footer.style.transform = 'translateY(100%)';
-      }
-    };
-
-    window.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('resize', onScroll);
-    
-    // Initial check in case the page is not scrollable
-    onScroll();
-
-    return () => {
-      window.removeEventListener('scroll', onScroll);
-      window.removeEventListener('resize', onScroll);
-    };
   }, []);
 
   return (
@@ -74,16 +39,64 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Source+Code+Pro:wght@400;500&display=swap" rel="stylesheet" />
       </head>
-      <body className="flex flex-col font-body antialiased">
+      <body>
         <AuthProvider>
           <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
-            <AnimatePresence>
-              {isLoading && <SplashScreen />}
-            </AnimatePresence>
-            {children}
+            <div className="flex flex-col min-h-screen">
+              <AnimatePresence>
+                {isLoading && <SplashScreen />}
+              </AnimatePresence>
+              <Header />
+              <main className="flex-1 w-full relative z-10">
+                {children}
+              </main>
+              <Footer />
+            </div>
             <Toaster />
           </ThemeProvider>
         </AuthProvider>
+        <script dangerouslySetInnerHTML={{
+          __html: `
+            document.addEventListener("DOMContentLoaded", function () {
+              const footer = document.getElementById("main-footer");
+              if (!footer) return;
+
+              let isScrolling = null;
+
+              function updateFooterPosition() {
+                const documentHeight = document.documentElement.scrollHeight;
+                const scrollPosition = window.scrollY;
+                const viewportHeight = window.innerHeight;
+                
+                // If content is shorter than or equal to viewport, just show the footer.
+                if (documentHeight <= viewportHeight + 5) {
+                    footer.style.transform = 'translateY(0%)';
+                    return;
+                }
+                
+                const isAtBottom = scrollPosition + viewportHeight >= documentHeight - 2;
+
+                if (isAtBottom) {
+                    footer.style.transform = 'translateY(0%)';
+                } else {
+                    footer.style.transform = 'translateY(100%)';
+                }
+              }
+
+              window.addEventListener('scroll', function() {
+                if (isScrolling) {
+                  window.clearTimeout(isScrolling);
+                }
+                isScrolling = setTimeout(updateFooterPosition, 50);
+              }, false);
+              
+              window.addEventListener('resize', updateFooterPosition);
+              
+              // Initial check after a short delay for content to render
+              setTimeout(updateFooterPosition, 100);
+            });
+          `
+        }}></script>
       </body>
     </html>
   );
