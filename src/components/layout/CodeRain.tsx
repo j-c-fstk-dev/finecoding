@@ -1,11 +1,24 @@
 "use client";
 
 import React, { useEffect, useRef } from 'react';
+import { useTheme } from 'next-themes';
 
 export function CodeRain() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const { resolvedTheme } = useTheme();
 
   useEffect(() => {
+    // Only run the effect if the theme is dark
+    if (resolvedTheme !== 'dark') {
+        const canvas = canvasRef.current;
+        // If canvas exists, clear it to handle theme switching
+        if (canvas) {
+            const ctx = canvas.getContext('2d');
+            ctx?.clearRect(0, 0, canvas.width, canvas.height);
+        }
+        return;
+    }
+
     const canvas = canvasRef.current;
     if (!canvas) return;
     
@@ -35,7 +48,7 @@ export function CodeRain() {
     const draw = () => {
       ctx.fillStyle = 'rgba(26, 26, 26, 0.05)';
       ctx.fillRect(0, 0, w, h);
-      ctx.fillStyle = '#2C6E49';
+      ctx.fillStyle = '#00674F'; // Use the correct dark theme green
       ctx.font = `${font}px monospace`;
       p.forEach((v, i) => {
         ctx.fillText(matrix[Math.floor(Math.random() * matrix.length)], i * font, v);
@@ -49,7 +62,12 @@ export function CodeRain() {
       clearInterval(interval);
       window.removeEventListener('resize', handleResize);
     };
-  }, []);
+  }, [resolvedTheme]); // Rerun effect when theme changes
+
+  // Don't render the canvas on light theme
+  if (resolvedTheme !== 'dark') {
+    return null;
+  }
 
   return <canvas ref={canvasRef} className="fixed top-0 left-0 w-full h-full z-0 opacity-20"></canvas>;
 }

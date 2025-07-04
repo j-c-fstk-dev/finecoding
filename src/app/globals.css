@@ -2,18 +2,13 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  font-family: Arial, Helvetica, sans-serif;
-  background-color: hsl(0 0% 10%); /* Default dark background to prevent white flash */
-}
-
 @layer base {
   :root {
-    --background: 0 0% 96.1%; /* #f5f5f5 */
+    --background: 240 4% 96%; /* #f5f5f5 */
     --foreground: 220 10% 15%;
-    --card: 120 100% 99%; /* #FAFFFA */
+    --card: 100 100% 98%; /* #FAFFFA */
     --card-foreground: 220 10% 15%;
-    --popover: 120 100% 99%; /* #FAFFFA */
+    --popover: 100 100% 98%; /* #FAFFFA */
     --popover-foreground: 220 10% 15%;
     --primary: 151 45% 45%;
     --primary-foreground: 0 0% 100%;
