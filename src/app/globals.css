@@ -14,7 +14,7 @@
     --primary-foreground: 0 0% 100%;
     --secondary: 0 0% 96.1%; /* Match background */
     --secondary-foreground: 220 10% 9%;
-    --muted: 0 0% 96.1%; /* Match background */
+    --muted: 0 0% 85.1%; /* #D9D9D9 */
     --muted-foreground: 220 10% 40%;
     --accent: 151 45% 45%;
     --accent-foreground: 0 0% 100%;
