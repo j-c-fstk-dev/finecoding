@@ -29,7 +29,9 @@ export default function RootLayout({
   }, []);
 
   useEffect(() => {
-    // This effect runs only on the client, after hydration.
+    // This effect runs only on the client, after hydration and after the initial loading is complete.
+    if (isLoading) return;
+
     const footer = document.getElementById("main-footer");
     if (!footer) return;
 
@@ -39,14 +41,17 @@ export default function RootLayout({
       const viewportHeight = window.innerHeight;
       const footerHeight = footer.offsetHeight;
 
+      // A buffer to start the reveal effect a bit earlier
       const revealBuffer = 200; 
       const revealStartPoint = documentHeight - viewportHeight - footerHeight - revealBuffer;
 
+      // When the user scrolls near the bottom, animate the footer into view
       if (scrollPosition >= revealStartPoint) {
         const scrollProgress = (scrollPosition - revealStartPoint) / (footerHeight + revealBuffer);
         const translateYValue = (1 - Math.min(1, scrollProgress)) * 100;
         setFooterStyle({ transform: `translateY(${translateYValue}%)` });
       } else {
+        // Otherwise, keep it hidden below the viewport
         setFooterStyle({ transform: 'translateY(100%)' });
       }
     };
@@ -54,13 +59,14 @@ export default function RootLayout({
     window.addEventListener('scroll', updateFooterPosition, { passive: true });
     window.addEventListener('resize', updateFooterPosition);
 
+    // Initial call to set position correctly on page load
     updateFooterPosition();
 
     return () => {
       window.removeEventListener('scroll', updateFooterPosition);
       window.removeEventListener('resize', updateFooterPosition);
     };
-  }, []);
+  }, [isLoading]); // Dependency on isLoading ensures this runs only after the page is ready
 
   return (
     <html lang="en" suppressHydrationWarning>
@@ -75,19 +81,17 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Source+Code+Pro:wght@400;500&display=swap" rel="stylesheet" />
       </head>
-      <body>
+      <body className="flex flex-col min-h-screen">
         <AuthProvider>
           <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
-            <div className="flex flex-col min-h-screen">
-              <AnimatePresence>
-                {isLoading && <SplashScreen />}
-              </AnimatePresence>
-              <Header />
-              <main className="flex-1 w-full relative z-10">
-                {children}
-              </main>
-              <Footer style={footerStyle} />
-            </div>
+            <AnimatePresence>
+              {isLoading && <SplashScreen />}
+            </AnimatePresence>
+            <Header />
+            <main className="flex-1 w-full relative z-10">
+              {children}
+            </main>
+            <Footer style={footerStyle} />
             <Toaster />
           </ThemeProvider>
         </AuthProvider>
