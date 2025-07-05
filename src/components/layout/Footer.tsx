@@ -23,9 +23,11 @@ export function Footer({ style }: { style?: CSSProperties }) {
               </div>
             </Link>
             <div className="text-center">
-                <p className="animate-text-shine bg-gradient-to-r from-gray-400 via-white to-gray-400 bg-clip-text text-lg font-semibold text-transparent">
-                    Powered by BeRegen ®
-                </p>
+                <a href="#" target="_blank" rel="noopener noreferrer" className="hover:opacity-80 transition-opacity">
+                    <p className="animate-text-shine bg-gradient-to-r from-gray-400 via-white to-gray-400 bg-clip-text text-lg font-semibold text-transparent">
+                        Powered by BeRegen ®
+                    </p>
+                </a>
                 <p className="text-xs text-gray-500 mt-1">All rights reserved</p>
             </div>
             <div className="mt-4 flex space-x-4">
