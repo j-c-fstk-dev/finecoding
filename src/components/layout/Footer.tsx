@@ -23,7 +23,7 @@ export function Footer({ style }: { style?: CSSProperties }) {
               </div>
             </Link>
             <div className="text-center">
-                <a href="#" target="_blank" rel="noopener noreferrer" className="hover:opacity-80 transition-opacity">
+                <a href="https://beregenerativelife.wordpress.com/" target="_blank" rel="noopener noreferrer" className="hover:opacity-80 transition-opacity">
                     <p className="animate-text-shine bg-gradient-to-r from-gray-400 via-white to-gray-400 bg-clip-text text-lg font-semibold text-transparent">
                         Powered by BeRegen ®
                     </p>
