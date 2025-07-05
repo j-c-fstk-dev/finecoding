@@ -8,7 +8,7 @@ import { ResourceCardActions } from './ResourceCardActions';
 
 export function ResourceCard({ resource }: { resource: Resource }) {
   return (
-    <Card className="w-80 h-full flex flex-col transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+    <Card className="w-80 flex flex-col transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
       <a
         href={resource.link}
         target="_blank"
@@ -22,7 +22,7 @@ export function ResourceCard({ resource }: { resource: Resource }) {
               <DynamicIcon name={resource.icon as IconName} className="h-6 w-6 text-primary" />
             </div>
             <div className="min-w-0">
-              <h3 className="truncate text-base font-semibold leading-tight text-card-foreground">
+              <h3 className="text-base font-semibold leading-tight text-card-foreground break-words">
                 {resource.name}
               </h3>
               <Badge variant="outline" className="mt-2 font-mono text-xs">{resource.pricing}</Badge>
