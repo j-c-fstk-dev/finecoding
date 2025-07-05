@@ -2,6 +2,24 @@ import { getResources } from '@/lib/resources';
 import { FilterableResourceList } from '@/components/resources/FilterableResourceList';
 import { WishlistForm } from '@/components/resources/WishlistForm';
 import { Separator } from '@/components/ui/separator';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Resource Hub',
+  description: 'A curated collection of tools, libraries, and learning materials for developers, covering AI, DevOps, Design, and more.',
+  alternates: {
+    canonical: '/resources',
+  },
+  openGraph: {
+    title: 'Resource Hub | Fine Coding',
+    description: 'A curated collection of tools for developers.',
+    url: '/resources',
+  },
+  twitter: {
+    title: 'Resource Hub | Fine Coding',
+    description: 'A curated collection of tools for developers.',
+  }
+};
 
 export default async function ResourcesPage() {
   const resources = await getResources();

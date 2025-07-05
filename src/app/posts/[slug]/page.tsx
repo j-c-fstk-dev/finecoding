@@ -1,4 +1,5 @@
 import { notFound } from 'next/navigation';
+import type { Metadata, ResolvingMetadata } from 'next'
 import { getPostBySlug, getPosts } from '@/lib/posts';
 import { getComments } from '@/lib/comments';
 import { Badge } from '@/components/ui/badge';
@@ -6,6 +7,54 @@ import { Calendar, Tag } from 'lucide-react';
 import { format } from 'date-fns';
 import { MarkdownRenderer } from '@/components/blog/MarkdownRenderer';
 import { PostInteraction } from '@/components/blog/PostInteraction';
+
+type Props = {
+  params: { slug: string }
+}
+
+export async function generateMetadata(
+  { params }: Props,
+  parent: ResolvingMetadata
+): Promise<Metadata> {
+  const post = await getPostBySlug(params.slug);
+ 
+  if (!post) {
+    return {
+      title: 'Post Not Found'
+    }
+  }
+
+  // optionally access and extend (rather than replace) parent metadata
+  const previousImages = (await parent).openGraph?.images || []
+ 
+  return {
+    title: post.title,
+    description: post.excerpt,
+    keywords: post.tags,
+    alternates: {
+      canonical: `/posts/${post.slug}`,
+    },
+    openGraph: {
+      title: post.title,
+      description: post.excerpt,
+      url: `/posts/${post.slug}`,
+      images: [
+        {
+          url: post.imageUrl,
+          width: 1200,
+          height: 630,
+          alt: post.title,
+        },
+        ...previousImages
+      ],
+    },
+    twitter: {
+        title: post.title,
+        description: post.excerpt,
+        images: [post.imageUrl],
+    }
+  }
+}
 
 export async function generateStaticParams() {
   const posts = await getPosts();

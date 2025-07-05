@@ -1,16 +1,44 @@
-'use client';
 
-import { useState, useEffect } from 'react';
-import type { CSSProperties } from 'react';
-import { AnimatePresence } from 'framer-motion';
+import type { Metadata } from 'next';
 import Script from 'next/script';
 import './globals.css';
-import { ThemeProvider } from '@/components/theme-provider';
-import { Toaster } from '@/components/ui/toaster';
-import { AuthProvider } from '@/lib/auth';
-import { SplashScreen } from '@/components/layout/SplashScreen';
-import { Header } from '@/components/layout/Header';
-import { Footer } from '@/components/layout/Footer';
+import { ClientLayout } from '@/components/layout/ClientLayout';
+
+export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:9002'),
+  title: {
+    default: 'Fine Coding - AI, Software Craftsmanship, and Modern Development',
+    template: '%s | Fine Coding',
+  },
+  description: 'A modern blog about software development, AI, and the art of fine coding. Exploring the frontiers of technology including vibecoding, Next.js, Genkit, and coding with AI.',
+  keywords: ['Fine Coding', 'finecoding', 'AI coding', 'software development', 'Next.js blog', 'Genkit', 'vibecoding', 'coding with ai', 'tech blog', 'software craftsmanship', 'developer blog'],
+  openGraph: {
+    title: 'Fine Coding - AI, Software Craftsmanship, and Modern Development',
+    description: 'A modern blog about software development, AI, and the art of fine coding.',
+    url: '/',
+    siteName: 'Fine Coding',
+    images: [
+      {
+        url: 'https://res.cloudinary.com/dr0weongo/image/upload/v1751168647/file_00000000591c61f59c33352b1d8f37fd_ncuhov.png', // default OG image
+        width: 1200,
+        height: 630,
+        alt: 'Fine Coding banner image',
+      },
+    ],
+    locale: 'en_US',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Fine Coding - AI, Software Craftsmanship, and Modern Development',
+    description: 'A modern blog about software development, AI, and the art of fine coding.',
+    images: ['https://res.cloudinary.com/dr0weongo/image/upload/v1751168647/file_00000000591c61f59c33352b1d8f37fd_ncuhov.png'],
+  },
+  alternates: {
+    canonical: '/',
+  }
+};
+
 
 const gaId = process.env.NEXT_PUBLIC_GA_ID;
 
@@ -19,63 +47,9 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const [isLoading, setIsLoading] = useState(true);
-  const [footerStyle, setFooterStyle] = useState<CSSProperties>({ transform: 'translateY(100%)' });
-
-  useEffect(() => {
-    // This timer simulates a loading process.
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 2500); // Duration of the splash screen animation
-
-    return () => clearTimeout(timer);
-  }, []);
-
-  useEffect(() => {
-    // This effect runs only on the client, after hydration and after the initial loading is complete.
-    if (isLoading) return;
-
-    const footer = document.getElementById("main-footer");
-    if (!footer) return;
-
-    const updateFooterPosition = () => {
-      const documentHeight = document.documentElement.scrollHeight;
-      const scrollPosition = window.scrollY;
-      const viewportHeight = window.innerHeight;
-      const footerHeight = footer.offsetHeight;
-
-      // A buffer to start the reveal effect a bit earlier
-      const revealBuffer = 200; 
-      const revealStartPoint = documentHeight - viewportHeight - footerHeight - revealBuffer;
-
-      // When the user scrolls near the bottom, animate the footer into view
-      if (scrollPosition >= revealStartPoint) {
-        const scrollProgress = (scrollPosition - revealStartPoint) / (footerHeight + revealBuffer);
-        const translateYValue = (1 - Math.min(1, scrollProgress)) * 100;
-        setFooterStyle({ transform: `translateY(${translateYValue}%)` });
-      } else {
-        // Otherwise, keep it hidden below the viewport
-        setFooterStyle({ transform: 'translateY(100%)' });
-      }
-    };
-    
-    window.addEventListener('scroll', updateFooterPosition, { passive: true });
-    window.addEventListener('resize', updateFooterPosition);
-
-    // Initial call to set position correctly on page load
-    updateFooterPosition();
-
-    return () => {
-      window.removeEventListener('scroll', updateFooterPosition);
-      window.removeEventListener('resize', updateFooterPosition);
-    };
-  }, [isLoading]); // Dependency on isLoading ensures this runs only after the page is ready
-
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        <title>Fine Coding</title>
-        <meta name="description" content="A blog about software development, AI, and Fine Coding." />
         <meta name="theme-color" content="#1A1A1A" />
         <link rel="manifest" href="/manifest.json" />
         <link rel="icon" href="https://res.cloudinary.com/dr0weongo/image/upload/v1751503667/20250702_212403_0000_2_pp63nm.svg" type="image/svg+xml" />
@@ -105,19 +79,7 @@ export default function RootLayout({
             />
           </>
         )}
-        <AuthProvider>
-          <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
-            <AnimatePresence>
-              {isLoading && <SplashScreen />}
-            </AnimatePresence>
-            <Header />
-            <main className="flex-1 w-full relative z-10">
-              {children}
-            </main>
-            <Footer style={footerStyle} />
-            <Toaster />
-          </ThemeProvider>
-        </AuthProvider>
+        <ClientLayout>{children}</ClientLayout>
       </body>
     </html>
   );

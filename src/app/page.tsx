@@ -3,6 +3,13 @@ import { PostCard } from '@/components/blog/PostCard';
 import { CodeRain } from '@/components/layout/CodeRain';
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  // The title and description are inherited from the root layout, 
+  // so we don't need to redefine them here unless we want to be more specific.
+  // This page will use the default metadata.
+};
 
 export default async function Home() {
   const posts = await getPosts();

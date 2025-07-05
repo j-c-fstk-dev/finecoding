@@ -1,4 +1,18 @@
 import Image from 'next/image';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'About',
+  description: 'Learn about the philosophy and mission of Fine Coding. A commitment to software craftsmanship, AI exploration, and modern web development.',
+  openGraph: {
+    title: 'About | Fine Coding',
+    description: 'Learn about the philosophy and mission of Fine Coding.',
+  },
+  twitter: {
+    title: 'About | Fine Coding',
+    description: 'Learn about the philosophy and mission of Fine Coding.',
+  }
+};
 
 export default function AboutPage() {
   return (
