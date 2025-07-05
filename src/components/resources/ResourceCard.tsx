@@ -8,13 +8,13 @@ import { ResourceCardActions } from './ResourceCardActions';
 
 export function ResourceCard({ resource }: { resource: Resource }) {
   return (
-    <Card className="w-full h-full flex flex-col transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+    <Card className="w-full max-w-sm h-full flex flex-col transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
       <a
         href={resource.link}
         target="_blank"
         rel="noopener noreferrer"
         aria-label={`Visit ${resource.name}`}
-        className="block rounded-t-lg bg-secondary p-4 transition-all duration-150 ease-out hover:bg-muted/70 active:translate-y-1 active:border-b-0 border-b-4 border-muted/50"
+        className="block rounded-t-lg bg-secondary p-4 border-b-4 border-border transition-all duration-150 ease-out hover:bg-muted/70 active:translate-y-1 active:border-b-0"
       >
         <div className="flex items-start justify-between gap-4">
           <div className="flex items-center gap-4">
