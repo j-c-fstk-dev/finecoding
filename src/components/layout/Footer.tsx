@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import type { CSSProperties } from 'react';
-import { Github, Twitter } from 'lucide-react';
+import { Github, Twitter, Instagram } from 'lucide-react';
 import { EmailSignup } from '@/components/blog/EmailSignup';
 
 export function Footer({ style }: { style?: CSSProperties }) {
@@ -36,6 +36,9 @@ export function Footer({ style }: { style?: CSSProperties }) {
               </a>
               <a href="https://x.com/FineCodingBlog?t=Rl_dmSeMK_BiVDU3XWQdIw&s=09" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary">
                 <Twitter size={20} />
+              </a>
+              <a href="https://www.instagram.com/fine.coding.blog?igsh=MWRnZml4eTE4bXlldQ==" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary">
+                <Instagram size={20} />
               </a>
             </div>
           </div>
