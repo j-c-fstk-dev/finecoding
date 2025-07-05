@@ -1,3 +1,4 @@
+
 import { getPosts } from '@/lib/posts';
 import type { Post } from '@/types';
 
@@ -26,10 +27,14 @@ function generateSiteMap(posts: Post[]) {
      <!-- Add dynamic routes for posts -->
      ${posts
        .map(({ slug, date }) => {
+         // Defensive check to ensure we have a valid slug and date
+         if (!slug || !date || !(date instanceof Date) || isNaN(date.getTime())) {
+            return ''; // Skip invalid entries
+         }
          return `
        <url>
            <loc>${`${URL}/posts/${slug}`}</loc>
-           <lastmod>${new Date(date).toISOString()}</lastmod>
+           <lastmod>${date.toISOString()}</lastmod>
            <priority>0.9</priority>
        </url>
      `;
@@ -40,13 +45,19 @@ function generateSiteMap(posts: Post[]) {
 }
 
 export async function GET() {
-  const posts = await getPosts();
-  const body = generateSiteMap(posts);
+  try {
+    const posts = await getPosts();
+    const body = generateSiteMap(posts);
 
-  return new Response(body, {
-    status: 200,
-    headers: {
-      'Content-Type': 'application/xml',
-    },
-  });
+    return new Response(body, {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/xml',
+        'Cache-Control': 's-maxage=86400, stale-while-revalidate', // Cache for 24 hours
+      },
+    });
+  } catch (error) {
+    console.error('Failed to generate sitemap:', error);
+    return new Response('Internal Server Error', { status: 500 });
+  }
 }
