@@ -75,7 +75,7 @@ export function FilterableResourceList({ resources }: FilterableResourceListProp
           {categoriesToDisplay.length > 0 ? (
             <Accordion type="multiple" defaultValue={categoriesToDisplay} className="w-full space-y-4">
               {categoriesToDisplay.map(category => (
-                <AccordionItem key={category} value={category} className="border-b-0 rounded-lg overflow-hidden border bg-muted dark:bg-card">
+                <AccordionItem key={category} value={category} className="border-b-0 rounded-lg overflow-hidden border bg-background/50 dark:bg-card">
                   <AccordionTrigger className="text-xl font-headline hover:no-underline px-6 py-4 data-[state=open]:border-b">
                     <div className="flex items-center gap-3">
                       {category}
@@ -83,7 +83,7 @@ export function FilterableResourceList({ resources }: FilterableResourceListProp
                     </div>
                   </AccordionTrigger>
                   <AccordionContent className="px-6 pb-6">
-                    <div className="pt-4 grid justify-items-center gap-4 md:grid-cols-2">
+                    <div className="pt-4 flex flex-wrap justify-center gap-4">
                       {groupedAndFilteredResources[category]?.map(resource => (
                         <ResourceCard key={resource.id} resource={resource} />
                       ))}

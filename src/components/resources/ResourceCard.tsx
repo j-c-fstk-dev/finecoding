@@ -8,7 +8,7 @@ import { ResourceCardActions } from './ResourceCardActions';
 
 export function ResourceCard({ resource }: { resource: Resource }) {
   return (
-    <Card className="w-full max-w-sm h-full flex flex-col transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+    <Card className="w-80 h-full flex flex-col transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
       <a
         href={resource.link}
         target="_blank"
