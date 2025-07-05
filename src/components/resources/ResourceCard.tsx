@@ -23,7 +23,7 @@ export function ResourceCard({ resource }: { resource: Resource }) {
             </div>
             <div className="min-w-0">
               <h3 className="text-base font-semibold leading-tight text-card-foreground break-words">
-                {resource.name}
+                {resource.name.replaceAll('/', ' and ')}
               </h3>
               <Badge variant="outline" className="mt-2 font-mono text-xs">{resource.pricing}</Badge>
             </div>
