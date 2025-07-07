@@ -526,6 +526,7 @@
 .btn-content {
   display: flex;
   align-items: center;
+  justify-content: center;
   padding: 0.5em 1em;
   text-decoration: none;
   font-family: 'Inter', sans-serif;
@@ -536,7 +537,8 @@
   transition: all 0.5s;
   border-radius: 100px;
   box-shadow: 0 0 0.2em 0 var(--nav-btn-shadow);
-  max-width: 48%;
+  width: 48%;
+  max-width: 240px;
   gap: 0.5rem;
 }
 
