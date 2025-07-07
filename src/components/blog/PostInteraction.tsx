@@ -20,10 +20,13 @@ import { Separator } from '@/components/ui/separator';
 import { Card, CardContent } from '@/components/ui/card';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { cn } from '@/lib/utils';
+import { PostNavigation } from '@/components/blog/PostNavigation';
 
 interface PostInteractionProps {
   post: Post;
   initialComments: Comment[];
+  previousPost: Post | null;
+  nextPost: Post | null;
 }
 
 const commentSchema = z.object({
@@ -31,7 +34,7 @@ const commentSchema = z.object({
   comment: z.string().min(3, { message: 'Comment must be at least 3 characters.' }).max(1000),
 });
 
-export function PostInteraction({ post, initialComments }: PostInteractionProps) {
+export function PostInteraction({ post, initialComments, previousPost, nextPost }: PostInteractionProps) {
   const router = useRouter();
   const { toast } = useToast();
   
@@ -109,6 +112,8 @@ export function PostInteraction({ post, initialComments }: PostInteractionProps)
           <span className="font-semibold">{likes}</span>
         </Button>
       </div>
+      
+      <PostNavigation previousPost={previousPost} nextPost={nextPost} />
 
       <div className="space-y-8">
         <h2 className="font-headline text-2xl font-bold tracking-tight md:text-3xl">

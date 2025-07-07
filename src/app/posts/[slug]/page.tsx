@@ -7,7 +7,6 @@ import { Calendar, Tag } from 'lucide-react';
 import { format } from 'date-fns';
 import { MarkdownRenderer } from '@/components/blog/MarkdownRenderer';
 import { PostInteraction } from '@/components/blog/PostInteraction';
-import { PostNavigation } from '@/components/blog/PostNavigation';
 
 type Props = {
   params: { slug: string }
@@ -112,9 +111,12 @@ export default async function PostPage({ params }: { params: { slug: string } })
         <MarkdownRenderer content={post.content} />
       </div>
       
-      <PostInteraction post={post} initialComments={comments} />
-
-      <PostNavigation previousPost={previousPost} nextPost={nextPost} />
+      <PostInteraction 
+        post={post} 
+        initialComments={comments} 
+        previousPost={previousPost} 
+        nextPost={nextPost}
+      />
       
     </article>
   );

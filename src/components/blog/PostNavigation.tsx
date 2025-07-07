@@ -27,25 +27,19 @@ export function PostNavigation({ previousPost, nextPost }: PostNavigationProps) 
   }
   
   return (
-    <div className="btn-container mt-16 pt-8 border-t border-border/40">
+    <div className="btn-container">
       {previousPost ? (
-        <Link href={`/posts/${previousPost.slug}`} className="btn-content" title={previousPost.title}>
+        <Link href={`/posts/${previousPost.slug}`} className="btn-content" title="Previous Post">
           <AnimatedArrow direction="left" />
-          <span className="text-right truncate">
-              <p className="text-sm font-normal text-muted-foreground">Previous</p>
-              {previousPost.title}
-          </span>
+          <span>Previous</span>
         </Link>
       ) : (
         <div /> // Empty div to maintain layout using space-between
       )}
 
       {nextPost ? (
-        <Link href={`/posts/${nextPost.slug}`} className="btn-content" title={nextPost.title}>
-          <span className="text-left truncate">
-              <p className="text-sm font-normal text-muted-foreground">Next</p>
-              {nextPost.title}
-          </span>
+        <Link href={`/posts/${nextPost.slug}`} className="btn-content" title="Next Post">
+          <span>Next</span>
           <AnimatedArrow direction="right" />
         </Link>
       ) : (
