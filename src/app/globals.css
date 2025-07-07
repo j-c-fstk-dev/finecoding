@@ -509,4 +509,104 @@
   animation-delay: 1.5s; /* Delay so it starts after text appears */
 }
 
+
+/* --- Post Navigation Buttons (Inspired by Uiverse.io by kheshore) --- */
+.btn-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  width: 100%;
+  gap: 1rem;
+  --nav-btn-text: hsl(var(--primary));
+  --nav-btn-bg: hsl(var(--muted));
+  --nav-btn-outline: hsl(var(--primary) / 0.5);
+  --nav-btn-shadow: hsl(var(--foreground) / 0.1);
+}
+
+.btn-content {
+  display: flex;
+  align-items: center;
+  padding: 0.5em 1em;
+  text-decoration: none;
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  font-size: 1rem;
+  color: var(--nav-btn-text);
+  background: var(--nav-btn-bg);
+  transition: all 0.5s;
+  border-radius: 100px;
+  box-shadow: 0 0 0.2em 0 var(--nav-btn-shadow);
+  max-width: 48%;
+  gap: 0.5rem;
+}
+
+.btn-content:hover,
+.btn-content:focus {
+  transition: 0.5s;
+  animation: post-nav-btn-content-anim 1s;
+  outline: 0.1em solid transparent;
+  outline-offset: 0.2em;
+  box-shadow: 0 0 0.4em 0 var(--nav-btn-shadow);
+}
+
+/* Next Button animation */
+.btn-content:hover .icon-arrow:not(.left-arrow) {
+  transition: 0.5s;
+  margin-left: 1rem;
+}
+
+/* Previous Button animation */
+.btn-content:hover .icon-arrow.left-arrow {
+  transition: 0.5s;
+  margin-right: 1rem;
+}
+
+.icon-arrow {
+  flex-shrink: 0;
+  transition: 0.5s;
+}
+.icon-arrow.left-arrow {
+  transform: rotate(180deg);
+  margin-right: 0;
+}
+.icon-arrow:not(.left-arrow) {
+  margin-left: 0;
+}
+
+/* SVG paths inside */
+.arrow-icon-one {
+  transition: 0.4s;
+  transform: translateX(-60%);
+}
+.arrow-icon-two {
+  transition: 0.5s;
+  transform: translateX(-30%);
+}
+.btn-content:hover .arrow-icon-one {
+  transform: translateX(0%);
+  animation: post-nav-color-anim 1s infinite 0.6s;
+}
+.btn-content:hover .arrow-icon-two {
+  transform: translateX(0%);
+  animation: post-nav-color-anim 1s infinite 0.4s;
+}
+
+@keyframes post-nav-color-anim {
+  0% {
+    stroke: hsl(var(--primary-foreground));
+  }
+  50% {
+    stroke: var(--nav-btn-bg);
+  }
+  100% {
+    stroke: var(--nav-btn-text);
+  }
+}
+
+@keyframes post-nav-btn-content-anim {
+  0% {
+    outline: 0.2em solid var(--nav-btn-outline);
+    outline-offset: 0;
+  }
+}
     

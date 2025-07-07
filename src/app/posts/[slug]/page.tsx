@@ -1,12 +1,13 @@
 import { notFound } from 'next/navigation';
 import type { Metadata, ResolvingMetadata } from 'next'
-import { getPostBySlug, getPosts } from '@/lib/posts';
+import { getPosts } from '@/lib/posts';
 import { getComments } from '@/lib/comments';
 import { Badge } from '@/components/ui/badge';
 import { Calendar, Tag } from 'lucide-react';
 import { format } from 'date-fns';
 import { MarkdownRenderer } from '@/components/blog/MarkdownRenderer';
 import { PostInteraction } from '@/components/blog/PostInteraction';
+import { PostNavigation } from '@/components/blog/PostNavigation';
 
 type Props = {
   params: { slug: string }
@@ -16,7 +17,8 @@ export async function generateMetadata(
   { params }: Props,
   parent: ResolvingMetadata
 ): Promise<Metadata> {
-  const post = await getPostBySlug(params.slug);
+  const posts = await getPosts();
+  const post = posts.find(p => p.slug === params.slug);
  
   if (!post) {
     return {
@@ -64,11 +66,22 @@ export async function generateStaticParams() {
 }
 
 export default async function PostPage({ params }: { params: { slug: string } }) {
-  const post = await getPostBySlug(params.slug);
+  const allPosts = await getPosts();
+  const currentPostIndex = allPosts.findIndex(p => p.slug === params.slug);
+
+  if (currentPostIndex === -1) {
+    notFound();
+  }
+
+  const post = allPosts[currentPostIndex];
 
   if (!post || !post.id) {
     notFound();
   }
+
+  // Determine previous and next posts (allPosts is sorted descending)
+  const previousPost = allPosts[currentPostIndex + 1] || null; // Older post
+  const nextPost = allPosts[currentPostIndex - 1] || null;     // Newer post
 
   const comments = await getComments(post.id);
 
@@ -100,6 +113,8 @@ export default async function PostPage({ params }: { params: { slug: string } })
       </div>
       
       <PostInteraction post={post} initialComments={comments} />
+
+      <PostNavigation previousPost={previousPost} nextPost={nextPost} />
       
     </article>
   );
