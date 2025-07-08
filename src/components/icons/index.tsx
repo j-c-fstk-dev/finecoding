@@ -10,6 +10,7 @@ import {
   Palette,
   Component, // Default/fallback icon
   ExternalLink,
+  Github,
 } from 'lucide-react';
 
 export const iconMap = {
@@ -20,6 +21,7 @@ export const iconMap = {
   BookOpen,
   Palette,
   ExternalLink,
+  Github,
   Default: Component,
 };
 

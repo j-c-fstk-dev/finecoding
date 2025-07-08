@@ -19,13 +19,52 @@ import {
 } from 'firebase/firestore';
 import { revalidatePath } from 'next/cache';
 
+
+// Hardcoded list of repositories to ensure they are always present.
+const hardcodedRepositories: Resource[] = [
+    {
+        id: 'onlook-main',
+        name: 'Onlook',
+        description: 'The Cursor for Designers - An open-source visual editor to build, style, and edit your React application with AI.',
+        link: 'https://github.com/onlook-dev/onlook',
+        category: 'Repositories',
+        pricing: 'Open Source',
+        icon: 'Github',
+        createdAt: new Date('2024-07-26T10:00:00Z'),
+        favorites: 215,
+    },
+    {
+        id: 'onlook-desktop',
+        name: 'Onlook Desktop',
+        description: 'Desktop version of Onlook - the open source Cursor for Designers.',
+        link: 'https://github.com/onlook-dev/desktop',
+        category: 'Repositories',
+        pricing: 'Open Source',
+        icon: 'Github',
+        createdAt: new Date('2024-07-25T11:00:00Z'),
+        favorites: 98,
+    },
+    {
+        id: 'onlook-web',
+        name: 'Onlook Web',
+        description: 'Web version of Onlook - design directly in your live React application and publish your changes to code.',
+        link: 'https://github.com/OpulentiaAI/onlook-web',
+        category: 'Repositories',
+        pricing: 'Open Source',
+        icon: 'Github',
+        createdAt: new Date('2024-07-24T12:00:00Z'),
+        favorites: 64,
+    },
+];
+
 export async function getResources(): Promise<Resource[]> {
+  let firestoreResources: Resource[] = [];
   try {
     const resourcesCollection = collection(db, 'resources');
     const q = query(resourcesCollection, orderBy('createdAt', 'desc'));
     const querySnapshot = await getDocs(q);
     
-    const resources = querySnapshot.docs.map(doc => {
+    firestoreResources = querySnapshot.docs.map(doc => {
       const data = doc.data();
       return {
         id: doc.id,
@@ -33,15 +72,23 @@ export async function getResources(): Promise<Resource[]> {
         createdAt: (data.createdAt as Timestamp).toDate(),
       } as Resource;
     });
-
-    return resources;
   } catch (error) {
-    console.error("Error fetching resources:", error);
-    return [];
+    console.error("Error fetching resources from Firestore:", error);
   }
+
+  const allResources = [...firestoreResources, ...hardcodedRepositories];
+
+  // Sort all resources by date descending
+  allResources.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+
+  return allResources;
 }
 
 export async function getResourceById(id: string): Promise<Resource | null> {
+    const hardcodedResource = hardcodedRepositories.find(repo => repo.id === id);
+    if (hardcodedResource) {
+        return hardcodedResource;
+    }
     try {
         const resourceRef = doc(db, 'resources', id);
         const docSnap = await getDoc(resourceRef);
@@ -91,6 +138,12 @@ export async function deleteResource(id: string) {
 }
 
 export async function likeResource(id: string) {
+    const hardcodedResource = hardcodedRepositories.find(repo => repo.id === id);
+    if (hardcodedResource) {
+        console.warn(`Liking a hardcoded resource (${id}) is not persisted.`);
+        // This action won't be saved for hardcoded items.
+        return;
+    }
     const resourceRef = doc(db, 'resources', id);
     await updateDoc(resourceRef, {
         favorites: increment(1)
