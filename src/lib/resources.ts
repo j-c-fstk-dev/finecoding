@@ -24,7 +24,7 @@ import { revalidatePath } from 'next/cache';
 const hardcodedRepositories: Resource[] = [
     {
         id: 'onlook-main',
-        name: 'onlook-dev/onlook',
+        name: 'onlook',
         description: 'The Cursor for Designers - An open-source visual editor to build, style, and edit your React application with AI.',
         link: 'https://github.com/onlook-dev/onlook',
         category: 'Repositories',
@@ -35,7 +35,7 @@ const hardcodedRepositories: Resource[] = [
     },
     {
         id: 'onlook-desktop',
-        name: 'onlook-dev/desktop',
+        name: 'desktop',
         description: 'Desktop version of Onlook - the open source Cursor for Designers.',
         link: 'https://github.com/onlook-dev/desktop',
         category: 'Repositories',
@@ -46,7 +46,7 @@ const hardcodedRepositories: Resource[] = [
     },
     {
         id: 'onlook-web',
-        name: 'OpulentiaAI/onlook-web',
+        name: 'onlook-web',
         description: 'Web version of Onlook - design directly in your live React application and publish your changes to code.',
         link: 'https://github.com/OpulentiaAI/onlook-web',
         category: 'Repositories',
@@ -57,7 +57,7 @@ const hardcodedRepositories: Resource[] = [
     },
     {
         id: 'free-programming-books',
-        name: 'EbookFoundation/free-programming-books',
+        name: 'free-programming-books',
         description: 'Freely available programming books.',
         link: 'https://github.com/EbookFoundation/free-programming-books',
         category: 'Repositories',
@@ -68,7 +68,7 @@ const hardcodedRepositories: Resource[] = [
     },
     {
         id: 'awesome',
-        name: 'sindresorhus/awesome',
+        name: 'awesome',
         description: 'Awesome lists about all kinds of interesting topics.',
         link: 'https://github.com/sindresorhus/awesome',
         category: 'Repositories',
@@ -79,7 +79,7 @@ const hardcodedRepositories: Resource[] = [
     },
     {
         id: 'developer-roadmap',
-        name: 'kamranahmedse/developer-roadmap',
+        name: 'developer-roadmap',
         description: 'Roadmaps to becoming a developer in 2024.',
         link: 'https://github.com/kamranahmedse/developer-roadmap',
         category: 'Repositories',
@@ -90,7 +90,7 @@ const hardcodedRepositories: Resource[] = [
     },
     {
         id: 'build-your-own-x',
-        name: 'codecrafters-io/build-your-own-x',
+        name: 'build-your-own-x',
         description: 'Master programming by recreating your favorite technologies from scratch.',
         link: 'https://github.com/codecrafters-io/build-your-own-x',
         category: 'Repositories',
@@ -101,7 +101,7 @@ const hardcodedRepositories: Resource[] = [
     },
     {
         id: 'public-apis',
-        name: 'public-apis/public-apis',
+        name: 'public-apis',
         description: 'A collective list of free APIs for use in software and web development.',
         link: 'https://github.com/public-apis/public-apis',
         category: 'Repositories',
@@ -112,7 +112,7 @@ const hardcodedRepositories: Resource[] = [
     },
     {
         id: 'tech-interview-handbook',
-        name: 'yangshun/tech-interview-handbook',
+        name: 'tech-interview-handbook',
         description: 'Curated content to help you ace your next tech interview.',
         link: 'https://github.com/yangshun/tech-interview-handbook',
         category: 'Repositories',
@@ -123,7 +123,7 @@ const hardcodedRepositories: Resource[] = [
     },
     {
         id: 'javascript-algorithms',
-        name: 'trekhleb/javascript-algorithms',
+        name: 'javascript-algorithms',
         description: 'Algorithms and data structures implemented in JavaScript.',
         link: 'https://github.com/trekhleb/javascript-algorithms',
         category: 'Repositories',
@@ -134,7 +134,7 @@ const hardcodedRepositories: Resource[] = [
     },
     {
         id: 'free-for-dev',
-        name: 'ripienaar/free-for-dev',
+        name: 'free-for-dev',
         description: 'A list of SaaS, PaaS and IaaS offerings that have free tiers of interest to developers.',
         link: 'https://github.com/ripienaar/free-for-dev',
         category: 'Repositories',
@@ -145,7 +145,7 @@ const hardcodedRepositories: Resource[] = [
     },
      {
         id: 'nodebestpractices',
-        name: 'goldbergyoni/nodebestpractices',
+        name: 'nodebestpractices',
         description: 'The Node.js best practices list (June 2024).',
         link: 'https://github.com/goldbergyoni/nodebestpractices',
         category: 'Repositories',
@@ -156,7 +156,7 @@ const hardcodedRepositories: Resource[] = [
     },
     {
         id: 'project-based-learning',
-        name: 'practical-tutorials/project-based-learning',
+        name: 'project-based-learning',
         description: 'A list of programming tutorials in which learners build an application from scratch.',
         link: 'https://github.com/practical-tutorials/project-based-learning',
         category: 'Repositories',
@@ -167,7 +167,7 @@ const hardcodedRepositories: Resource[] = [
     },
     {
         id: 'the-art-of-command-line',
-        name: 'jlevy/the-art-of-command-line',
+        name: 'the-art-of-command-line',
         description: 'Master the command line, in one page.',
         link: 'https://github.com/jlevy/the-art-of-command-line',
         category: 'Repositories',
@@ -178,7 +178,7 @@ const hardcodedRepositories: Resource[] = [
     },
     {
         id: 'realworld',
-        name: 'gothinkster/realworld',
+        name: 'realworld',
         description: 'The mother of all demo apps — Exemplary fullstack Medium.com clone.',
         link: 'https://github.com/gothinkster/realworld',
         category: 'Repositories',
@@ -189,7 +189,7 @@ const hardcodedRepositories: Resource[] = [
     },
     {
         id: 'app-ideas',
-        name: 'florinpop17/app-ideas',
+        name: 'app-ideas',
         description: 'A collection of application ideas which can be used to improve your coding skills.',
         link: 'https://github.com/florinpop17/app-ideas',
         category: 'Repositories',
@@ -200,7 +200,7 @@ const hardcodedRepositories: Resource[] = [
     },
     {
         id: 'the-book-of-secret-knowledge',
-        name: 'trimstray/the-book-of-secret-knowledge',
+        name: 'the-book-of-secret-knowledge',
         description: 'A collection of inspiring lists, manuals, cheatsheets, blogs, hacks, and more.',
         link: 'https://github.com/trimstray/the-book-of-secret-knowledge',
         category: 'Repositories',
@@ -211,7 +211,7 @@ const hardcodedRepositories: Resource[] = [
     },
     {
         id: 'awesome-n8n-templates',
-        name: 'enescingoz/awesome-n8n-templates',
+        name: 'awesome-n8n-templates',
         description: 'A curated list of awesome n8n templates and resources.',
         link: 'https://github.com/enescingoz/awesome-n8n-templates',
         category: 'Repositories',
