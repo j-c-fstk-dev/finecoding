@@ -8,11 +8,12 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { ThemeSwitch } from "@/components/ui/ThemeSwitch";
 import { IconFC } from "@/components/icons/IconFC";
-import { LogOut, Menu, Newspaper, Library } from "lucide-react";
+import { LogOut, Menu, Newspaper, Library, Users } from "lucide-react";
 
 const navItems = [
     { href: "/dashboard", label: "Posts", icon: Newspaper },
     { href: "/dashboard/resources", label: "Resources", icon: Library },
+    { href: "/dashboard/subscribers", label: "Subscribers", icon: Users },
 ];
 
 function DashboardLayout({ children }: { children: React.ReactNode }) {

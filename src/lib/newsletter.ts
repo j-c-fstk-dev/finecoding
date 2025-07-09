@@ -3,7 +3,7 @@
 import { db } from '@/lib/firebase';
 import { z } from 'zod';
 import { Resend } from 'resend';
-import { collection, addDoc, serverTimestamp, query, where, getDocs } from 'firebase/firestore';
+import { collection, addDoc, serverTimestamp, query, where, getDocs, orderBy, Timestamp } from 'firebase/firestore';
 
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
@@ -98,5 +98,30 @@ export async function subscribeToNewsletter(email: string): Promise<{ success: b
   } catch (error) {
     console.error('Error subscribing to newsletter:', error);
     return { success: false, error: 'An unexpected error occurred. Please try again later.' };
+  }
+}
+
+export async function getSubscribersAsCsv(): Promise<string | null> {
+  try {
+    const subscribersCollection = collection(db, 'subscribers');
+    const q = query(subscribersCollection, orderBy('subscribedAt', 'desc'));
+    const querySnapshot = await getDocs(q);
+
+    if (querySnapshot.empty) {
+      return null;
+    }
+
+    const headers = ['email', 'subscribedAt'];
+    const rows = querySnapshot.docs.map(doc => {
+      const data = doc.data();
+      const email = data.email || '';
+      const subscribedAt = data.subscribedAt ? (data.subscribedAt as Timestamp).toDate().toISOString() : '';
+      return `"${email}","${subscribedAt}"`;
+    });
+
+    return [headers.join(','), ...rows].join('\n');
+  } catch (error) {
+    console.error("Error exporting subscribers to CSV:", error);
+    throw new Error("Failed to export subscribers.");
   }
 }
