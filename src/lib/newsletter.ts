@@ -11,6 +11,40 @@ const SubscribeSchema = z.object({
   email: z.string().email(),
 });
 
+async function syncWithBeehiiv(email: string) {
+  const apiKey = process.env.BEEHIIV_API_KEY;
+  const publicationId = process.env.BEEHIIV_PUBLICATION_ID;
+
+  if (!apiKey || !publicationId) {
+    console.warn('Beehiiv API Key or Publication ID not set. Skipping sync.');
+    return;
+  }
+
+  try {
+    const response = await fetch(`https://api.beehiiv.com/v2/publications/${publicationId}/subscriptions`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        email: email,
+        send_welcome_email: true, // Automatically sends Beehiiv's welcome email
+      }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error('Failed to sync subscriber to Beehiiv:', errorData);
+      // We don't throw an error, as the main goal (saving to Firestore) succeeded.
+    } else {
+      console.log(`Successfully synced subscriber ${email} to Beehiiv.`);
+    }
+  } catch (error) {
+    console.error('Error calling Beehiiv API:', error);
+  }
+}
+
 export async function subscribeToNewsletter(email: string): Promise<{ success: boolean; error?: string }> {
   const validationResult = SubscribeSchema.safeParse({ email });
 
@@ -27,30 +61,38 @@ export async function subscribeToNewsletter(email: string): Promise<{ success: b
       return { success: false, error: 'This email is already subscribed.' };
     }
 
+    // Save to Firestore first, as it's our primary source of truth
     await addDoc(newsletterCollection, {
       email: email,
       subscribedAt: serverTimestamp(),
     });
 
-    if (resend) {
-      const adminEmail = process.env.ADMIN_EMAIL;
-      if (adminEmail) {
-        try {
-          await resend.emails.send({
-            from: 'Matrix Coder <onboarding@resend.dev>',
-            to: adminEmail,
-            subject: 'New Newsletter Subscriber!',
-            html: `<p>A new user has subscribed to your newsletter:</p><p><strong>${email}</strong></p>`,
-          });
-        } catch (emailError) {
-          console.error('Failed to send notification email:', emailError);
+    // Perform side-effects: sync to Beehiiv and send admin notification
+    // We run them in parallel to not slow down the user's request.
+    await Promise.all([
+      syncWithBeehiiv(email),
+      (async () => {
+        if (resend) {
+          const adminEmail = process.env.ADMIN_EMAIL;
+          if (adminEmail) {
+            try {
+              await resend.emails.send({
+                from: 'Matrix Coder <onboarding@resend.dev>',
+                to: adminEmail,
+                subject: 'New Newsletter Subscriber!',
+                html: `<p>A new user has subscribed to your newsletter:</p><p><strong>${email}</strong></p>`,
+              });
+            } catch (emailError) {
+              console.error('Failed to send notification email:', emailError);
+            }
+          } else {
+            console.warn('ADMIN_EMAIL environment variable not set. Skipping notification.');
+          }
+        } else {
+          console.warn('RESEND_API_KEY not found. Skipping email notification.');
         }
-      } else {
-        console.warn('ADMIN_EMAIL environment variable not set. Skipping notification.');
-      }
-    } else {
-        console.warn('RESEND_API_KEY not found. Skipping email notification.');
-    }
+      })()
+    ]);
 
     return { success: true };
   } catch (error) {
