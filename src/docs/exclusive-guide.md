@@ -446,3 +446,168 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
 With these pieces in place, we now have a fully functional, server-side backend ready to power our application. We can create, read, update, and delete all of our content, and we have a secure way to protect our admin area.
 
 In the next part, we'll dive into the exciting world of Artificial Intelligence by setting up Genkit to build our first AI-powered feature.
+
+# Part 4: The Heart of the AI with Genkit
+
+Now we arrive at one of the most exciting parts of this project: integrating Artificial Intelligence. We'll use Google's Genkit, an open-source framework, to build a feature that suggests relevant tags for a blog post based on its content. This will not only make content management easier but also serve as a perfect example of practical AI integration.
+
+## 4.1. Configuring Genkit
+
+First, we need to tell our application how to talk to the AI models. This is done in a central configuration file.
+
+**Action: Understand the Genkit configuration file.**
+
+1.  Open the file `src/ai/genkit.ts`.
+2.  Review the code. It's concise but powerful:
+
+```typescript
+// src/ai/genkit.ts
+import {genkit} from 'genkit';
+import {googleAI} from '@genkit-ai/googleai';
+
+export const ai = genkit({
+  plugins: [googleAI()], // Loads the plugin to connect with Google AI models
+  model: 'googleai/gemini-2.0-flash', // Sets the default model to use
+});
+```
+
+This file does two key things:
+*   It imports the `googleAI` plugin, which contains all the logic needed to communicate with Google's AI services (like Gemini).
+*   It initializes a global `ai` object, setting a default model (`gemini-2.0-flash`) that will be used for our requests unless specified otherwise. This `ai` object is what we'll use to define our AI "flows".
+
+## 4.2. Creating Our First AI Flow: Tag Suggestion
+
+A "flow" in Genkit is a reusable, server-side function that performs an AI-related task. For our first feature, we'll create a flow that takes the content of a blog post as input and returns a list of suggested tags as output.
+
+**Action: Understand the Tag Suggestion Flow.**
+
+1.  Open the file `src/ai/flows/suggest-tags.ts`. Let's break it down piece by piece.
+
+### Defining Input and Output with Zod
+
+To ensure our AI interactions are reliable and predictable, we define a strict "schema" for our data using a library called **Zod**.
+
+```typescript
+import {z} from 'genkit';
+
+const SuggestTagsInputSchema = z.object({
+  postContent: z.string().describe('The content of the blog post.'),
+});
+
+const SuggestTagsOutputSchema = z.object({
+  tags: z.array(z.string()).describe('An array of suggested tags for the blog post.'),
+});
+```
+
+Here, we're telling Genkit:
+*   The **input** must be an object with one key, `postContent`, which must be a string.
+*   The **output** must be an object with one key, `tags`, which must be an array of strings.
+
+The `.describe()` part is crucial. It gives the AI model context about what each field means, helping it generate a correctly formatted response.
+
+### Creating the Prompt
+
+Next, we define the instructions we'll send to the AI model. This is called the "prompt".
+
+```typescript
+const prompt = ai.definePrompt({
+  name: 'suggestTagsPrompt',
+  input: {schema: SuggestTagsInputSchema},
+  output: {schema: SuggestTagsOutputSchema},
+  prompt: `You are a blog post tag suggester. Given the content of a blog post, you will suggest a list of tags that are relevant to the content.
+
+Content: {{{postContent}}}
+
+Tags:`,
+  // ... safety settings ...
+});
+```
+
+This configuration does several things:
+*   `name`: Gives our prompt a unique identifier for debugging.
+*   `input` & `output`: Links the prompt to our Zod schemas. This tells the AI model what kind of data to expect and what format its answer must be in.
+*   `prompt`: This is the core instruction. The text inside the backticks is sent directly to the language model.
+    *   `You are a blog post tag suggester...`: This is called "role-playing." We're telling the AI to act as an expert in a specific task.
+    *   `{{{postContent}}}`: This is **Handlebars** syntax. Genkit uses it to inject our input data (from the `SuggestTagsInputSchema`) directly into the prompt text before sending it to the model.
+
+### Defining the Flow
+
+Finally, we wrap our prompt in a "flow," which is the function our application will actually call.
+
+```typescript
+const suggestTagsFlow = ai.defineFlow(
+  {
+    name: 'suggestTagsFlow',
+    inputSchema: SuggestTagsInputSchema,
+    outputSchema: SuggestTagsOutputSchema,
+  },
+  async input => {
+    const {output} = await prompt(input);
+    return output!;
+  }
+);
+```
+
+This flow, `suggestTagsFlow`, takes an input that matches our schema, passes it to the `prompt` we defined, and then returns the structured output from the AI.
+
+### The Exported Wrapper
+
+To make it easy to use in our application, we export a simple async function that calls the flow.
+
+```typescript
+export async function suggestTags(input: SuggestTagsInput): Promise<SuggestTagsOutput> {
+  return suggestTagsFlow(input);
+}
+```
+
+This is the function we'll import into our Post Editor component to power the "Suggest" button.
+
+---
+
+And that's it! We've created a complete, type-safe, and reliable AI feature. We have a system that can take raw text, send it to a powerful language model with clear instructions, and get back a structured, predictable result.
+
+In the next part, we'll shift our focus to the frontend and start building the user interface, bringing our application to life for both visitors and the admin.
+
+# Part 5: Crafting the User Interface (The Frontend)
+
+With our backend services, authentication, and AI flow in place, it's time to build what the user sees and interacts with. This section covers the creation of the frontend, from the global layout and styling down to the specific pages and interactive components.
+
+## 5.1. The Core Structure: Layout, Fonts, and Themes
+
+The foundation of our UI is defined in a few key files.
+
+*   **`src/app/layout.tsx`**: This is the root layout for the entire application. It's where we define the `<html>` and `<body>` tags, import global stylesheets, and set up our font strategy. We're using Google Fonts to load "Inter" for our main text and headlines, and "Source Code Pro" for code snippets, giving the blog a clean, modern, yet technical feel.
+*   **`src/app/globals.css`**: This file sets up our Tailwind CSS foundation and defines our color palette using CSS variables. By using HSL values for colors (`--primary: 151 45% 45%;`), we make it incredibly easy to change the entire site's theme just by tweaking these variables. We have separate color definitions for the `:root` (light mode) and `.dark` selectors.
+*   **`src/components/layout/ClientLayout.tsx`**: Since the root layout is a Server Component, we wrap its children in this `ClientLayout` component. This allows us to use client-side hooks and providers, such as `ThemeProvider` for light/dark mode switching and our `AuthProvider` for managing login state, without making the entire app a client component. It's also responsible for orchestrating the initial splash screen animation.
+
+## 5.2. A Component-Driven UI with ShadCN
+
+We are using **ShadCN/UI** for our component library. The key benefit of ShadCN is that you don't install it as a typical dependency. Instead, you use its CLI to add individual, unstyled components directly into your project at `src/components/ui`. This gives you full ownership and control over the code.
+
+**Action: Adding a new component.**
+
+If you needed a new component, like an `Accordion`, you would run this command in your terminal:
+```sh
+npx shadcn-ui@latest add accordion
+```
+This adds the `accordion.tsx` file to your `src/components/ui` directory, ready for you to use and customize. We've already done this for `Card`, `Button`, `Input`, `Textarea`, `Badge`, and many others.
+
+## 5.3. Building the Public Pages
+
+Each public page is a React Server Component located in the `src/app` directory. This allows them to fetch data directly on the server for fast page loads.
+
+*   **Homepage (`/`):** The `src/app/page.tsx` file fetches the most recent posts using our `getPosts()` server action from `src/lib/posts.ts`. It then passes this data to the `PostCard` component to render the post previews. It also includes the client component `CodeRain` for the "Matrix" effect.
+*   **Post Page (`/posts/[slug]`):** The `src/app/posts/[slug]/page.tsx` file is a dynamic route. It uses `getPostBySlug()` to fetch the specific post's data. The post content, which is in Markdown format, is then rendered safely into HTML using the `MarkdownRenderer` component. This component also handles syntax highlighting for code blocks. All the interactive elements (likes, comments) are bundled into the `PostInteraction` client component to keep the main page as a server component.
+*   **Resource Hub (`/resources`):** The `src/app/resources/page.tsx` file fetches all resources with `getResources()` and passes them to the `FilterableResourceList` client component, which handles all the filtering and display logic in the browser.
+
+## 5.4. Building the Admin Dashboard
+
+The admin dashboard, located under `src/app/dashboard`, is where we manage our content.
+
+*   **Layout (`/dashboard/layout.tsx`):** The entire dashboard is wrapped in our `ProtectedRoute` component, which we created in Part 3. This ensures that only authenticated users can access any page within this route group. The layout itself provides the consistent sidebar navigation and header for the admin panel.
+*   **Post Management (`/dashboard` and `/dashboard/new`):** The main dashboard page (`/dashboard/page.tsx`) displays a table of all existing posts, fetched via `getPosts()`. The "Add New Post" button links to `/dashboard/new`, which contains the `PostEditorForm` component.
+*   **The Post Editor (`/components/admin/PostEditorForm.tsx`):** This is the heart of our admin panel. It's a large client component that uses `react-hook-form` and `zod` for robust form validation. When the form is submitted, it calls either the `addPost()` or `updatePost()` server action to save the data to Firestore. This is also where we call our `suggestTags()` AI flow.
+
+---
+
+With the frontend structure in place, our blog is now fully functional from end to end. Users can read posts, and the admin can manage all the content. In the final part, we'll cover the last steps to take our application live.
