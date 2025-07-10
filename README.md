@@ -46,11 +46,16 @@ The entire application was built with the principles it advocates, serving as a 
 -   **Full-Fledged Admin Dashboard:**
     -   Secure authentication powered by **Firebase Auth**.
     -   Complete CRUD (Create, Read, Update, Delete) functionality for blog posts.
-    -   A rich text editor that supports Markdown for writing content.
+    -   Complete CRUD functionality for the **Resource Hub**.
+    -   Ability to export newsletter subscribers to CSV.
+-   **Rich Content & Community Features:**
+    -   A **Resource Hub** to share curated tools and links with the community.
+    -   A "wishlist" form for users to suggest new resources.
 -   **User Engagement:**
     -   Interactive "like" button on posts with client-side state persistence.
-    -   A complete comment section for visitors to share their thoughts.
-    -   Newsletter subscription form integrated with Firebase and optional Resend notifications.
+    -   Interactive "favorite" button on resources.
+    -   A complete comment section for visitors on both blog posts and resources.
+    -   Newsletter subscription form integrated with Firebase and optional Beehiiv sync.
 -   **Fully Responsive:** Designed to look and work great on all devices, from mobile phones to desktops.
 
 ## Built With
@@ -98,12 +103,13 @@ To get a local copy up and running, follow these simple steps.
     -   Go to **Firestore Database** and create a new database in production mode.
 
 4.  **Configure Environment Variables**
-    -   Create a `.env` file in the root of your project by copying the example file:
+    -   Create a `.env.local` file in the root of your project by copying from `.env.example` if it exists, or creating a new one.
         ```sh
-        cp .env.example .env
+        cp .env.example .env.local # if .env.example exists
         ```
-    -   Open your new `.env` file and fill in the required variables. You can find your Firebase project credentials in your Firebase project settings.
+    -   Open your new `.env.local` file and fill in the required variables. You can find your Firebase project credentials in your Firebase project settings.
     -   You will also need a `GOOGLE_API_KEY` for Genkit. You can get one from [Google AI Studio](https://aistudio.google.com/app/apikey).
+    -   For newsletter features, you will need `RESEND_API_KEY`, `ADMIN_EMAIL`, `BEEHIIV_API_KEY`, and `BEEHIIV_PUBLICATION_ID`.
 
 ---
 
