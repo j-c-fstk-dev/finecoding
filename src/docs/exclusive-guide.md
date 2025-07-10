@@ -611,3 +611,81 @@ The admin dashboard, located under `src/app/dashboard`, is where we manage our c
 ---
 
 With the frontend structure in place, our blog is now fully functional from end to end. Users can read posts, and the admin can manage all the content. In the final part, we'll cover the last steps to take our application live.
+
+# Part 6: Deploying Your Blog
+
+Our application is built, functional, and ready to be shared with the world. This final section covers the process of deploying our Next.js application to Netlify, a platform that makes hosting modern web projects incredibly simple.
+
+## 6.1. Preparing for Deployment
+
+Before we can deploy, we need to ensure our project is on GitHub and that our deployment settings are configured.
+
+### 1. Push to GitHub
+
+If you haven't already, make sure your project is a Git repository and that you've pushed all your code to a repository on GitHub.
+
+```sh
+# (If you haven't initialized a git repository yet)
+git init
+git add .
+git commit -m "Initial commit of Fine Coding blog"
+
+# (Link to your GitHub repo and push)
+git remote add origin https://github.com/YOUR_USERNAME/YOUR_REPO_NAME.git
+git branch -M main
+git push -u origin main
+```
+
+### 2. Configure Netlify Settings
+
+We need to tell Netlify how to build our project. This is done in the `netlify.toml` file at the root of our project.
+
+**Action: Review the Netlify configuration.**
+
+Open `netlify.toml`. The contents should look like this:
+
+```toml
+[build]
+  command = "npm run build"
+  publish = ".next"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
+```
+
+*   `command = "npm run build"`: This tells Netlify to run our Next.js build script.
+*   `publish = ".next"`: This specifies that the output of the build, which Netlify should make public, is in the `.next` directory.
+*   `[[plugins]]`: This loads the official Netlify plugin for Next.js, which automatically handles all the complexities of deploying a Next.js site with server components, server actions, and image optimization.
+
+## 6.2. Deploying on Netlify
+
+Now for the magic.
+
+**Action: Connect your project to Netlify.**
+
+1.  Log in to your [Netlify account](https://app.netlify.com/).
+2.  Click **"Add new site"** and select **"Import an existing project"**.
+3.  Connect to **GitHub** as your provider.
+4.  Search for and select the GitHub repository for your blog.
+5.  Netlify will automatically detect the settings from `netlify.toml`. You don't need to change the "Build command" or "Publish directory".
+6.  Before deploying, we need to add our environment variables. Click on **"Show advanced"** and then **"New variable"**.
+7.  Add all the variables from your local `.env.local` file one by one. This includes all `NEXT_PUBLIC_FIREBASE_*` keys, your `GOOGLE_API_KEY`, and any keys for Resend or Beehiiv. **This is the most critical step.** Your application will not work without these keys.
+8.  Once all variables are added, click **"Deploy site"**.
+
+Netlify will now pull your code from GitHub, install the dependencies, run the build command, and deploy your site to a live URL (e.g., `your-site-name.netlify.app`). The first deploy might take a few minutes.
+
+From now on, every time you push a change to your `main` branch on GitHub, Netlify will automatically redeploy the site with the latest changes.
+
+## 6.3. Domain and SEO
+
+Once the site is live, there are a few final steps for a professional setup.
+
+*   **Custom Domain:** In your site's settings on Netlify, go to **"Domain management"** to add your own custom domain (e.g., `www.yourblog.com`). Netlify provides instructions on how to configure your domain's DNS settings.
+*   **Google Search Console:** To ensure your blog gets indexed by Google, you should submit your sitemap.
+    1.  Go to [Google Search Console](https://search.google.com/search-console/) and add your new domain as a property.
+    2.  Once verified, go to the **"Sitemaps"** section.
+    3.  Enter `sitemap.xml` in the text box and click **"Submit"**. Google will now know to crawl your site and all its posts.
+
+---
+
+**Congratulations!** You have successfully built and deployed a modern, feature-rich, AI-powered blog from scratch.
