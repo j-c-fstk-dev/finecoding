@@ -71,7 +71,6 @@ export function SearchBar() {
     return () => document.removeEventListener("keydown", down);
   }, []);
 
-  // Effect to block body scroll when search is open
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
@@ -93,7 +92,7 @@ export function SearchBar() {
     const results = data.filter(item => 
         item.title.toLowerCase().includes(lowerCaseQuery) ||
         item.excerpt.toLowerCase().includes(lowerCaseQuery) ||
-        item.tags.some(tag => tag.toLowerCase().includes(lowerCaseQuery))
+        (item.tags && item.tags.some(tag => tag.toLowerCase().includes(lowerCaseQuery)))
     );
     setIsLoading(false);
     return results;

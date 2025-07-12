@@ -16,7 +16,7 @@ export async function GET() {
         excerpt: post.excerpt,
         slug: `/posts/${post.slug}`,
         thumbnail: post.imageUrl,
-        tags: post.tags,
+        tags: post.tags || [],
       })),
       ...resources.map(resource => ({
         type: 'Resource',
