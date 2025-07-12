@@ -8,7 +8,6 @@ import { Menu, CodeXml } from 'lucide-react';
 import { ThemeSwitch } from '@/components/ui/ThemeSwitch';
 import { useState, useEffect, useRef } from 'react';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Button } from '@/components/ui/button';
 import { SearchBar } from '@/components/search/SearchBar';
 
@@ -54,9 +53,9 @@ export function Header() {
   return (
     <header 
       className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/80 backdrop-blur-sm"
-      style={{ '--header-height': '6rem' } as React.CSSProperties}
+      style={{ '--header-height': '7rem' } as React.CSSProperties} // Increased height
     >
-      <div className="container relative flex h-20 max-w-screen-2xl items-center">
+      <div className="container relative flex h-28 max-w-screen-2xl items-center">
         
         {/* Left Side: Mobile Menu Sheet & Desktop Popover */}
         <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center">
@@ -114,34 +113,12 @@ export function Header() {
             </Sheet>
           </div>
 
-          {/* Desktop Navigation Popover */}
+          {/* Desktop Navigation Button */}
           <div className="hidden md:block">
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button variant="ghost" size="icon">
-                  <Menu className="h-6 w-6" />
-                  <span className="sr-only">Open menu</span>
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-2" align="start">
-                <nav className="flex items-center gap-2">
-                  {navLinks.map(({ href, label }) => (
-                    <Link
-                      key={href}
-                      href={href}
-                      className={cn(
-                        'rounded-md px-3 py-1.5 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground',
-                        pathname === href
-                          ? 'bg-accent text-accent-foreground'
-                          : 'text-foreground/60'
-                      )}
-                    >
-                      {label}
-                    </Link>
-                  ))}
-                </nav>
-              </PopoverContent>
-            </Popover>
+            <Button variant="ghost" size="icon">
+                <Menu className="h-6 w-6" />
+                <span className="sr-only">Open menu</span>
+            </Button>
           </div>
         </div>
 
@@ -164,11 +141,9 @@ export function Header() {
         </div>
 
         {/* Right Side: Search and Theme Switch */}
-        <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center">
+        <div className="absolute right-4 top-1/2 -translate-y-1/2 flex flex-col items-end gap-y-2">
+            <ThemeSwitch />
             <SearchBar />
-            <div className="hidden md:flex ml-2">
-                <ThemeSwitch />
-            </div>
         </div>
       </div>
     </header>

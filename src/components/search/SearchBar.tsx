@@ -85,9 +85,9 @@ export function SearchBar() {
     };
   }, [isOpen]);
 
-  const { posts: postResults, resources: resourceResults, tags: tagResults, total: totalResults } = useMemo(() => {
+  const { posts: postResults, resources: resourceResults, tags: tagResults } = useMemo(() => {
     if (!data || !debouncedQuery) {
-      return { posts: [], resources: [], tags: [], total: 0 };
+      return { posts: [], resources: [], tags: [] };
     }
     const lowerCaseQuery = debouncedQuery.toLowerCase();
     
@@ -108,11 +108,11 @@ export function SearchBar() {
         posts, 
         resources, 
         tags,
-        total: posts.length + resources.length + tags.length 
     };
   }, [debouncedQuery, data]);
 
-  const hasResults = totalResults > 0;
+  const hasResults = postResults.length > 0 || resourceResults.length > 0 || tagResults.length > 0;
+  const totalResults = postResults.length + resourceResults.length + tagResults.length;
 
   const runCommand = useCallback((callback: () => void) => {
     setIsOpen(false);
@@ -136,23 +136,23 @@ export function SearchBar() {
             placeholder="Search posts, resources, tags..."
             className={cn(
               "h-full rounded-lg pl-10 text-base transition-all duration-300 ease-in-out focus:cursor-text",
-              "text-foreground placeholder:text-sm w-48 md:w-64"
+              "text-foreground placeholder:text-sm w-48 md:w-64" // Adjusted width
             )}
           />
         </div>
 
-        {isOpen && (
+        {isOpen && debouncedQuery && (
           <CommandList 
             className="fixed left-1/2 -translate-x-1/2 top-[calc(var(--header-height,6rem)+0.5rem)] w-[90vw] max-w-2xl rounded-lg border bg-background shadow-lg overflow-y-auto max-h-[70vh]"
           >
-            {(isFetchingIndex && debouncedQuery) ? (
+            {(isFetchingIndex) ? (
               <div className="p-4 text-center text-sm flex items-center justify-center">
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 Searching...
               </div>
-            ) : debouncedQuery && !hasResults ? (
+            ) : !hasResults ? (
               <CommandEmpty>No results found for &quot;{debouncedQuery}&quot;.</CommandEmpty>
-            ) : debouncedQuery && hasResults ? (
+            ) : (
               <>
                 {postResults.length > 0 && (
                   <CommandGroup heading="Posts">
@@ -185,21 +185,19 @@ export function SearchBar() {
                   </CommandGroup>
                 )}
                 
-                {hasResults && (
-                   <CommandGroup className="border-t pt-2 mt-1">
-                      <CommandItem 
-                          key="view-all"
-                          value="view-all"
-                          onSelect={() => runCommand(() => router.push(`/search?q=${debouncedQuery}`))} 
-                          className="flex justify-center text-sm text-primary hover:text-primary/80"
-                      >
-                          <Search className="mr-3 h-4 w-4" />
-                          View all {totalResults} results
-                      </CommandItem>
-                  </CommandGroup>
-                )}
+                <CommandGroup className="border-t pt-1 mt-1">
+                    <CommandItem 
+                        key="view-all"
+                        value="view-all"
+                        onSelect={() => runCommand(() => router.push(`/search?q=${debouncedQuery}`))} 
+                        className="flex justify-start text-sm text-primary hover:text-primary/80" // justify-start for left alignment
+                    >
+                        <Search className="mr-3 h-4 w-4" />
+                        View all {totalResults} results
+                    </CommandItem>
+                </CommandGroup>
               </>
-            ) : null}
+            )}
           </CommandList>
         )}
       </Command>
