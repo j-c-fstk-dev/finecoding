@@ -85,9 +85,9 @@ export function SearchBar() {
     };
   }, [isOpen]);
 
-  const { posts: postResults, resources: resourceResults, tags: tagResults } = useMemo(() => {
+  const { postResults, resourceResults, tagResults } = useMemo(() => {
     if (!data || !debouncedQuery) {
-      return { posts: [], resources: [], tags: [] };
+      return { postResults: [], resourceResults: [], tagResults: [] };
     }
     const lowerCaseQuery = debouncedQuery.toLowerCase();
     
@@ -105,9 +105,9 @@ export function SearchBar() {
     const tags = allTags.filter(tag => tag && tag.toLowerCase().includes(lowerCaseQuery));
 
     return { 
-        posts, 
-        resources, 
-        tags,
+        postResults: posts, 
+        resourceResults: resources, 
+        tagResults: tags,
     };
   }, [debouncedQuery, data]);
 
@@ -136,7 +136,8 @@ export function SearchBar() {
             placeholder="Search posts, resources, tags..."
             className={cn(
               "h-full rounded-lg pl-10 text-base transition-all duration-300 ease-in-out focus:cursor-text",
-              "text-foreground placeholder:text-sm w-48 md:w-64" // Adjusted width
+              "w-64 md:w-80",
+              "text-foreground placeholder:text-sm"
             )}
           />
         </div>
@@ -185,17 +186,18 @@ export function SearchBar() {
                   </CommandGroup>
                 )}
                 
-                <CommandGroup className="border-t pt-1 mt-1">
-                    <CommandItem 
-                        key="view-all"
-                        value="view-all"
-                        onSelect={() => runCommand(() => router.push(`/search?q=${debouncedQuery}`))} 
-                        className="flex justify-start text-sm text-primary hover:text-primary/80" // justify-start for left alignment
-                    >
-                        <Search className="mr-3 h-4 w-4" />
-                        View all {totalResults} results
-                    </CommandItem>
-                </CommandGroup>
+                {hasResults && (
+                  <CommandGroup className="border-t pt-1 mt-1">
+                      <CommandItem 
+                          value="view-all"
+                          onSelect={() => runCommand(() => router.push(`/search?q=${debouncedQuery}`))} 
+                          className="flex justify-start text-sm text-primary hover:text-primary/80"
+                      >
+                          <Search className="mr-3 h-4 w-4" />
+                          View all {totalResults} results
+                      </CommandItem>
+                  </CommandGroup>
+                )}
               </>
             )}
           </CommandList>

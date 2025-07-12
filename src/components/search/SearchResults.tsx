@@ -12,7 +12,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { LoadingSpinner } from '@/components/layout/LoadingSpinner';
-import { BookText, Code, ExternalLink, Search as SearchIcon, ArrowLeft } from 'lucide-react';
+import { BookText, Code, ExternalLink, Search as SearchIcon, ArrowLeft, Tag } from 'lucide-react';
 import type { SearchResult } from '@/types';
 
 export function SearchResults() {
@@ -42,20 +42,29 @@ export function SearchResults() {
     fetchSearchIndex();
   }, []);
 
-  const filteredData = useMemo(() => {
+  const { posts, resources, tags } = useMemo(() => {
     if (!data || !debouncedQuery) {
-      return { posts: [], resources: [] };
+      return { posts: [], resources: [], tags: [] };
     }
     const lowerCaseQuery = debouncedQuery.toLowerCase();
-    const results = data.filter(item => 
-        item.title.toLowerCase().includes(lowerCaseQuery) ||
-        item.excerpt.toLowerCase().includes(lowerCaseQuery) ||
-        (Array.isArray(item.tags) && item.tags.some(tag => tag.toLowerCase().includes(lowerCaseQuery)))
+    
+    const postResults = data.filter(item => 
+        item.type === 'Post' && 
+        (item.title.toLowerCase().includes(lowerCaseQuery) || item.excerpt.toLowerCase().includes(lowerCaseQuery))
+    );
+
+    const resourceResults = data.filter(item => 
+        item.type === 'Resource' && 
+        (item.title.toLowerCase().includes(lowerCaseQuery) || item.excerpt.toLowerCase().includes(lowerCaseQuery))
     );
     
+    const allTags = [...new Set(data.flatMap(item => Array.isArray(item.tags) ? item.tags : []))];
+    const tagResults = allTags.filter(tag => tag && tag.toLowerCase().includes(lowerCaseQuery));
+
     return {
-      posts: results.filter(r => r.type === 'Post'),
-      resources: results.filter(r => r.type === 'Resource'),
+      posts: postResults,
+      resources: resourceResults,
+      tags: tagResults,
     };
   }, [debouncedQuery, data]);
 
@@ -67,11 +76,11 @@ export function SearchResults() {
     );
   }
 
-  const { posts, resources } = filteredData;
-  const totalResults = posts.length + resources.length;
+  const totalResults = posts.length + resources.length + tags.length;
   const defaultOpen = [
     ...(posts.length > 0 ? ['posts'] : []),
     ...(resources.length > 0 ? ['resources'] : []),
+    ...(tags.length > 0 ? ['tags'] : []),
   ];
 
   return (
@@ -154,6 +163,26 @@ export function SearchResults() {
                         </CardHeader>
                       </Card>
                     </a>
+                  ))}
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+          )}
+
+          {tags.length > 0 && (
+            <AccordionItem value="tags" className="border-b-0 rounded-lg overflow-hidden border bg-muted">
+              <AccordionTrigger className="text-xl font-headline hover:no-underline px-6 py-4 data-[state=open]:border-b">
+                <div className="flex items-center gap-3">
+                  <Tag className="h-6 w-6" /> Tags
+                  <Badge variant="secondary">{tags.length}</Badge>
+                </div>
+              </AccordionTrigger>
+              <AccordionContent className="px-6 pb-6 bg-background">
+                <div className="pt-4 flex flex-wrap gap-2">
+                  {tags.map(tag => (
+                    <Link key={tag} href={`/posts?tag=${encodeURIComponent(tag)}`}>
+                        <Badge variant="outline" className="text-base py-1 px-3 cursor-pointer hover:bg-accent"># {tag}</Badge>
+                    </Link>
                   ))}
                 </div>
               </AccordionContent>
