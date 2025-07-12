@@ -11,7 +11,6 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { LoadingSpinner } from '@/components/layout/LoadingSpinner';
 import { BookText, Code, ExternalLink, Search as SearchIcon, ArrowLeft, Tag } from 'lucide-react';
 import type { SearchResult } from '@/types';
 
@@ -23,11 +22,9 @@ export function SearchResults() {
   const [query, setQuery] = useState(initialQuery);
   const [debouncedQuery] = useDebounce(query, 300);
   const [data, setData] = useState<SearchResult[] | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     async function fetchSearchIndex() {
-      setIsLoading(true);
       try {
         const res = await fetch('/api/search-index');
         const searchData = await res.json();
@@ -35,8 +32,6 @@ export function SearchResults() {
       } catch (error) {
         console.error("Failed to fetch search index", error);
         setData([]);
-      } finally {
-        setIsLoading(false);
       }
     }
     fetchSearchIndex();
@@ -68,19 +63,12 @@ export function SearchResults() {
     };
   }, [debouncedQuery, data]);
 
-  if (isLoading) {
-    return (
-      <div className="flex justify-center items-center h-64">
-        <LoadingSpinner />
-      </div>
-    );
-  }
 
-  const totalResults = posts.length + resources.length + tags.length;
+  const totalResults = (posts?.length || 0) + (resources?.length || 0) + (tags?.length || 0);
   const defaultOpen = [
-    ...(posts.length > 0 ? ['posts'] : []),
-    ...(resources.length > 0 ? ['resources'] : []),
-    ...(tags.length > 0 ? ['tags'] : []),
+    ...(posts && posts.length > 0 ? ['posts'] : []),
+    ...(resources && resources.length > 0 ? ['resources'] : []),
+    ...(tags && tags.length > 0 ? ['tags'] : []),
   ];
 
   return (
