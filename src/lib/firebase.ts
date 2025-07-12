@@ -33,13 +33,9 @@ try {
     app = initializeFirebase();
     db = getFirestore(app);
 } catch (error) {
-    console.error("Failed to initialize Firebase. Please check your configuration and API keys.", error);
-    // We are not re-throwing here to allow the app to potentially render
-    // a more graceful error state instead of crashing completely.
-    // @ts-ignore
-    app = app || null;
-    // @ts-ignore
-    db = db || null;
+    console.error("Firebase initialization failed:", error);
+    // Re-throw the error to make it visible during development and prevent silent failures.
+    throw error;
 }
 
 

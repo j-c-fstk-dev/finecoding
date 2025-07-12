@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
@@ -5,15 +6,6 @@ import { useRouter } from 'next/navigation';
 import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut, type User, type Auth } from 'firebase/auth';
 import { firebaseApp } from '@/lib/firebase';
 import { LoadingSpinner } from '@/components/layout/LoadingSpinner';
-
-let auth: Auth | null = null;
-if (firebaseApp) {
-  try {
-    auth = getAuth(firebaseApp);
-  } catch (error) {
-    console.error("Firebase Auth could not be initialized:", error);
-  }
-}
 
 interface AuthContextType {
   user: User | null;
@@ -29,11 +21,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!auth) {
-      setLoading(false);
-      return;
-    }
-
+    // Get the Auth instance inside the effect to ensure firebaseApp is initialized.
+    const auth = getAuth(firebaseApp);
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setUser(user);
       setLoading(false);
@@ -43,12 +32,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const login = (email: string, password: string) => {
-    if (!auth) return Promise.reject(new Error("Auth is not initialized."));
+    const auth = getAuth(firebaseApp);
     return signInWithEmailAndPassword(auth, email, password);
   };
 
   const logout = () => {
-    if (!auth) return Promise.reject(new Error("Auth is not initialized."));
+    const auth = getAuth(firebaseApp);
     return signOut(auth);
   };
 

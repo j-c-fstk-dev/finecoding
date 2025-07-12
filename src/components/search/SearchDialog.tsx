@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
@@ -13,7 +14,7 @@ import {
   CommandList,
 } from "@/components/ui/command";
 import { BookText, Code, Loader2 } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { useRouter } from "next/navigation";
 
 interface SearchResult {
   type: 'Post' | 'Resource';
@@ -29,7 +30,7 @@ export function SearchDialog({ open, onOpenChange }: { open: boolean, onOpenChan
   const [query, setQuery] = useState("");
   const [debouncedQuery] = useDebounce(query, 300);
   const [data, setData] = useState<SearchResult[] | null>(null);
-  const [filteredData, setFilteredData] = useState<SearchResult[]>([]);
+  const router = useRouter();
 
   useEffect(() => {
     async function fetchSearchIndex() {
@@ -51,25 +52,23 @@ export function SearchDialog({ open, onOpenChange }: { open: boolean, onOpenChan
     }
   }, [open, data]);
 
-  useEffect(() => {
-    if (!data || !debouncedQuery) {
-      setFilteredData([]);
-      return;
-    }
+  const runCommand = React.useCallback((command: () => unknown) => {
+    onOpenChange(false)
+    setQuery("")
+    command()
+  }, [onOpenChange])
 
+  const filteredData = useMemo(() => {
+    if (!data || !debouncedQuery) {
+      return [];
+    }
     const lowerCaseQuery = debouncedQuery.toLowerCase();
-    const results = data.filter(item => 
+    return data.filter(item => 
         item.title.toLowerCase().includes(lowerCaseQuery) ||
         item.excerpt.toLowerCase().includes(lowerCaseQuery) ||
         item.tags.some(tag => tag.toLowerCase().includes(lowerCaseQuery))
     );
-    setFilteredData(results);
   }, [debouncedQuery, data]);
-
-  const handleSelect = useCallback(() => {
-    onOpenChange(false);
-    setQuery("");
-  }, [onOpenChange]);
 
   const postResults = filteredData.filter(item => item.type === 'Post');
   const resourceResults = filteredData.filter(item => item.type === 'Resource');
@@ -83,14 +82,17 @@ export function SearchDialog({ open, onOpenChange }: { open: boolean, onOpenChan
       />
       <CommandList>
         {loading && <div className="p-4 text-center text-sm flex items-center justify-center"><Loader2 className="mr-2 h-4 w-4 animate-spin" />Loading Index...</div>}
-        {!loading && debouncedQuery.length === 0 && <CommandEmpty>Start typing to search.</CommandEmpty>}
-        {!loading && debouncedQuery.length > 0 && filteredData.length === 0 && <CommandEmpty>No results found.</CommandEmpty>}
+        {!loading && query.length > 0 && !filteredData.length && <CommandEmpty>No results found.</CommandEmpty>}
 
         {postResults.length > 0 && (
           <CommandGroup heading="Posts">
             {postResults.map((item) => (
-              <Link key={`post-${item.slug}`} href={item.slug} passHref>
-                <CommandItem onSelect={handleSelect} className="cursor-pointer">
+              <CommandItem
+                key={`post-${item.slug}`}
+                value={item.title}
+                onSelect={() => runCommand(() => router.push(item.slug))}
+                className="cursor-pointer"
+              >
                   <div className="flex items-center gap-4">
                     {item.thumbnail ? (
                        <Image
@@ -111,8 +113,7 @@ export function SearchDialog({ open, onOpenChange }: { open: boolean, onOpenChan
                         <span className="text-xs text-muted-foreground line-clamp-2">{item.excerpt}</span>
                     </div>
                   </div>
-                </CommandItem>
-              </Link>
+              </CommandItem>
             ))}
           </CommandGroup>
         )}
@@ -120,8 +121,12 @@ export function SearchDialog({ open, onOpenChange }: { open: boolean, onOpenChan
         {resourceResults.length > 0 && (
             <CommandGroup heading="Resources">
             {resourceResults.map((item) => (
-              <a key={`resource-${item.slug}`} href={item.slug} target="_blank" rel="noopener noreferrer">
-                <CommandItem onSelect={handleSelect} className="cursor-pointer">
+              <CommandItem
+                key={`resource-${item.slug}`}
+                value={item.title}
+                onSelect={() => runCommand(() => window.open(item.slug, '_blank'))}
+                className="cursor-pointer"
+              >
                   <div className="flex items-center gap-4">
                      <div className="flex h-12 w-12 items-center justify-center rounded-md bg-muted">
                         <Code className="h-6 w-6 text-muted-foreground" />
@@ -131,8 +136,7 @@ export function SearchDialog({ open, onOpenChange }: { open: boolean, onOpenChan
                         <span className="text-xs text-muted-foreground line-clamp-2">{item.excerpt}</span>
                     </div>
                   </div>
-                </CommandItem>
-              </a>
+              </CommandItem>
             ))}
           </CommandGroup>
         )}
@@ -140,3 +144,4 @@ export function SearchDialog({ open, onOpenChange }: { open: boolean, onOpenChan
     </CommandDialog>
   );
 }
+
