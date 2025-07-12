@@ -5,7 +5,7 @@ import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useDebounce } from 'use-debounce';
 import { cn } from "@/lib/utils";
-import { Search, Loader2, BookText, Code, Tag, ArrowRight } from "lucide-react";
+import { Search, Loader2, BookText, Code, Tag } from "lucide-react";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import type { SearchResult } from '@/types';
 
@@ -86,23 +86,10 @@ export function SearchBar() {
     };
   }, [isOpen]);
 
-  const allTags = useMemo(() => {
-    if (!data) return [];
-    const tagsSet = new Set<string>();
-    data.forEach(item => {
-        if (item.tags && Array.isArray(item.tags)) {
-            item.tags.forEach(tag => tagsSet.add(tag));
-        }
-    });
-    return Array.from(tagsSet);
-  }, [data]);
-
   const searchResults = useMemo(() => {
     if (!data || !debouncedQuery) {
-      setIsLoading(false);
       return { posts: [], resources: [], tags: [], total: 0 };
     }
-    setIsLoading(true);
     const lowerCaseQuery = debouncedQuery.toLowerCase();
     
     const posts = data.filter(item => 
@@ -114,18 +101,22 @@ export function SearchBar() {
         item.type === 'Resource' && 
         (item.title.toLowerCase().includes(lowerCaseQuery) || item.excerpt.toLowerCase().includes(lowerCaseQuery))
     );
-
+    
+    const allTags = [...new Set(data.flatMap(item => Array.isArray(item.tags) ? item.tags : []))];
     const tags = allTags.filter(tag => tag.toLowerCase().includes(lowerCaseQuery));
 
-    setIsLoading(false);
     return { 
         posts, 
         resources, 
         tags,
         total: posts.length + resources.length + tags.length 
     };
-  }, [debouncedQuery, data, allTags]);
+  }, [debouncedQuery, data]);
   
+  useEffect(() => {
+    setIsLoading(!!debouncedQuery);
+  }, [debouncedQuery]);
+
   const { posts: postResults, resources: resourceResults, tags: tagResults, total: totalResults } = searchResults;
 
   const hasResults = totalResults > 0;
@@ -168,7 +159,7 @@ export function SearchBar() {
             <CommandList 
               className="fixed left-1/2 -translate-x-1/2 top-[calc(var(--header-height,6rem)+0.5rem)] w-[90vw] max-w-2xl rounded-lg border bg-background shadow-lg overflow-y-auto max-h-[70vh]"
             >
-              {(isLoading || isFetchingIndex) && debouncedQuery ? (
+              {(isFetchingIndex && debouncedQuery) ? (
                 <div className="p-4 text-center text-sm flex items-center justify-center">
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   Searching...
@@ -200,7 +191,7 @@ export function SearchBar() {
                   {tagResults.length > 0 && (
                      <CommandGroup heading="Tags">
                       {tagResults.slice(0, MAX_TAGS_IN_DROPDOWN).map(tag => (
-                        <CommandItem key={tag} value={tag} onSelect={() => runCommand(() => router.push(`/search?q=${tag}`))}>
+                        <CommandItem key={tag} value={tag} onSelect={() => runCommand(() => router.push(`/posts?tag=${tag}`))}>
                           <Tag className="mr-3 h-4 w-4 text-muted-foreground" />
                           <span className="truncate">{tag}</span>
                         </CommandItem>
@@ -208,10 +199,12 @@ export function SearchBar() {
                     </CommandGroup>
                   )}
                   {hasResults && (
-                     <CommandItem onSelect={() => runCommand(() => router.push(`/search?q=${debouncedQuery}`))} className="border-t mt-2 pt-2 justify-center text-sm text-primary hover:text-primary/80">
-                        <Search className="mr-3 h-4 w-4" />
-                        View all {totalResults} results
-                     </CommandItem>
+                     <CommandGroup className="border-t pt-2 mt-1">
+                        <CommandItem onSelect={() => runCommand(() => router.push(`/search?q=${debouncedQuery}`))} className="justify-center text-sm text-primary hover:text-primary/80">
+                            <Search className="mr-3 h-4 w-4" />
+                            View all {totalResults} results
+                        </CommandItem>
+                     </CommandGroup>
                   )}
                 </>
               ) : null}
