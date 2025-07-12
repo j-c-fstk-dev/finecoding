@@ -37,8 +37,7 @@ export function SearchBar() {
           const res = await fetch('/api/search-index');
           const searchData = await res.json();
           setData(searchData);
-        } catch (error) {
-          console.error("Failed to fetch search index", error);
+        } catch (error)          console.error("Failed to fetch search index", error);
         } finally {
           setIsFetchingIndex(false);
         }
@@ -118,7 +117,6 @@ export function SearchBar() {
 
   const { postResults, resourceResults, tagResults } = results;
   const totalResults = postResults.length + resourceResults.length + tagResults.length;
-  const shownResults = Math.min(postResults.length, MAX_POSTS_IN_DROPDOWN) + Math.min(resourceResults.length, MAX_RESOURCES_IN_DROPDOWN) + Math.min(tagResults.length, MAX_TAGS_IN_DROPDOWN);
   const hasResults = totalResults > 0;
 
   return (
@@ -167,49 +165,51 @@ export function SearchBar() {
               <CommandEmpty className="text-foreground">No results found for &quot;{debouncedQuery}&quot;.</CommandEmpty>
             ) : null}
 
-            {postResults.length > 0 && (
-              <CommandGroup heading="Posts">
-                {postResults.slice(0, MAX_POSTS_IN_DROPDOWN).map(item => (
-                  <CommandItem key={item.slug} value={`post-${item.slug}`} onSelect={() => runCommand(() => router.push(item.slug))}>
-                    <BookText className="mr-3 h-4 w-4 text-muted-foreground" />
-                    <span className="truncate">{item.title}</span>
-                  </CommandItem>
-                ))}
-              </CommandGroup>
-            )}
-            {resourceResults.length > 0 && (
-              <CommandGroup heading="Resources">
-                {resourceResults.slice(0, MAX_RESOURCES_IN_DROPDOWN).map(item => (
-                  <CommandItem key={item.slug} value={`resource-${item.slug}`} onSelect={() => runCommand(() => window.open(item.slug, '_blank'))}>
-                    <Code className="mr-3 h-4 w-4 text-muted-foreground" />
-                    <span className="truncate">{item.title}</span>
-                  </CommandItem>
-                ))}
-              </CommandGroup>
-            )}
-            {tagResults.length > 0 && (
-                <CommandGroup heading="Tags">
-                {tagResults.slice(0, MAX_TAGS_IN_DROPDOWN).map(tag => (
-                  <CommandItem key={tag} value={`tag-${tag}`} onSelect={() => runCommand(() => router.push(`/posts?tag=${tag}`))}>
-                    <Tag className="mr-3 h-4 w-4 text-muted-foreground" />
-                    <span className="truncate">{tag}</span>
-                  </CommandItem>
-                ))}
-              </CommandGroup>
-            )}
-            
-            {hasResults && totalResults > shownResults && (
-              <CommandGroup className="border-t pt-1 mt-1">
-                  <CommandItem 
-                      key="view-all"
-                      value="view-all"
-                      onSelect={() => runCommand(() => router.push(`/search?q=${debouncedQuery}`))} 
-                      className="flex justify-start text-sm text-primary hover:text-primary/80"
-                  >
-                      <Search className="mr-3 h-4 w-4" />
-                      View all {totalResults} results
-                  </CommandItem>
-              </CommandGroup>
+            {hasResults && (
+              <>
+                {postResults.length > 0 && (
+                  <CommandGroup heading="Posts">
+                    {postResults.slice(0, MAX_POSTS_IN_DROPDOWN).map(item => (
+                      <CommandItem key={item.slug} value={`post-${item.slug}`} onSelect={() => runCommand(() => router.push(item.slug))}>
+                        <BookText className="mr-3 h-4 w-4 text-muted-foreground" />
+                        <span className="truncate">{item.title}</span>
+                      </CommandItem>
+                    ))}
+                  </CommandGroup>
+                )}
+                {resourceResults.length > 0 && (
+                  <CommandGroup heading="Resources">
+                    {resourceResults.slice(0, MAX_RESOURCES_IN_DROPDOWN).map(item => (
+                      <CommandItem key={item.slug} value={`resource-${item.slug}`} onSelect={() => runCommand(() => window.open(item.slug, '_blank'))}>
+                        <Code className="mr-3 h-4 w-4 text-muted-foreground" />
+                        <span className="truncate">{item.title}</span>
+                      </CommandItem>
+                    ))}
+                  </CommandGroup>
+                )}
+                {tagResults.length > 0 && (
+                    <CommandGroup heading="Tags">
+                    {tagResults.slice(0, MAX_TAGS_IN_DROPDOWN).map(tag => (
+                      <CommandItem key={tag} value={`tag-${tag}`} onSelect={() => runCommand(() => router.push(`/posts?tag=${tag}`))}>
+                        <Tag className="mr-3 h-4 w-4 text-muted-foreground" />
+                        <span className="truncate">{tag}</span>
+                      </CommandItem>
+                    ))}
+                  </CommandGroup>
+                )}
+                
+                <CommandGroup className="border-t pt-1 mt-1">
+                    <CommandItem 
+                        key="view-all"
+                        value="view-all"
+                        onSelect={() => runCommand(() => router.push(`/search?q=${debouncedQuery}`))} 
+                        className="flex justify-start text-sm text-primary hover:text-primary/80"
+                    >
+                        <Search className="mr-3 h-4 w-4" />
+                        View all results
+                    </CommandItem>
+                </CommandGroup>
+              </>
             )}
           </CommandList>
         )}
