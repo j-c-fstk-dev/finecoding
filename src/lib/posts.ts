@@ -62,6 +62,10 @@ export async function getPostBySlug(slug: string): Promise<Post | null> {
 
         const postDoc = querySnapshot.docs[0];
         const data = postDoc.data();
+        
+        if (!data) {
+          return null;
+        }
 
         return {
             id: postDoc.id,

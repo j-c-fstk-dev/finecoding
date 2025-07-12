@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { useDebounce } from 'use-debounce';
 import { cn } from "@/lib/utils";
 import { Search, Loader2, BookText, Code, ArrowRight } from "lucide-react";
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
+import { Command, CommandEmpty, CommandGroup, CommandItem, CommandList } from "@/components/ui/command";
 import type { SearchResult } from '@/types';
 
 export function SearchBar() {

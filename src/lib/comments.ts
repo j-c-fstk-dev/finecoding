@@ -22,9 +22,12 @@ export async function getComments(postId: string): Promise<Comment[]> {
       } as Comment;
     });
   } catch (error) {
+    // This is a common case if a post has no comments subcollection yet.
+    // We can safely return an empty array.
     if (error instanceof Error && error.message.includes('No document to update')) {
         return [];
     }
+    // For other errors, log it, as it might be a more serious issue (e.g., permissions).
     console.error("Error fetching comments:", error);
     return [];
   }
