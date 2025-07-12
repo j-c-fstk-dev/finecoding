@@ -109,7 +109,6 @@ export function SearchBar() {
   const displayedResources = resourceResults.slice(0, MAX_RESOURCES_IN_DROPDOWN);
   
   const hasResults = filteredData.length > 0;
-  const hasMoreResults = postResults.length > displayedPosts.length || resourceResults.length > displayedResources.length;
 
   const runCommand = useCallback((callback: () => void) => {
     setIsOpen(false);
@@ -136,7 +135,7 @@ export function SearchBar() {
               value={query}
               onValueChange={setQuery}
               onFocus={() => setIsOpen(true)}
-              placeholder={isOpen ? "Search posts, resources..." : ""}
+              placeholder={isOpen ? "Search posts, resources, tags..." : ""}
               className={cn(
                 "h-full rounded-lg pl-10 text-base transition-all duration-300 ease-in-out focus:cursor-text",
                 "text-foreground", 

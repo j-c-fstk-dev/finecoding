@@ -12,7 +12,7 @@ import { Badge } from '@/components/ui/badge';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { LoadingSpinner } from '@/components/layout/LoadingSpinner';
 import { BookText, Code, ExternalLink, Search as SearchIcon } from 'lucide-react';
-import type { SearchResult, Resource, Post } from '@/types';
+import type { SearchResult } from '@/types';
 
 export function SearchResults() {
   const searchParams = useSearchParams();
@@ -48,7 +48,7 @@ export function SearchResults() {
     const results = data.filter(item => 
         item.title.toLowerCase().includes(lowerCaseQuery) ||
         item.excerpt.toLowerCase().includes(lowerCaseQuery) ||
-        item.tags.some(tag => tag.toLowerCase().includes(lowerCaseQuery))
+        (Array.isArray(item.tags) && item.tags.some(tag => tag.toLowerCase().includes(lowerCaseQuery)))
     );
     
     return {
