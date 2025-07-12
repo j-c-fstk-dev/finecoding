@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils';
 import { Menu, CodeXml } from 'lucide-react';
 import { ThemeSwitch } from '@/components/ui/ThemeSwitch';
 import { useState, useEffect, useRef } from 'react';
-import { Sheet, SheetContent, SheetTrigger, SheetClose } from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Button } from '@/components/ui/button';
 import { SearchBar } from '@/components/search/SearchBar';
@@ -52,124 +52,125 @@ export function Header() {
   }, []);
 
   return (
-    <>
-      <header 
-        className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/80 backdrop-blur-sm"
-        style={{ '--header-height': '6rem' } as React.CSSProperties}
-      >
-        <div className="container flex h-20 max-w-screen-2xl items-center justify-between">
-          
-          {/* Left Side: Title and Nav */}
-          <div className="flex items-center gap-4">
-            <Link href="/" className="flex items-center space-x-2">
-              <span className={cn('glitch-icon', { 'is-glitching': isGlitching })}>
-                  <CodeXml className="h-8 w-8 text-primary transition-colors" />
-              </span>
-              <span className="font-headline text-2xl font-bold sm:text-3xl">
-                Fine{' '}
-                <span
-                  className={cn('glitch-text text-primary', { 'is-glitching': isGlitching })}
-                  data-glitch="Coding"
-                >
-                  Coding
-                </span>
-              </span>
-            </Link>
-          
-            {/* Desktop Navigation Popover */}
-            <div className="hidden md:block">
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button variant="ghost" size="icon">
-                    <Menu className="h-6 w-6" />
-                    <span className="sr-only">Open menu</span>
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-2" align="start">
-                  <nav className="flex items-center gap-2">
-                    {navLinks.map(({ href, label }) => (
-                      <Link
-                        key={href}
-                        href={href}
-                        className={cn(
-                          'rounded-md px-3 py-1.5 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground',
-                          pathname === href
-                            ? 'bg-accent text-accent-foreground'
-                            : 'text-foreground/60'
-                        )}
-                      >
-                        {label}
+    <header 
+      className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/80 backdrop-blur-sm"
+      style={{ '--header-height': '6rem' } as React.CSSProperties}
+    >
+      <div className="container relative flex h-20 max-w-screen-2xl items-center">
+        
+        {/* Left Side: Mobile Menu Sheet & Desktop Popover */}
+        <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center">
+          {/* Mobile Navigation Sheet */}
+          <div className="md:hidden">
+            <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
+              <SheetTrigger asChild>
+                <Button variant="ghost" size="icon">
+                  <Menu className="h-6 w-6" />
+                  <span className="sr-only">Open menu</span>
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="left" className="flex flex-col bg-background/90 backdrop-blur-sm">
+                <div>
+                  <div className="mb-8">
+                      <Link href="/" className="flex items-center space-x-2" onClick={() => setIsMobileMenuOpen(false)}>
+                        <span className={cn('glitch-icon', { 'is-glitching': isGlitching })}>
+                            <CodeXml className="h-6 w-6 text-primary" />
+                        </span>
+                        <span className="font-headline text-xl font-bold">
+                          Fine{' '}
+                            <span
+                              className={cn('glitch-text text-primary', { 'is-glitching': isGlitching })}
+                              data-glitch="Coding"
+                            >
+                              Coding
+                            </span>
+                        </span>
                       </Link>
+                  </div>
+                  <nav className="grid gap-4">
+                    {navLinks.map(({ href, label }) => (
+                      <SheetTrigger asChild key={href}>
+                        <Link
+                          href={href}
+                          className={cn(
+                            'text-lg text-muted-foreground transition-colors hover:text-foreground',
+                            pathname === href && 'text-foreground'
+                          )}
+                          onClick={() => setIsMobileMenuOpen(false)}
+                        >
+                          {label}
+                        </Link>
+                      </SheetTrigger>
                     ))}
                   </nav>
-                </PopoverContent>
-              </Popover>
-            </div>
-
-            {/* Mobile Navigation Sheet */}
-            <div className="md:hidden">
-              <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
-                <SheetTrigger asChild>
-                  <Button variant="ghost" size="icon">
-                    <Menu className="h-6 w-6" />
-                    <span className="sr-only">Open menu</span>
-                  </Button>
-                </SheetTrigger>
-                <SheetContent side="left" className="flex flex-col bg-background/90 backdrop-blur-sm">
-                  <div>
-                    <div className="mb-8">
-                        <Link href="/" className="flex items-center space-x-2" onClick={() => setIsMobileMenuOpen(false)}>
-                          <span className={cn('glitch-icon', { 'is-glitching': isGlitching })}>
-                              <CodeXml className="h-6 w-6 text-primary" />
-                          </span>
-                          <span className="font-headline text-xl font-bold">
-                            Fine{' '}
-                              <span
-                                className={cn('glitch-text text-primary', { 'is-glitching': isGlitching })}
-                                data-glitch="Coding"
-                              >
-                                Coding
-                              </span>
-                          </span>
-                        </Link>
-                    </div>
-                    <nav className="grid gap-4">
-                      {navLinks.map(({ href, label }) => (
-                        <SheetClose asChild key={href}>
-                          <Link
-                            href={href}
-                            className={cn(
-                              'text-lg text-muted-foreground transition-colors hover:text-foreground',
-                              pathname === href && 'text-foreground'
-                            )}
-                            onClick={() => setIsMobileMenuOpen(false)}
-                          >
-                            {label}
-                          </Link>
-                        </SheetClose>
-                      ))}
-                    </nav>
+                </div>
+                <div className="mt-auto border-t border-border/40 pt-4">
+                  <div className="flex items-center justify-between">
+                      <span className="text-lg text-muted-foreground">Change Theme</span>
+                      <ThemeSwitch />
                   </div>
-                  <div className="mt-auto border-t border-border/40 pt-4">
-                    <div className="flex items-center justify-between">
-                        <span className="text-lg text-muted-foreground">Change Theme</span>
-                        <ThemeSwitch />
-                    </div>
-                  </div>
-                </SheetContent>
-              </Sheet>
-            </div>
+                </div>
+              </SheetContent>
+            </Sheet>
           </div>
 
-          {/* Right Side: Search and Theme Switch */}
-          <div className="flex items-center gap-2">
-            <SearchBar />
-            <div className="hidden md:flex">
-                <ThemeSwitch />
-            </div>
+          {/* Desktop Navigation Popover */}
+          <div className="hidden md:block">
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="ghost" size="icon">
+                  <Menu className="h-6 w-6" />
+                  <span className="sr-only">Open menu</span>
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-2" align="start">
+                <nav className="flex items-center gap-2">
+                  {navLinks.map(({ href, label }) => (
+                    <Link
+                      key={href}
+                      href={href}
+                      className={cn(
+                        'rounded-md px-3 py-1.5 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground',
+                        pathname === href
+                          ? 'bg-accent text-accent-foreground'
+                          : 'text-foreground/60'
+                      )}
+                    >
+                      {label}
+                    </Link>
+                  ))}
+                </nav>
+              </PopoverContent>
+            </Popover>
           </div>
         </div>
-      </header>
-    </>
+
+        {/* Center: Title */}
+        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+          <Link href="/" className="flex items-center space-x-2">
+            <span className={cn('glitch-icon', { 'is-glitching': isGlitching })}>
+                <CodeXml className="h-8 w-8 text-primary transition-colors" />
+            </span>
+            <span className="font-headline text-2xl font-bold sm:text-3xl">
+              Fine{' '}
+              <span
+                className={cn('glitch-text text-primary', { 'is-glitching': isGlitching })}
+                data-glitch="Coding"
+              >
+                Coding
+              </span>
+            </span>
+          </Link>
+        </div>
+
+        {/* Right Side: Search and Theme Switch */}
+        <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center">
+            <SearchBar />
+            <div className="hidden md:flex ml-2">
+                <ThemeSwitch />
+            </div>
+        </div>
+      </div>
+    </header>
   );
 }

@@ -85,7 +85,7 @@ export function SearchBar() {
     };
   }, [isOpen]);
 
-  const searchResults = useMemo(() => {
+  const { posts: postResults, resources: resourceResults, tags: tagResults, total: totalResults } = useMemo(() => {
     if (!data || !debouncedQuery) {
       return { posts: [], resources: [], tags: [], total: 0 };
     }
@@ -112,8 +112,6 @@ export function SearchBar() {
     };
   }, [debouncedQuery, data]);
 
-  const { posts: postResults, resources: resourceResults, tags: tagResults, total: totalResults } = searchResults;
-
   const hasResults = totalResults > 0;
 
   const runCommand = useCallback((callback: () => void) => {
@@ -124,77 +122,71 @@ export function SearchBar() {
 
   return (
     <div ref={searchRef} className="relative">
-      <div 
-        className={cn(
-          "flex items-center w-10 h-10 transition-all duration-300 ease-in-out",
-          isOpen && "w-[275px] md:w-[340px]"
-        )}
-      >
-        <Command className="relative overflow-visible bg-transparent">
-          <div 
-            onClick={() => setIsOpen(true)}
-            className="group relative flex h-10 items-center rounded-lg border border-input bg-background cursor-pointer"
-          >
-            <Search className="absolute left-3 h-5 w-5 text-muted-foreground transition-opacity duration-200" />
-            <CommandInput
-              ref={inputRef}
-              value={query}
-              onValueChange={setQuery}
-              onFocus={() => setIsOpen(true)}
-              placeholder="Search posts, resources, tags..."
-              className={cn(
-                "h-full rounded-lg pl-10 text-base transition-all duration-300 ease-in-out focus:cursor-text",
-                "text-foreground placeholder:text-sm", 
-                isOpen ? "w-full cursor-text" : "w-10 cursor-pointer",
-              )}
-            />
-          </div>
+      <Command className="relative overflow-visible bg-transparent">
+        <div 
+          onClick={() => setIsOpen(true)}
+          className="group relative flex h-10 items-center rounded-lg border border-input bg-background cursor-pointer"
+        >
+          <Search className="absolute left-3 h-5 w-5 text-muted-foreground transition-opacity duration-200" />
+          <CommandInput
+            ref={inputRef}
+            value={query}
+            onValueChange={setQuery}
+            onFocus={() => setIsOpen(true)}
+            placeholder="Search posts, resources, tags..."
+            className={cn(
+              "h-full rounded-lg pl-10 text-base transition-all duration-300 ease-in-out focus:cursor-text",
+              "text-foreground placeholder:text-sm w-48 md:w-64"
+            )}
+          />
+        </div>
 
-          {isOpen && (
-            <CommandList 
-              className="fixed left-1/2 -translate-x-1/2 top-[calc(var(--header-height,6rem)+0.5rem)] w-[90vw] max-w-2xl rounded-lg border bg-background shadow-lg overflow-y-auto max-h-[70vh]"
-            >
-              {(isFetchingIndex && debouncedQuery) ? (
-                <div className="p-4 text-center text-sm flex items-center justify-center">
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Searching...
-                </div>
-              ) : debouncedQuery && !hasResults ? (
-                <CommandEmpty>No results found for &quot;{debouncedQuery}&quot;.</CommandEmpty>
-              ) : debouncedQuery && hasResults ? (
-                <>
-                  {postResults.length > 0 && (
-                    <CommandGroup heading="Posts">
-                      {postResults.slice(0, MAX_POSTS_IN_DROPDOWN).map(item => (
-                        <CommandItem key={item.slug} value={item.title} onSelect={() => runCommand(() => router.push(item.slug))}>
-                          <BookText className="mr-3 h-4 w-4 text-muted-foreground" />
-                          <span className="truncate">{item.title}</span>
-                        </CommandItem>
-                      ))}
-                    </CommandGroup>
-                  )}
-                  {resourceResults.length > 0 && (
-                    <CommandGroup heading="Resources">
-                      {resourceResults.slice(0, MAX_RESOURCES_IN_DROPDOWN).map(item => (
-                        <CommandItem key={item.slug} value={item.title} onSelect={() => runCommand(() => window.open(item.slug, '_blank'))}>
-                          <Code className="mr-3 h-4 w-4 text-muted-foreground" />
-                          <span className="truncate">{item.title}</span>
-                        </CommandItem>
-                      ))}
-                    </CommandGroup>
-                  )}
-                  {tagResults.length > 0 && (
-                     <CommandGroup heading="Tags">
-                      {tagResults.slice(0, MAX_TAGS_IN_DROPDOWN).map(tag => (
-                        <CommandItem key={tag} value={tag} onSelect={() => runCommand(() => router.push(`/posts?tag=${tag}`))}>
-                          <Tag className="mr-3 h-4 w-4 text-muted-foreground" />
-                          <span className="truncate">{tag}</span>
-                        </CommandItem>
-                      ))}
-                    </CommandGroup>
-                  )}
-                  
-                  <CommandGroup className="border-t pt-2 mt-1">
+        {isOpen && (
+          <CommandList 
+            className="fixed left-1/2 -translate-x-1/2 top-[calc(var(--header-height,6rem)+0.5rem)] w-[90vw] max-w-2xl rounded-lg border bg-background shadow-lg overflow-y-auto max-h-[70vh]"
+          >
+            {(isFetchingIndex && debouncedQuery) ? (
+              <div className="p-4 text-center text-sm flex items-center justify-center">
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Searching...
+              </div>
+            ) : debouncedQuery && !hasResults ? (
+              <CommandEmpty>No results found for &quot;{debouncedQuery}&quot;.</CommandEmpty>
+            ) : debouncedQuery && hasResults ? (
+              <>
+                {postResults.length > 0 && (
+                  <CommandGroup heading="Posts">
+                    {postResults.slice(0, MAX_POSTS_IN_DROPDOWN).map(item => (
+                      <CommandItem key={item.slug} value={item.title} onSelect={() => runCommand(() => router.push(item.slug))}>
+                        <BookText className="mr-3 h-4 w-4 text-muted-foreground" />
+                        <span className="truncate">{item.title}</span>
+                      </CommandItem>
+                    ))}
+                  </CommandGroup>
+                )}
+                {resourceResults.length > 0 && (
+                  <CommandGroup heading="Resources">
+                    {resourceResults.slice(0, MAX_RESOURCES_IN_DROPDOWN).map(item => (
+                      <CommandItem key={item.slug} value={item.title} onSelect={() => runCommand(() => window.open(item.slug, '_blank'))}>
+                        <Code className="mr-3 h-4 w-4 text-muted-foreground" />
+                        <span className="truncate">{item.title}</span>
+                      </CommandItem>
+                    ))}
+                  </CommandGroup>
+                )}
+                {tagResults.length > 0 && (
+                   <CommandGroup heading="Tags">
+                    {tagResults.slice(0, MAX_TAGS_IN_DROPDOWN).map(tag => (
+                      <CommandItem key={tag} value={tag} onSelect={() => runCommand(() => router.push(`/posts?tag=${tag}`))}>
+                        <Tag className="mr-3 h-4 w-4 text-muted-foreground" />
+                        <span className="truncate">{tag}</span>
+                      </CommandItem>
+                    ))}
+                  </CommandGroup>
+                )}
+                
+                {hasResults && (
+                   <CommandGroup className="border-t pt-2 mt-1">
                       <CommandItem 
                           key="view-all"
                           value="view-all"
@@ -205,13 +197,12 @@ export function SearchBar() {
                           View all {totalResults} results
                       </CommandItem>
                   </CommandGroup>
-
-                </>
-              ) : null}
-            </CommandList>
-          )}
-        </Command>
-      </div>
+                )}
+              </>
+            ) : null}
+          </CommandList>
+        )}
+      </Command>
     </div>
   );
 }
