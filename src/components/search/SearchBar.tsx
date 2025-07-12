@@ -118,7 +118,7 @@ export function SearchBar() {
 
   const { postResults, resourceResults, tagResults } = results;
   const totalResults = postResults.length + resourceResults.length + tagResults.length;
-  const hasResults = totalResults > 0;
+  const hasResults = debouncedQuery.length > 0 && totalResults > 0;
 
   return (
     <div ref={searchRef} className="relative w-full">
@@ -196,6 +196,7 @@ export function SearchBar() {
                 
                 <CommandGroup className="border-t pt-1 mt-1">
                     <CommandItem 
+                        key="view-all"
                         value="view-all"
                         onSelect={() => runCommand(() => router.push(`/search?q=${debouncedQuery}`))} 
                         className="flex justify-start text-sm text-primary hover:text-primary/80"
