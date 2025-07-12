@@ -5,12 +5,13 @@ import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useDebounce } from 'use-debounce';
 import { cn } from "@/lib/utils";
-import { Search, Loader2, BookText, Code, ArrowRight } from "lucide-react";
+import { Search, Loader2, BookText, Code, Tag, ArrowRight } from "lucide-react";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import type { SearchResult } from '@/types';
 
-const MAX_POSTS_IN_DROPDOWN = 5;
-const MAX_RESOURCES_IN_DROPDOWN = 5;
+const MAX_POSTS_IN_DROPDOWN = 3;
+const MAX_RESOURCES_IN_DROPDOWN = 3;
+const MAX_TAGS_IN_DROPDOWN = 3;
 
 export function SearchBar() {
   const router = useRouter();
@@ -85,30 +86,49 @@ export function SearchBar() {
     };
   }, [isOpen]);
 
-  const filteredData = useMemo(() => {
+  const allTags = useMemo(() => {
+    if (!data) return [];
+    const tagsSet = new Set<string>();
+    data.forEach(item => {
+        if (item.tags && Array.isArray(item.tags)) {
+            item.tags.forEach(tag => tagsSet.add(tag));
+        }
+    });
+    return Array.from(tagsSet);
+  }, [data]);
+
+  const searchResults = useMemo(() => {
     if (!data || !debouncedQuery) {
       setIsLoading(false);
-      return [];
+      return { posts: [], resources: [], tags: [], total: 0 };
     }
     setIsLoading(true);
     const lowerCaseQuery = debouncedQuery.toLowerCase();
-    const results = data.filter(item => {
-        const titleMatch = item.title.toLowerCase().includes(lowerCaseQuery);
-        const excerptMatch = item.excerpt.toLowerCase().includes(lowerCaseQuery);
-        const tagsMatch = item.tags && Array.isArray(item.tags) && item.tags.some(tag => tag.toLowerCase().includes(lowerCaseQuery));
-        return titleMatch || excerptMatch || tagsMatch;
-    });
+    
+    const posts = data.filter(item => 
+        item.type === 'Post' && 
+        (item.title.toLowerCase().includes(lowerCaseQuery) || item.excerpt.toLowerCase().includes(lowerCaseQuery))
+    );
+
+    const resources = data.filter(item => 
+        item.type === 'Resource' && 
+        (item.title.toLowerCase().includes(lowerCaseQuery) || item.excerpt.toLowerCase().includes(lowerCaseQuery))
+    );
+
+    const tags = allTags.filter(tag => tag.toLowerCase().includes(lowerCaseQuery));
+
     setIsLoading(false);
-    return results;
-  }, [debouncedQuery, data]);
+    return { 
+        posts, 
+        resources, 
+        tags,
+        total: posts.length + resources.length + tags.length 
+    };
+  }, [debouncedQuery, data, allTags]);
   
-  const postResults = useMemo(() => filteredData.filter(item => item.type === 'Post'), [filteredData]);
-  const resourceResults = useMemo(() => filteredData.filter(item => item.type === 'Resource'), [filteredData]);
-  
-  const displayedPosts = postResults.slice(0, MAX_POSTS_IN_DROPDOWN);
-  const displayedResources = resourceResults.slice(0, MAX_RESOURCES_IN_DROPDOWN);
-  
-  const hasResults = filteredData.length > 0;
+  const { posts: postResults, resources: resourceResults, tags: tagResults, total: totalResults } = searchResults;
+
+  const hasResults = totalResults > 0;
 
   const runCommand = useCallback((callback: () => void) => {
     setIsOpen(false);
@@ -135,7 +155,7 @@ export function SearchBar() {
               value={query}
               onValueChange={setQuery}
               onFocus={() => setIsOpen(true)}
-              placeholder={isOpen ? "Search posts, resources..." : ""}
+              placeholder={isOpen ? "Search posts, resources, tags..." : ""}
               className={cn(
                 "h-full rounded-lg pl-10 text-base transition-all duration-300 ease-in-out focus:cursor-text",
                 "text-foreground", 
@@ -157,9 +177,9 @@ export function SearchBar() {
                 <CommandEmpty>No results found for &quot;{debouncedQuery}&quot;.</CommandEmpty>
               ) : debouncedQuery && hasResults ? (
                 <>
-                  {displayedPosts.length > 0 && (
+                  {postResults.length > 0 && (
                     <CommandGroup heading="Posts">
-                      {displayedPosts.map(item => (
+                      {postResults.slice(0, MAX_POSTS_IN_DROPDOWN).map(item => (
                         <CommandItem key={item.slug} value={item.title} onSelect={() => runCommand(() => router.push(item.slug))}>
                           <BookText className="mr-3 h-4 w-4 text-muted-foreground" />
                           <span className="truncate">{item.title}</span>
@@ -167,9 +187,9 @@ export function SearchBar() {
                       ))}
                     </CommandGroup>
                   )}
-                  {displayedResources.length > 0 && (
+                  {resourceResults.length > 0 && (
                     <CommandGroup heading="Resources">
-                      {displayedResources.map(item => (
+                      {resourceResults.slice(0, MAX_RESOURCES_IN_DROPDOWN).map(item => (
                         <CommandItem key={item.slug} value={item.title} onSelect={() => runCommand(() => window.open(item.slug, '_blank'))}>
                           <Code className="mr-3 h-4 w-4 text-muted-foreground" />
                           <span className="truncate">{item.title}</span>
@@ -177,10 +197,20 @@ export function SearchBar() {
                       ))}
                     </CommandGroup>
                   )}
+                  {tagResults.length > 0 && (
+                     <CommandGroup heading="Tags">
+                      {tagResults.slice(0, MAX_TAGS_IN_DROPDOWN).map(tag => (
+                        <CommandItem key={tag} value={tag} onSelect={() => runCommand(() => router.push(`/search?q=${tag}`))}>
+                          <Tag className="mr-3 h-4 w-4 text-muted-foreground" />
+                          <span className="truncate">{tag}</span>
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  )}
                   {hasResults && (
-                     <CommandItem onSelect={() => runCommand(() => router.push(`/search?q=${debouncedQuery}`))}>
-                        <ArrowRight className="mr-3 h-4 w-4 text-primary" />
-                        <span className="text-primary">View all {filteredData.length} results</span>
+                     <CommandItem onSelect={() => runCommand(() => router.push(`/search?q=${debouncedQuery}`))} className="border-t mt-2 pt-2 justify-center text-sm text-primary hover:text-primary/80">
+                        <Search className="mr-3 h-4 w-4" />
+                        View all {totalResults} results
                      </CommandItem>
                   )}
                 </>

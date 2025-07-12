@@ -2,19 +2,21 @@
 "use client";
 
 import { useState, useMemo, useEffect } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useDebounce } from 'use-debounce';
 import Link from 'next/link';
 
 import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { LoadingSpinner } from '@/components/layout/LoadingSpinner';
-import { BookText, Code, ExternalLink, Search as SearchIcon } from 'lucide-react';
+import { BookText, Code, ExternalLink, Search as SearchIcon, ArrowLeft } from 'lucide-react';
 import type { SearchResult } from '@/types';
 
 export function SearchResults() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const initialQuery = searchParams.get('q') || '';
   
@@ -75,10 +77,16 @@ export function SearchResults() {
   return (
     <div className="space-y-8">
       <section>
-        <h1 className="font-headline text-4xl font-bold tracking-tight text-foreground sm:text-5xl">
-          Search Results
-        </h1>
-        <div className="relative mt-6">
+        <div className="flex items-center gap-4 mb-4">
+            <Button variant="outline" size="icon" onClick={() => router.back()}>
+                <ArrowLeft className="h-4 w-4" />
+                <span className="sr-only">Go back</span>
+            </Button>
+            <h1 className="font-headline text-4xl font-bold tracking-tight text-foreground sm:text-5xl">
+                Search Results
+            </h1>
+        </div>
+        <div className="relative">
           <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
           <Input 
             type="search"
