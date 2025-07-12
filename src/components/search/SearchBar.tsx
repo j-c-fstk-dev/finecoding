@@ -5,7 +5,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useDebounce } from 'use-debounce';
 import { cn } from "@/lib/utils";
-import { Search, Loader2, BookText, Code, Tag } from "lucide-react";
+import { Search, Loader2, BookText, Code, Tag, CornerDownLeft } from "lucide-react";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import type { SearchResult } from '@/types';
 
@@ -141,14 +141,17 @@ export function SearchBar() {
             onValueChange={setQuery}
             onFocus={() => setIsOpen(true)}
             onKeyDown={handleKeyDown}
-            placeholder="Search..."
+            placeholder="Search posts, resources, tags..."
             className={cn(
               "h-full rounded-lg text-base transition-all duration-300 ease-in-out focus:cursor-text",
-              "w-full pl-10",
+              "w-full pl-10 pr-10",
               "placeholder:text-sm",
               isOpen ? "opacity-100" : "opacity-0 cursor-pointer"
             )}
           />
+           {isOpen && debouncedQuery && (
+              <CornerDownLeft className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+           )}
         </div>
 
         {isOpen && debouncedQuery.length > 0 && (
