@@ -121,7 +121,7 @@ export function SearchBar() {
   const hasResults = debouncedQuery.length > 0 && totalResults > 0;
 
   return (
-    <div ref={searchRef} className="relative w-full">
+    <div ref={searchRef}>
       <Command className="relative overflow-visible bg-transparent">
         <div 
           className={cn(
@@ -129,18 +129,23 @@ export function SearchBar() {
             isOpen ? "w-64 md:w-80" : "w-10",
             "focus-within:w-64 focus-within:md:w-80"
           )}
+          onClick={() => {
+            setIsOpen(true);
+            inputRef.current?.focus();
+          }}
         >
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <CommandInput
             ref={inputRef}
             value={query}
             onValueChange={setQuery}
             onFocus={() => setIsOpen(true)}
             onKeyDown={handleKeyDown}
-            placeholder="Search posts, resources, tags..."
+            placeholder="Search..."
             className={cn(
               "h-full rounded-lg text-base transition-all duration-300 ease-in-out focus:cursor-text",
               "w-full pl-10",
-              "text-foreground placeholder:text-sm",
+              "placeholder:text-sm",
               isOpen ? "opacity-100" : "opacity-0 cursor-pointer"
             )}
           />
@@ -148,7 +153,7 @@ export function SearchBar() {
 
         {isOpen && debouncedQuery.length > 0 && (
           <CommandList 
-            className="fixed left-1/2 -translate-x-1/2 top-[calc(var(--header-height,6rem)+0.5rem)] w-[90vw] max-w-2xl rounded-lg border bg-background shadow-lg overflow-y-auto max-h-[70vh]"
+            className="absolute top-[calc(100%_+_0.5rem)] w-[90vw] max-w-2xl rounded-lg border bg-background shadow-lg overflow-y-auto max-h-[70vh] left-1/2 -translate-x-1/2 sm:left-auto sm:translate-x-0 sm:right-0 sm:w-[400px]"
           >
             {(isFetchingIndex) ? (
               <div className="p-4 text-center text-sm flex items-center justify-center">
