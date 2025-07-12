@@ -124,14 +124,12 @@ export function SearchBar() {
     <div ref={searchRef} className="relative w-full">
       <Command className="relative overflow-visible bg-transparent">
         <div 
-          onClick={() => setIsOpen(true)}
           className={cn(
             "group relative flex h-10 items-center rounded-lg border border-input bg-background cursor-pointer transition-all duration-300",
             isOpen ? "w-64 md:w-80" : "w-10",
             "focus-within:w-64 focus-within:md:w-80"
           )}
         >
-          <Search className="absolute left-3 h-5 w-5 text-muted-foreground transition-opacity duration-200" />
           <CommandInput
             ref={inputRef}
             value={query}
@@ -140,24 +138,24 @@ export function SearchBar() {
             onKeyDown={handleKeyDown}
             placeholder="Search posts, resources, tags..."
             className={cn(
-              "h-full rounded-lg pl-10 text-base transition-all duration-300 ease-in-out focus:cursor-text",
-              "w-full",
+              "h-full rounded-lg text-base transition-all duration-300 ease-in-out focus:cursor-text",
+              "w-full pl-10",
               "text-foreground placeholder:text-sm",
-              isOpen ? "opacity-100" : "opacity-0"
+              isOpen ? "opacity-100" : "opacity-0 cursor-pointer"
             )}
           />
         </div>
 
-        {isOpen && (
+        {isOpen && debouncedQuery.length > 0 && (
           <CommandList 
             className="fixed left-1/2 -translate-x-1/2 top-[calc(var(--header-height,6rem)+0.5rem)] w-[90vw] max-w-2xl rounded-lg border bg-background shadow-lg overflow-y-auto max-h-[70vh]"
           >
-            {(isFetchingIndex && debouncedQuery) ? (
+            {(isFetchingIndex) ? (
               <div className="p-4 text-center text-sm flex items-center justify-center">
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 Searching...
               </div>
-            ) : (!hasResults && debouncedQuery) ? (
+            ) : (!hasResults) ? (
               <CommandEmpty>No results found for &quot;{debouncedQuery}&quot;.</CommandEmpty>
             ) : null}
 
