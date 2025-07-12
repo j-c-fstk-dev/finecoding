@@ -132,7 +132,7 @@ export function SearchBar() {
       <div 
         className={cn(
           "flex items-center w-10 h-10 transition-all duration-300 ease-in-out",
-          isOpen && "w-64 md:w-80"
+          isOpen && "w-[275px] md:w-[340px]"
         )}
       >
         <Command className="relative overflow-visible bg-transparent">
@@ -146,7 +146,7 @@ export function SearchBar() {
               value={query}
               onValueChange={setQuery}
               onFocus={() => setIsOpen(true)}
-              placeholder={isOpen ? "Search posts, resources, tags..." : ""}
+              placeholder="Search posts, resources, tags..."
               className={cn(
                 "h-full rounded-lg pl-10 text-base transition-all duration-300 ease-in-out focus:cursor-text",
                 "text-foreground placeholder:text-sm", 
@@ -198,12 +198,19 @@ export function SearchBar() {
                       ))}
                     </CommandGroup>
                   )}
-                  <CommandGroup className="border-t pt-2 mt-1">
-                    <CommandItem onSelect={() => runCommand(() => router.push(`/search?q=${debouncedQuery}`))} className="flex justify-center text-sm text-primary hover:text-primary/80">
-                        <Search className="mr-3 h-4 w-4" />
-                        View all {totalResults} results
-                    </CommandItem>
-                  </CommandGroup>
+                  {hasResults && (
+                     <CommandGroup className="border-t pt-2 mt-1">
+                        <CommandItem 
+                            key="view-all"
+                            value="view-all"
+                            onSelect={() => runCommand(() => router.push(`/search?q=${debouncedQuery}`))} 
+                            className="flex justify-center text-sm text-primary hover:text-primary/80"
+                        >
+                            <Search className="mr-3 h-4 w-4" />
+                            View all {totalResults} results
+                        </CommandItem>
+                    </CommandGroup>
+                  )}
                 </>
               ) : null}
             </CommandList>
