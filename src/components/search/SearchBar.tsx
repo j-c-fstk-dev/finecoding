@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { useDebounce } from 'use-debounce';
 import { cn } from "@/lib/utils";
 import { Search, Loader2, BookText, Code, ArrowRight } from "lucide-react";
-import { Command, CommandEmpty, CommandGroup, CommandItem, CommandList } from "@/components/ui/command";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import type { SearchResult } from '@/types';
 
 const MAX_POSTS_IN_DROPDOWN = 5;
@@ -135,7 +135,7 @@ export function SearchBar() {
               value={query}
               onValueChange={setQuery}
               onFocus={() => setIsOpen(true)}
-              placeholder={isOpen ? "Search posts, resources, tags..." : ""}
+              placeholder={isOpen ? "Search posts, resources..." : ""}
               className={cn(
                 "h-full rounded-lg pl-10 text-base transition-all duration-300 ease-in-out focus:cursor-text",
                 "text-foreground", 
