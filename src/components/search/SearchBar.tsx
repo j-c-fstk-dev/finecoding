@@ -106,6 +106,7 @@ export function SearchBar() {
               placeholder={isOpen ? "Search posts, resources..." : ""}
               className={cn(
                 "h-full cursor-pointer rounded-lg pl-10 text-base transition-all duration-300 ease-in-out focus:cursor-text",
+                "text-foreground", 
                 isOpen ? "w-full" : "w-10",
               )}
             />
