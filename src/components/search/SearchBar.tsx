@@ -141,11 +141,10 @@ export function SearchBar() {
             onValueChange={setQuery}
             onFocus={() => setIsOpen(true)}
             onKeyDown={handleKeyDown}
-            placeholder="Search posts, resources, tags..."
+            placeholder="Search..."
             className={cn(
               "h-full rounded-lg text-base transition-all duration-300 ease-in-out focus:cursor-text",
               "w-full pl-10 pr-10",
-              "placeholder:text-sm",
               isOpen ? "opacity-100" : "opacity-0 cursor-pointer"
             )}
           />
