@@ -18,7 +18,6 @@ export function SearchBar() {
   const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [debouncedQuery] = useDebounce(query, 300);
-  const [isLoading, setIsLoading] = useState(false);
   const [isFetchingIndex, setIsFetchingIndex] = useState(false);
   const [data, setData] = useState<SearchResult[] | null>(null);
   const searchRef = useRef<HTMLDivElement>(null);
@@ -112,10 +111,6 @@ export function SearchBar() {
         total: posts.length + resources.length + tags.length 
     };
   }, [debouncedQuery, data]);
-  
-  useEffect(() => {
-    setIsLoading(!!debouncedQuery);
-  }, [debouncedQuery]);
 
   const { posts: postResults, resources: resourceResults, tags: tagResults, total: totalResults } = searchResults;
 
@@ -198,19 +193,19 @@ export function SearchBar() {
                       ))}
                     </CommandGroup>
                   )}
-                  {hasResults && (
-                     <CommandGroup className="border-t pt-2 mt-1">
-                        <CommandItem 
-                            key="view-all"
-                            value="view-all"
-                            onSelect={() => runCommand(() => router.push(`/search?q=${debouncedQuery}`))} 
-                            className="flex justify-center text-sm text-primary hover:text-primary/80"
-                        >
-                            <Search className="mr-3 h-4 w-4" />
-                            View all {totalResults} results
-                        </CommandItem>
-                    </CommandGroup>
-                  )}
+                  
+                  <CommandGroup className="border-t pt-2 mt-1">
+                      <CommandItem 
+                          key="view-all"
+                          value="view-all"
+                          onSelect={() => runCommand(() => router.push(`/search?q=${debouncedQuery}`))} 
+                          className="flex justify-center text-sm text-primary hover:text-primary/80"
+                      >
+                          <Search className="mr-3 h-4 w-4" />
+                          View all {totalResults} results
+                      </CommandItem>
+                  </CommandGroup>
+
                 </>
               ) : null}
             </CommandList>
