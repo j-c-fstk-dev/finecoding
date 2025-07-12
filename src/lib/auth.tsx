@@ -3,9 +3,11 @@
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut, type User, type Auth } from 'firebase/auth';
+import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut, type User } from 'firebase/auth';
 import { firebaseApp } from '@/lib/firebase';
 import { LoadingSpinner } from '@/components/layout/LoadingSpinner';
+
+const auth = getAuth(firebaseApp);
 
 interface AuthContextType {
   user: User | null;
@@ -21,8 +23,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Get the Auth instance inside the effect to ensure firebaseApp is initialized.
-    const auth = getAuth(firebaseApp);
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setUser(user);
       setLoading(false);
@@ -32,12 +32,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const login = (email: string, password: string) => {
-    const auth = getAuth(firebaseApp);
     return signInWithEmailAndPassword(auth, email, password);
   };
 
   const logout = () => {
-    const auth = getAuth(firebaseApp);
     return signOut(auth);
   };
 
@@ -45,10 +43,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <AuthContext.Provider value={value}>
-      {/* 
-        The initial loading UI is now handled exclusively by the SplashScreen 
-        in the root layout to prevent conflicting loaders.
-      */}
       {children}
     </AuthContext.Provider>
   );

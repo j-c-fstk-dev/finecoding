@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { useDebounce } from 'use-debounce';
 import { cn } from "@/lib/utils";
 import { Search, Loader2, BookText, Code, ArrowRight } from "lucide-react";
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
+import { Command, CommandEmpty, CommandGroup, CommandItem, CommandList } from "@/components/ui/command";
 import type { SearchResult } from '@/types';
 
 const MAX_POSTS_IN_DROPDOWN = 5;
@@ -101,9 +101,9 @@ export function SearchBar() {
     setIsLoading(false);
     return results;
   }, [debouncedQuery, data]);
-
-  const postResults = filteredData.filter(item => item.type === 'Post');
-  const resourceResults = filteredData.filter(item => item.type === 'Resource');
+  
+  const postResults = useMemo(() => filteredData.filter(item => item.type === 'Post'), [filteredData]);
+  const resourceResults = useMemo(() => filteredData.filter(item => item.type === 'Resource'), [filteredData]);
   
   const displayedPosts = postResults.slice(0, MAX_POSTS_IN_DROPDOWN);
   const displayedResources = resourceResults.slice(0, MAX_RESOURCES_IN_DROPDOWN);
@@ -155,7 +155,7 @@ export function SearchBar() {
                 </div>
               ) : debouncedQuery && !hasResults ? (
                 <CommandEmpty>No results found for &quot;{debouncedQuery}&quot;.</CommandEmpty>
-              ) : (
+              ) : debouncedQuery && hasResults ? (
                 <>
                   {displayedPosts.length > 0 && (
                     <CommandGroup heading="Posts">
@@ -184,7 +184,7 @@ export function SearchBar() {
                      </CommandItem>
                   )}
                 </>
-              )}
+              ) : null}
             </CommandList>
           )}
         </Command>
