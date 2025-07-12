@@ -1,3 +1,4 @@
+
 export interface Post {
   id?: string; // Firestore document ID
   slug: string;
@@ -43,4 +44,13 @@ export interface ResourceComment {
   name: string;
   comment: string;
   createdAt: Date;
+}
+
+export interface SearchResult {
+  type: 'Post' | 'Resource';
+  title: string;
+  excerpt: string;
+  slug: string;
+  thumbnail: string | null;
+  tags: string[];
 }

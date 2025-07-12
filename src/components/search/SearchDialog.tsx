@@ -1,10 +1,9 @@
 
 "use client";
 
-import * as React from "react";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import Image from "next/image";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useDebounce } from 'use-debounce';
 import {
   CommandDialog,
@@ -15,7 +14,6 @@ import {
   CommandList,
 } from "@/components/ui/command";
 import { BookText, Code, Loader2 } from "lucide-react";
-import { useRouter } from "next/navigation";
 
 interface SearchResult {
   type: 'Post' | 'Resource';
@@ -53,7 +51,7 @@ export function SearchDialog({ open, onOpenChange }: { open: boolean, onOpenChan
     }
   }, [open, data]);
 
-  const runCommand = React.useCallback((command: () => unknown) => {
+  const runCommand = useCallback((command: () => unknown) => {
     onOpenChange(false)
     setQuery("")
     command()
@@ -79,7 +77,7 @@ export function SearchDialog({ open, onOpenChange }: { open: boolean, onOpenChan
       <CommandInput
         placeholder="Search posts, resources, and tags..."
         value={query}
-        onValueValueChange={setQuery}
+        onValueChange={setQuery}
       />
       <CommandList>
         {loading && <div className="p-4 text-center text-sm flex items-center justify-center"><Loader2 className="mr-2 h-4 w-4 animate-spin" />Loading Index...</div>}

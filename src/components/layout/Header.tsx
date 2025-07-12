@@ -1,15 +1,16 @@
+
 "use client";
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import { Menu, CodeXml, Search } from 'lucide-react';
+import { Menu, CodeXml } from 'lucide-react';
 import { ThemeSwitch } from '@/components/ui/ThemeSwitch';
 import { useState, useEffect, useRef } from 'react';
 import { Sheet, SheetContent, SheetTrigger, SheetClose } from '@/components/ui/sheet';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Button } from '@/components/ui/button';
-import { SearchDialog } from '@/components/search/SearchDialog';
+import { SearchBar } from '@/components/search/SearchBar';
 
 const navLinks = [
   { href: '/', label: 'Home' },
@@ -21,7 +22,6 @@ const navLinks = [
 export function Header() {
   const pathname = usePathname();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isGlitching, setIsGlitching] = useState(false);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -49,17 +49,6 @@ export function Header() {
         clearTimeout(timeoutRef.current);
       }
     };
-  }, []);
-
-  useEffect(() => {
-    const down = (e: KeyboardEvent) => {
-      if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
-        e.preventDefault();
-        setIsSearchOpen((open) => !open);
-      }
-    };
-    document.addEventListener("keydown", down);
-    return () => document.removeEventListener("keydown", down);
   }, []);
 
   return (
@@ -175,10 +164,7 @@ export function Header() {
 
             {/* Right Side: Search and Theme Switch */}
             <div className="flex items-center gap-2">
-                <Button variant="ghost" size="icon" onClick={() => setIsSearchOpen(true)}>
-                    <Search className="h-5 w-5" />
-                    <span className="sr-only">Search</span>
-                </Button>
+                <SearchBar />
                 <div className="hidden md:flex">
                    <ThemeSwitch />
                 </div>
@@ -186,7 +172,6 @@ export function Header() {
           </div>
         </div>
       </header>
-      <SearchDialog open={isSearchOpen} onOpenChange={setIsSearchOpen} />
     </>
   );
 }
