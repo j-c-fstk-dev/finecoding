@@ -53,7 +53,7 @@ export function Header() {
   return (
     <header 
       className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/80 backdrop-blur-sm"
-      style={{ '--header-height': '7rem' } as React.CSSProperties} // Increased height
+      style={{ '--header-height': '7rem' } as React.CSSProperties}
     >
       <div className="container relative flex h-28 max-w-screen-2xl items-center">
         
