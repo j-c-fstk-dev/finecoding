@@ -4,15 +4,15 @@
 
 @layer base {
   :root {
-    --background: 240 4% 96%; /* #f5f5f5 */
+    --background: 0 0% 96.1%; /* #F5F5F5 */
     --foreground: 220 10% 15%;
-    --card: 100 100% 98%; /* #FAFFFA */
+    --card: 0 0% 96.1%; /* #F5F5F5 */
     --card-foreground: 220 10% 15%;
-    --popover: 100 100% 98%; /* #FAFFFA */
+    --popover: 0 0% 96.1%; /* #F5F5F5 */
     --popover-foreground: 220 10% 15%;
     --primary: 151 45% 45%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 0 0% 96.1%; /* Match background */
+    --secondary: 0 0% 96.1%;
     --secondary-foreground: 220 10% 9%;
     --muted: 0 0% 85.1%; /* #D9D9D9 */
     --muted-foreground: 220 10% 40%;
