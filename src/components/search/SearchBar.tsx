@@ -163,7 +163,7 @@ export function SearchBar() {
                 Searching...
               </div>
             ) : (!hasResults) ? (
-              <CommandEmpty>No results found for &quot;{debouncedQuery}&quot;.</CommandEmpty>
+              <CommandEmpty className="text-foreground">No results found for &quot;{debouncedQuery}&quot;.</CommandEmpty>
             ) : null}
 
             {hasResults && (
