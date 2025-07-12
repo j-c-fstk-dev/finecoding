@@ -100,6 +100,7 @@ export function SearchBar() {
 
   const postResults = filteredData.filter(item => item.type === 'Post').slice(0, 5);
   const resourceResults = filteredData.filter(item => item.type === 'Resource').slice(0, 5);
+  const hasResults = filteredData.length > 0;
 
   const runCommand = useCallback((callback: () => void) => {
     setIsOpen(false);
@@ -144,7 +145,7 @@ export function SearchBar() {
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   Searching...
                 </div>
-              ) : debouncedQuery && !filteredData.length ? (
+              ) : debouncedQuery && !hasResults ? (
                 <CommandEmpty>No results found for &quot;{debouncedQuery}&quot;.</CommandEmpty>
               ) : (
                 <>
@@ -168,7 +169,7 @@ export function SearchBar() {
                       ))}
                     </CommandGroup>
                   )}
-                  {filteredData.length > 0 && (
+                  {hasResults && (
                      <CommandItem onSelect={() => runCommand(() => router.push(`/search?q=${debouncedQuery}`))}>
                         <ArrowRight className="mr-3 h-4 w-4 text-primary" />
                         <span className="text-primary">View all {filteredData.length} results</span>
