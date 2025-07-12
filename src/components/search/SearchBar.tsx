@@ -105,14 +105,14 @@ export function SearchBar() {
               onFocus={() => setIsOpen(true)}
               placeholder={isOpen ? "Search posts, resources..." : ""}
               className={cn(
-                "h-full cursor-pointer rounded-lg pl-10 transition-all duration-300 ease-in-out focus:cursor-text",
+                "h-full cursor-pointer rounded-lg pl-10 text-base transition-all duration-300 ease-in-out focus:cursor-text",
                 isOpen ? "w-full" : "w-10",
               )}
             />
           </div>
 
           {isOpen && (
-            <CommandList className="absolute top-12 w-full rounded-lg border bg-background shadow-lg max-h-[500px]">
+            <CommandList className="absolute top-12 w-full rounded-lg border bg-background shadow-lg max-h-[500px] overflow-y-auto">
               {isLoading || isFetchingIndex ? (
                 <div className="p-4 text-center text-sm flex items-center justify-center">
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
