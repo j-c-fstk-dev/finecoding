@@ -1,7 +1,8 @@
 
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import * as React from "react";
+import { useState, useEffect, useMemo } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useDebounce } from 'use-debounce';
@@ -78,7 +79,7 @@ export function SearchDialog({ open, onOpenChange }: { open: boolean, onOpenChan
       <CommandInput
         placeholder="Search posts, resources, and tags..."
         value={query}
-        onValueChange={setQuery}
+        onValueValueChange={setQuery}
       />
       <CommandList>
         {loading && <div className="p-4 text-center text-sm flex items-center justify-center"><Loader2 className="mr-2 h-4 w-4 animate-spin" />Loading Index...</div>}
@@ -144,4 +145,3 @@ export function SearchDialog({ open, onOpenChange }: { open: boolean, onOpenChan
     </CommandDialog>
   );
 }
-
