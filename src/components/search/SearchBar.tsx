@@ -198,14 +198,12 @@ export function SearchBar() {
                       ))}
                     </CommandGroup>
                   )}
-                  {hasResults && (
-                     <CommandGroup className="border-t pt-2 mt-1">
-                        <CommandItem onSelect={() => runCommand(() => router.push(`/search?q=${debouncedQuery}`))} className="justify-center text-sm text-primary hover:text-primary/80">
-                            <Search className="mr-3 h-4 w-4" />
-                            View all {totalResults} results
-                        </CommandItem>
-                     </CommandGroup>
-                  )}
+                  <CommandGroup className={cn("border-t pt-2 mt-1", hasResults ? "flex" : "hidden")}>
+                    <CommandItem onSelect={() => runCommand(() => router.push(`/search?q=${debouncedQuery}`))} className="flex-1 justify-center text-sm text-primary hover:text-primary/80">
+                        <Search className="mr-3 h-4 w-4" />
+                        View all {totalResults} results
+                    </CommandItem>
+                  </CommandGroup>
                 </>
               ) : null}
             </CommandList>
