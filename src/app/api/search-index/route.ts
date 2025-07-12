@@ -1,3 +1,4 @@
+
 import { getPosts } from '@/lib/posts';
 import { getResources } from '@/lib/resources';
 import { NextResponse } from 'next/server';
@@ -11,15 +12,15 @@ export async function GET() {
 
     const searchIndex = [
       ...posts.map(post => ({
-        type: 'Post',
+        type: 'Post' as const,
         title: post.title,
         excerpt: post.excerpt,
         slug: `/posts/${post.slug}`,
         thumbnail: post.imageUrl,
-        tags: post.tags || [],
+        tags: Array.isArray(post.tags) ? post.tags : [],
       })),
       ...resources.map(resource => ({
-        type: 'Resource',
+        type: 'Resource' as const,
         title: resource.name,
         excerpt: resource.description,
         slug: resource.link,

@@ -9,6 +9,9 @@ import { Search, Loader2, BookText, Code, ArrowRight } from "lucide-react";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import type { SearchResult } from '@/types';
 
+const MAX_POSTS_IN_DROPDOWN = 5;
+const MAX_RESOURCES_IN_DROPDOWN = 5;
+
 export function SearchBar() {
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
@@ -89,18 +92,24 @@ export function SearchBar() {
     }
     setIsLoading(true);
     const lowerCaseQuery = debouncedQuery.toLowerCase();
-    const results = data.filter(item => 
-        item.title.toLowerCase().includes(lowerCaseQuery) ||
-        item.excerpt.toLowerCase().includes(lowerCaseQuery) ||
-        (item.tags && item.tags.some(tag => tag.toLowerCase().includes(lowerCaseQuery)))
-    );
+    const results = data.filter(item => {
+        const titleMatch = item.title.toLowerCase().includes(lowerCaseQuery);
+        const excerptMatch = item.excerpt.toLowerCase().includes(lowerCaseQuery);
+        const tagsMatch = item.tags && Array.isArray(item.tags) && item.tags.some(tag => tag.toLowerCase().includes(lowerCaseQuery));
+        return titleMatch || excerptMatch || tagsMatch;
+    });
     setIsLoading(false);
     return results;
   }, [debouncedQuery, data]);
 
-  const postResults = filteredData.filter(item => item.type === 'Post').slice(0, 5);
-  const resourceResults = filteredData.filter(item => item.type === 'Resource').slice(0, 5);
+  const postResults = filteredData.filter(item => item.type === 'Post');
+  const resourceResults = filteredData.filter(item => item.type === 'Resource');
+  
+  const displayedPosts = postResults.slice(0, MAX_POSTS_IN_DROPDOWN);
+  const displayedResources = resourceResults.slice(0, MAX_RESOURCES_IN_DROPDOWN);
+  
   const hasResults = filteredData.length > 0;
+  const hasMoreResults = postResults.length > displayedPosts.length || resourceResults.length > displayedResources.length;
 
   const runCommand = useCallback((callback: () => void) => {
     setIsOpen(false);
@@ -138,7 +147,7 @@ export function SearchBar() {
 
           {isOpen && (
             <CommandList 
-              className="fixed left-1/2 -translate-x-1/2 top-[calc(var(--header-height,6rem)+0.5rem)] w-[90vw] max-w-2xl rounded-lg border bg-background shadow-lg max-h-[70vh] overflow-y-auto"
+              className="fixed left-1/2 -translate-x-1/2 top-[calc(var(--header-height,6rem)+0.5rem)] w-[90vw] max-w-2xl rounded-lg border bg-background shadow-lg overflow-y-auto max-h-[70vh]"
             >
               {(isLoading || isFetchingIndex) && debouncedQuery ? (
                 <div className="p-4 text-center text-sm flex items-center justify-center">
@@ -149,9 +158,9 @@ export function SearchBar() {
                 <CommandEmpty>No results found for &quot;{debouncedQuery}&quot;.</CommandEmpty>
               ) : (
                 <>
-                  {postResults.length > 0 && (
+                  {displayedPosts.length > 0 && (
                     <CommandGroup heading="Posts">
-                      {postResults.map(item => (
+                      {displayedPosts.map(item => (
                         <CommandItem key={item.slug} value={item.title} onSelect={() => runCommand(() => router.push(item.slug))}>
                           <BookText className="mr-3 h-4 w-4 text-muted-foreground" />
                           <span className="truncate">{item.title}</span>
@@ -159,9 +168,9 @@ export function SearchBar() {
                       ))}
                     </CommandGroup>
                   )}
-                  {resourceResults.length > 0 && (
+                  {displayedResources.length > 0 && (
                     <CommandGroup heading="Resources">
-                      {resourceResults.map(item => (
+                      {displayedResources.map(item => (
                         <CommandItem key={item.slug} value={item.title} onSelect={() => runCommand(() => window.open(item.slug, '_blank'))}>
                           <Code className="mr-3 h-4 w-4 text-muted-foreground" />
                           <span className="truncate">{item.title}</span>
