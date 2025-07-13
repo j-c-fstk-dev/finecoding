@@ -1,4 +1,5 @@
 
+
 export interface Post {
   id?: string; // Firestore document ID
   slug: string;
@@ -21,7 +22,7 @@ export interface Comment {
 
 // --- New Types for Resources ---
 
-export const resourceCategories = ['AI & Machine Learning', 'Developer Tools', 'DevOps & Hosting', 'Productivity', 'Books & Courses', 'UI & Design', 'Repositories'] as const;
+export const resourceCategories = ['AI & Machine Learning', 'Developer Tools', 'DevOps & Hosting', 'Productivity', 'Books & Courses', 'UI & Design', 'Repositories', 'Cloud Platforms', 'APIs & Backends', 'Testing & Quality', 'Docs & Knowledge', 'Browser Extensions'] as const;
 export type ResourceCategory = typeof resourceCategories[number];
 
 export const pricingModels = ['Free', 'Free Tier', 'Paid', 'Open Source'] as const;
