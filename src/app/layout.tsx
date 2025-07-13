@@ -6,6 +6,7 @@ import { Toaster } from '@/components/ui/toaster';
 import { AuthProvider } from '@/lib/auth';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
+import { ClientLayout } from '@/components/layout/ClientLayout';
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:9002'),
@@ -61,11 +62,13 @@ export default function RootLayout({
       <body className="flex flex-col min-h-screen">
         <AuthProvider>
           <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
-            <Header />
-            <main className="flex-1 w-full relative z-10">
-              {children}
-            </main>
-            <Footer />
+            <ClientLayout>
+              <Header />
+              <main className="flex-1 w-full relative z-10">
+                {children}
+              </main>
+              <Footer />
+            </ClientLayout>
             <Toaster />
           </ThemeProvider>
         </AuthProvider>

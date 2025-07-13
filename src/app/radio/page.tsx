@@ -2,24 +2,8 @@
 'use client';
 
 import { Headphones } from 'lucide-react';
-import { useEffect } from 'react';
 
 export default function RadioPage() {
-  
-  useEffect(() => {
-    const script = document.createElement('script');
-    script.src = "https://static.elfsight.com/platform/platform.js";
-    script.defer = true;
-    script.setAttribute('data-use-service-core', '');
-    
-    document.body.appendChild(script);
-
-    return () => {
-      // Clean up the script when the component unmounts
-      document.body.removeChild(script);
-    }
-  }, []);
-
   return (
     <div className="container mx-auto max-w-3xl px-4 py-16">
       <section className="text-center">
@@ -35,8 +19,8 @@ export default function RadioPage() {
       </section>
       
       <section className="mt-12">
-        <div className="w-full h-[75px] mx-auto overflow-hidden">
-           <div className="elfsight-app-e0d15945-5b55-4388-8217-a91bc7f38c50" data-elfsight-app-lazy></div>
+        <div id="radio-player-container" className="w-full h-[75px] mx-auto overflow-hidden">
+           {/* The radio player from ClientLayout will be positioned here via CSS when on this page */}
         </div>
       </section>
     </div>
