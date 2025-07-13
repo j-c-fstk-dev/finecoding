@@ -36,7 +36,7 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
   }, []);
 
   useEffect(() => {
-    // This effect runs only on the client, after hydration and after initial loading is complete.
+    // Defer footer animation until after the initial loading is complete.
     if (isLoading) return;
 
     const footer = document.getElementById("main-footer");
