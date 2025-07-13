@@ -31,7 +31,7 @@ export function RadioPlayer() {
         // If on the radio page, make it visible and position it.
         // If not on the radio page, it remains in the DOM but is visually hidden.
         isRadioPage
-          ? 'fixed bottom-4 left-1/2 -translate-x-1/2 z-50 w-[90vw] max-w-2xl opacity-100'
+          ? 'fixed bottom-4 left-1/2 -translate-x-1/2 z-50 w-[90vw] max-w-2xl opacity-100 h-[105px] overflow-hidden rounded-lg'
           : 'opacity-0 pointer-events-none h-0 w-0'
       )}
     >
