@@ -1,8 +1,11 @@
 
 import type { Metadata } from 'next';
-import Script from 'next/script';
 import './globals.css';
-import { ClientLayout } from '@/components/layout/ClientLayout';
+import { ThemeProvider } from '@/components/theme-provider';
+import { Toaster } from '@/components/ui/toaster';
+import { AuthProvider } from '@/lib/auth';
+import { Header } from '@/components/layout/Header';
+import { Footer } from '@/components/layout/Footer';
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:9002'),
@@ -39,9 +42,6 @@ export const metadata: Metadata = {
   }
 };
 
-
-const gaId = process.env.NEXT_PUBLIC_GA_ID;
-
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -57,30 +57,18 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Source+Code+Pro:wght@400;500&display=swap" rel="stylesheet" />
-        <script src="https://static.elfsight.com/platform/platform.js" data-use-service-core defer></script>
       </head>
       <body className="flex flex-col min-h-screen">
-        {gaId && (
-          <>
-            <Script
-              strategy="afterInteractive"
-              src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`}
-            />
-            <Script
-              id="google-analytics"
-              strategy="afterInteractive"
-              dangerouslySetInnerHTML={{
-                __html: `
-                  window.dataLayer = window.dataLayer || [];
-                  function gtag(){dataLayer.push(arguments);}
-                  gtag('js', new Date());
-                  gtag('config', '${gaId}');
-                `,
-              }}
-            />
-          </>
-        )}
-        <ClientLayout>{children}</ClientLayout>
+        <AuthProvider>
+          <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
+            <Header />
+            <main className="flex-1 w-full relative z-10">
+              {children}
+            </main>
+            <Footer />
+            <Toaster />
+          </ThemeProvider>
+        </AuthProvider>
       </body>
     </html>
   );

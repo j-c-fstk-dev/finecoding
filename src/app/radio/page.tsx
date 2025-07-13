@@ -7,17 +7,16 @@ import { useEffect } from 'react';
 export default function RadioPage() {
   
   useEffect(() => {
-    // This script is already loaded in ClientLayout, but calling it here
-    // ensures the widget initializes if it hasn't already.
-    // The main purpose of this page is to provide a UI for the player.
     const script = document.createElement('script');
     script.src = "https://static.elfsight.com/platform/platform.js";
     script.defer = true;
+    script.setAttribute('data-use-service-core', '');
+    
     document.body.appendChild(script);
 
     return () => {
-      // It's generally not recommended to remove the script on cleanup
-      // as it might manage global state for the player.
+      // Clean up the script when the component unmounts
+      document.body.removeChild(script);
     }
   }, []);
 
@@ -36,12 +35,9 @@ export default function RadioPage() {
       </section>
       
       <section className="mt-12">
-        {/* 
-          This div is now a placeholder for the global player to become visible.
-          The actual player logic is in ClientLayout to persist across pages.
-          We just provide a sized box here.
-        */}
-        <div className="w-full h-[75px] mx-auto" />
+        <div className="w-full h-[75px] mx-auto overflow-hidden">
+           <div className="elfsight-app-e0d15945-5b55-4388-8217-a91bc7f38c50" data-elfsight-app-lazy></div>
+        </div>
       </section>
     </div>
   );
