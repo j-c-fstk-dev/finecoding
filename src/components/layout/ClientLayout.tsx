@@ -10,6 +10,8 @@ import { AuthProvider } from '@/lib/auth';
 import { SplashScreen } from '@/components/layout/SplashScreen';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
+import { RadioProvider } from '@/hooks/use-radio';
+import { RadioPlayer } from './RadioPlayer';
 
 export function ClientLayout({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
@@ -66,17 +68,20 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <AuthProvider>
-      <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
-          <AnimatePresence>
-            {isLoading && <SplashScreen />}
-          </AnimatePresence>
-          <Header />
-          <main className="flex-1 w-full relative z-10">
-            {children}
-          </main>
-          <Footer style={footerStyle} />
-          <Toaster />
-      </ThemeProvider>
+      <RadioProvider>
+        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
+            <AnimatePresence>
+              {isLoading && <SplashScreen />}
+            </AnimatePresence>
+            <Header />
+            <main className="flex-1 w-full relative z-10">
+              {children}
+            </main>
+            <Footer style={footerStyle} />
+            <RadioPlayer />
+            <Toaster />
+        </ThemeProvider>
+      </RadioProvider>
     </AuthProvider>
   );
 }

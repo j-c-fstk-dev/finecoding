@@ -1,9 +1,18 @@
 
 'use client';
 
+import { useEffect } from 'react';
+import { useRadio } from '@/hooks/use-radio';
 import { Headphones } from 'lucide-react';
 
 export default function RadioPage() {
+  const { playRadio } = useRadio();
+
+  // When this page mounts, signal that the radio should start playing.
+  useEffect(() => {
+    playRadio();
+  }, [playRadio]);
+
   return (
     <div className="container mx-auto max-w-3xl px-4 py-16">
       <section className="text-center">
@@ -19,6 +28,7 @@ export default function RadioPage() {
       </section>
       
       <section className="mt-12">
+        <p className="text-center text-muted-foreground mb-4">The player below is now active and will continue playing in the background as you navigate the site.</p>
         <div className="elfsight-app-e0d15945-5b55-4388-8217-a91bc7f38c50" data-elfsight-app-lazy></div>
       </section>
     </div>
