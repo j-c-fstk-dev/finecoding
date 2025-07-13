@@ -35,16 +35,19 @@ const textVariants = {
   }
 }
 
-// The animation is controlled by layout.tsx using AnimatePresence
-export function SplashScreen() {
+interface SplashScreenProps {
+  onExitComplete: () => void;
+}
+
+export function SplashScreen({ onExitComplete }: SplashScreenProps) {
     return (
         <motion.div
             className="fixed inset-0 z-[100] bg-[#1A1A1A]"
             initial={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.75, ease: 'easeInOut' }}
+            onAnimationComplete={onExitComplete}
         >
-            {/* Positioning Wrapper for Logo */}
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-[70%]">
               <motion.div
                 variants={logoVariants}
@@ -63,7 +66,6 @@ export function SplashScreen() {
               </motion.div>
             </div>
 
-            {/* Positioning Wrapper for Footer Text */}
             <div className="absolute bottom-12 left-1/2 -translate-x-1/2 text-center">
               <motion.div
                 variants={textVariants}

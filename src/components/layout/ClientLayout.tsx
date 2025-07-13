@@ -3,7 +3,7 @@
 
 import { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
-import { AnimatePresence } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import { SplashScreen } from './SplashScreen';
 import { cn } from '@/lib/utils';
 
@@ -16,7 +16,6 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
     setIsMounted(true);
   }, []);
   
-  // This useEffect will load the Elfsight script once the component is mounted on the client.
   useEffect(() => {
     if (isMounted) {
       const script = document.createElement('script');
@@ -27,7 +26,6 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
       document.body.appendChild(script);
 
       return () => {
-        // Clean up the script when the component unmounts
         if (script.parentNode) {
             script.parentNode.removeChild(script);
         }
@@ -46,31 +44,31 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
         }}
       >
         {isLoading && (
-            <SplashScreen />
+            <SplashScreen onExitComplete={() => setIsLoading(false)} />
         )}
       </AnimatePresence>
       
-      <div 
-        onAnimationComplete={() => setIsLoading(false)}
-        className={!isLoading ? 'animate-fade-in' : 'opacity-0'}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.5, delay: 0.2 }}
+        className={cn(isLoading && 'hidden')}
       >
         {children}
-      </div>
+      </motion.div>
 
-      {/* 
-        This div will always exist on the client after mount, ensuring the music persists.
-        Its visibility and position are controlled by the `isRadioPage` state.
-      */}
       {isMounted && (
         <div
           className={cn(
-            'transition-opacity duration-300',
+            'transition-all duration-300',
             isRadioPage 
-              ? 'opacity-100' // Visible on radio page
-              : 'opacity-0 pointer-events-none' // Hidden on other pages
+              ? 'opacity-100 visible'
+              : 'opacity-0 invisible'
           )}
         >
-          <div className="elfsight-app-e0d15945-5b55-4388-8217-a91bc7f38c50" data-elfsight-app-lazy></div>
+          <div id="radio-player-container" className="w-full h-[75px] mx-auto overflow-hidden">
+            <div className="elfsight-app-e0d15945-5b55-4388-8217-a91bc7f38c50" data-elfsight-app-lazy></div>
+          </div>
         </div>
       )}
     </>
