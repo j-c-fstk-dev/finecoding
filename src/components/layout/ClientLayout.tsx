@@ -6,7 +6,6 @@ import { usePathname } from 'next/navigation';
 import { AnimatePresence, motion } from 'framer-motion';
 import { SplashScreen } from './SplashScreen';
 import { cn } from '@/lib/utils';
-import { Footer } from './Footer';
 
 export function ClientLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -16,22 +15,23 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     setIsMounted(true);
 
+    const minDisplayTime = 2000; // 2 seconds
+    const startTime = Date.now();
+
     const handleLoad = () => {
-      setIsLoading(false);
+      const elapsedTime = Date.now() - startTime;
+      const remainingTime = minDisplayTime - elapsedTime;
+      
+      setTimeout(() => {
+        setIsLoading(false);
+      }, Math.max(0, remainingTime));
     };
 
-    // Check if the page is already loaded
     if (document.readyState === 'complete') {
       handleLoad();
     } else {
       window.addEventListener('load', handleLoad);
-      // Fallback timer in case the 'load' event fails to fire
-      const timeoutId = setTimeout(handleLoad, 3000); 
-      
-      return () => {
-        window.removeEventListener('load', handleLoad);
-        clearTimeout(timeoutId);
-      };
+      return () => window.removeEventListener('load', handleLoad);
     }
   }, []);
   
@@ -56,33 +56,32 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <>
-      <AnimatePresence mode="wait">
-        {isLoading && <SplashScreen />}
+      <AnimatePresence>
+        {isLoading && <SplashScreen onExitComplete={() => {}} />}
       </AnimatePresence>
       
       <motion.div
         className={cn(isLoading && 'hidden')}
         initial={{ opacity: 0 }}
-        animate={{ opacity: isLoading ? 0 : 1 }}
+        animate={{ opacity: 1 }}
         transition={{ duration: 0.5, delay: 0.2 }}
       >
         {children}
 
-        {/* Radio Player Container - Hidden by default, visible only on radio page */}
+        {/* Radio Player Container - Always in DOM for persistence, visibility controlled by CSS */}
         <div
           className={cn(
             'transition-opacity duration-300',
             isRadioPage 
-              ? 'opacity-100'
-              : 'opacity-0 pointer-events-none h-0 w-0'
+              ? 'opacity-100' // Visible on radio page
+              : 'opacity-0 pointer-events-none' // Hidden everywhere else
           )}
         >
-          <div className="relative w-full h-[75px] mx-auto overflow-hidden">
+          {/* This div provides the placeholder for the player in the radio page layout */}
+          <div id="radio-player-container" className="w-full h-[75px] mx-auto overflow-hidden">
             <div className="elfsight-app-e0d15945-5b55-4388-8217-a91bc7f38c50" data-elfsight-app-lazy></div>
           </div>
         </div>
-
-        <Footer />
       </motion.div>
     </>
   );
