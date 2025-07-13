@@ -154,9 +154,9 @@ export function Header() {
         </div>
 
         {/* Right Side: Search and Theme Switch */}
-        <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-4">
-            <SearchBar />
+        <div className="absolute right-4 top-1/2 -translate-y-1/2 flex flex-col items-end gap-2">
             <ThemeSwitch />
+            <SearchBar />
         </div>
       </div>
     </header>

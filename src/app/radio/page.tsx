@@ -1,18 +1,9 @@
 
 'use client';
 
-import type { Metadata } from 'next';
-import { useEffect } from 'react';
-import { useRadio } from '@/hooks/use-radio';
-import { Headphones, Radio } from 'lucide-react';
+import { Headphones } from 'lucide-react';
 
 export default function RadioPage() {
-  const { playRadio } = useRadio();
-
-  useEffect(() => {
-    playRadio();
-  }, [playRadio]);
-
   return (
     <div className="container mx-auto max-w-3xl px-4 py-16">
       <section className="text-center">
@@ -24,9 +15,6 @@ export default function RadioPage() {
         </h1>
         <p className="mt-4 text-lg text-muted-foreground sm:text-xl">
           Chill beats for focused coding sessions.
-        </p>
-        <p className="mt-2 text-sm text-muted-foreground">
-            The player has been launched and will follow you across the site.
         </p>
       </section>
       
