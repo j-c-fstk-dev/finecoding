@@ -4,7 +4,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import { Menu, CodeXml, Radio } from 'lucide-react';
+import { Menu, CodeXml, Radio, Home, LayoutList, Library, Info, Headphones } from 'lucide-react';
 import { ThemeSwitch } from '@/components/ui/ThemeSwitch';
 import { useState, useEffect, useRef } from 'react';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
@@ -12,11 +12,11 @@ import { Button } from '@/components/ui/button';
 import { SearchBar } from '@/components/search/SearchBar';
 
 const navLinks = [
-  { href: '/', label: 'Home' },
-  { href: '/posts', label: 'All Posts' },
-  { href: '/resources', label: 'Resources' },
-  { href: '/radio', label: 'Radio' },
-  { href: '/about', label: 'About' },
+  { href: '/', label: 'Home', icon: Home },
+  { href: '/posts', label: 'All Posts', icon: LayoutList },
+  { href: '/resources', label: 'Resources', icon: Library },
+  { href: '/radio', label: 'Radio', icon: Headphones },
+  { href: '/about', label: 'About', icon: Info },
 ];
 
 export function Header() {
@@ -50,6 +50,22 @@ export function Header() {
       }
     };
   }, []);
+
+  const renderNavLinks = (isMobile = false) => navLinks.map(({ href, label, icon: Icon }) => (
+    <Link
+      key={href}
+      href={href}
+      className={cn(
+        'transition-colors hover:text-foreground/80 flex items-center gap-3',
+        isMobile ? 'text-lg' : 'text-sm font-medium',
+        pathname === href ? 'text-foreground font-semibold' : 'text-muted-foreground'
+      )}
+      onClick={isMobile ? () => setIsMobileMenuOpen(false) : undefined}
+    >
+      <Icon className="h-5 w-5 text-primary" />
+      {label}
+    </Link>
+  ));
 
   return (
     <header 
@@ -88,22 +104,7 @@ export function Header() {
                       </Link>
                   </div>
                   <nav className="grid gap-4">
-                    {navLinks.map(({ href, label }) => (
-                      <SheetTrigger asChild key={href}>
-                        <Link
-                          href={href}
-                          className={cn(
-                            'text-lg text-muted-foreground transition-colors hover:text-foreground flex items-center gap-3',
-                            pathname === href && 'text-foreground font-semibold',
-                            label === 'Radio' && 'text-primary hover:text-primary/80'
-                          )}
-                          onClick={() => setIsMobileMenuOpen(false)}
-                        >
-                          {label === 'Radio' && <Radio className="h-5 w-5" />}
-                          {label}
-                        </Link>
-                      </SheetTrigger>
-                    ))}
+                    {renderNavLinks(true)}
                   </nav>
                 </div>
                 <div className="mt-auto border-t border-border/40 pt-4">
@@ -117,21 +118,8 @@ export function Header() {
           </div>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
-             {navLinks.map(({ href, label }) => (
-                <Link
-                  key={href}
-                  href={href}
-                  className={cn(
-                    'transition-colors hover:text-foreground/80',
-                    pathname === href ? 'text-foreground' : 'text-muted-foreground',
-                     label === 'Radio' && 'text-primary hover:text-primary/80 flex items-center gap-1.5'
-                  )}
-                >
-                  {label === 'Radio' && <Radio className="h-4 w-4" />}
-                  {label}
-                </Link>
-              ))}
+          <nav className="hidden md:flex items-center gap-6">
+             {renderNavLinks()}
           </nav>
         </div>
 
