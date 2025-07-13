@@ -1,13 +1,23 @@
 
 'use client';
 
+import { useState, useEffect } from 'react';
 import { useRadio } from "@/hooks/use-radio";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Radio as RadioIcon } from "lucide-react";
+import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export function RadioPlayer() {
   const { isPlaying, closeRadio } = useRadio();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return null;
+  }
 
   return (
     <AnimatePresence>
