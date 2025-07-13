@@ -18,7 +18,7 @@ export function RadioPlayer() {
 
   const isRadioPage = pathname === '/radio';
 
-  // The player is always in the DOM if playing, but only visible on the radio page.
+  // The player is always in the DOM if playing, but its visibility is controlled by CSS.
   if (!mounted || !isPlaying) {
     return null;
   }
@@ -28,8 +28,8 @@ export function RadioPlayer() {
       id="radio-player-container"
       className={cn(
         'transition-opacity duration-500 ease-in-out',
-        // If on the radio page, make it visible and position it.
-        // If not on the radio page, it remains in the DOM but is visually hidden.
+        // If on the radio page, make it visible and position it fixed at the bottom.
+        // If not, it remains in the DOM (for audio persistence) but is visually hidden.
         isRadioPage
           ? 'fixed bottom-4 left-1/2 -translate-x-1/2 z-50 w-[90vw] max-w-2xl opacity-100 h-[105px] overflow-hidden rounded-lg'
           : 'opacity-0 pointer-events-none h-0 w-0'
