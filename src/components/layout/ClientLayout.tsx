@@ -16,8 +16,15 @@ import { cn } from '@/lib/utils';
 export function ClientLayout({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
   const [footerStyle, setFooterStyle] = useState<CSSProperties>({ transform: 'translateY(100%)' });
+  const [mounted, setMounted] = useState(false);
   const pathname = usePathname();
-  const isRadioPage = pathname === '/radio';
+  
+  // This now depends on `mounted` to avoid hydration mismatch
+  const isRadioPage = mounted && pathname === '/radio';
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     // This timer simulates a loading process.
@@ -81,11 +88,6 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
           <Footer style={footerStyle} />
           <Toaster />
           
-          {/* 
-            The Elfsight widget is placed here, in the global layout.
-            It is always present in the DOM after the first load, allowing music to persist.
-            Its visibility is controlled by CSS based on the current page.
-          */}
           <div
             className={cn(
               "transition-opacity duration-300",
