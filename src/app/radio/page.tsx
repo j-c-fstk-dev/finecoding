@@ -30,10 +30,11 @@ export default function RadioPage() {
       
       <section className="mt-12">
         <p className="text-center text-muted-foreground mb-4">The player is active below and will continue playing in the background as you navigate the site.</p>
-        {/* The actual player is now managed globally in ClientLayout and will become visible here. */}
-        {/* This space is a visual placeholder for where the player will appear. */}
-        <div className="relative min-h-[400px]">
-            {/* The #radio-player-container in RadioPlayer.tsx will be positioned here */}
+        {/* The actual player is now managed globally in ClientLayout.
+            The RadioPlayer component will position itself absolutely within the viewport when on this page.
+        */}
+        <div className="relative min-h-[120px]">
+             {/* This space ensures there's room for the player to appear without overlapping other content initially. */}
         </div>
       </section>
     </div>

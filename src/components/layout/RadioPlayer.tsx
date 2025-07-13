@@ -18,7 +18,7 @@ export function RadioPlayer() {
 
   const isRadioPage = pathname === '/radio';
 
-  // O player só deve ser renderizado no cliente e quando a música estiver tocando.
+  // The player is always in the DOM if playing, but only visible on the radio page.
   if (!mounted || !isPlaying) {
     return null;
   }
@@ -27,30 +27,15 @@ export function RadioPlayer() {
     <div
       id="radio-player-container"
       className={cn(
-        'transition-all duration-500 ease-in-out overflow-hidden',
-        // Estilos para quando estiver na página /radio
-        isRadioPage 
-          ? 'relative w-full max-w-2xl mx-auto h-auto'
-          // Estilos para o mini-player flutuante em outras páginas
-          : 'fixed bottom-4 right-4 z-50 w-80 h-[105px] shadow-2xl rounded-lg bg-background/80 backdrop-blur-sm border'
+        'transition-opacity duration-500 ease-in-out',
+        // If on the radio page, make it visible and position it.
+        // If not on the radio page, it remains in the DOM but is visually hidden.
+        isRadioPage
+          ? 'fixed bottom-4 left-1/2 -translate-x-1/2 z-50 w-[90vw] max-w-2xl opacity-100'
+          : 'opacity-0 pointer-events-none h-0 w-0'
       )}
     >
-        {!isRadioPage && (
-            <div className="flex items-center justify-between p-2 border-b">
-                <div className="flex items-center gap-2">
-                    <Music className="h-4 w-4 text-primary" />
-                    <p className="text-xs font-semibold text-primary">Fine Coding Radio</p>
-                </div>
-                <button 
-                    onClick={stopRadio} 
-                    className="p-1 rounded-full text-muted-foreground hover:bg-muted hover:text-foreground"
-                    aria-label="Stop Radio"
-                >
-                    <X className="h-4 w-4" />
-                </button>
-            </div>
-        )}
-      {/* Este é o único embed da Elfsight em todo o aplicativo */}
+      {/* This is the only embed of Elfsight in the entire app */}
       <div className="elfsight-app-e0d15945-5b55-4388-8217-a91bc7f38c50" data-elfsight-app-lazy></div>
     </div>
   );
