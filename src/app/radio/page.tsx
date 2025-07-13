@@ -1,19 +1,9 @@
 
 'use client';
 
-import { useEffect } from 'react';
-import { useRadio } from '@/hooks/use-radio';
 import { Headphones } from 'lucide-react';
 
 export default function RadioPage() {
-  const { playRadio } = useRadio();
-
-  // On mounting this page, signal that the radio should start playing.
-  // The RadioPlayer component in the main layout will handle the rendering.
-  useEffect(() => {
-    playRadio();
-  }, [playRadio]);
-
   return (
     <div className="container mx-auto max-w-3xl px-4 py-16">
       <section className="text-center">
@@ -29,12 +19,9 @@ export default function RadioPage() {
       </section>
       
       <section className="mt-12">
-        <p className="text-center text-muted-foreground mb-4">The player is active below and will continue playing in the background as you navigate the site.</p>
-        {/* The actual player is now managed globally in ClientLayout.
-            The RadioPlayer component will position itself absolutely within the viewport when on this page.
-        */}
-        <div className="relative min-h-[120px]">
-             {/* This space ensures there's room for the player to appear without overlapping other content initially. */}
+        <div className="w-full h-[95px] overflow-hidden rounded-lg mx-auto">
+          {/* This is the only embed of Elfsight in the entire app */}
+          <div className="elfsight-app-e0d15945-5b55-4388-8217-a91bc7f38c50" data-elfsight-app-lazy></div>
         </div>
       </section>
     </div>
