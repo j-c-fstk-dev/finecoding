@@ -3,6 +3,7 @@
 
 import { useState, useEffect } from 'react';
 import type { CSSProperties } from 'react';
+import { usePathname } from 'next/navigation';
 import { AnimatePresence } from 'framer-motion';
 import { ThemeProvider } from '@/components/theme-provider';
 import { Toaster } from '@/components/ui/toaster';
@@ -10,22 +11,25 @@ import { AuthProvider } from '@/lib/auth';
 import { SplashScreen } from '@/components/layout/SplashScreen';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
+import { cn } from '@/lib/utils';
 
 export function ClientLayout({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
   const [footerStyle, setFooterStyle] = useState<CSSProperties>({ transform: 'translateY(100%)' });
+  const pathname = usePathname();
+  const isRadioPage = pathname === '/radio';
 
   useEffect(() => {
-    // Este timer simula um processo de carregamento.
+    // This timer simulates a loading process.
     const timer = setTimeout(() => {
       setIsLoading(false);
-    }, 2500); // Duração da animação da tela de splash
+    }, 2500); // Duration of the splash screen animation
 
     return () => clearTimeout(timer);
   }, []);
 
   useEffect(() => {
-    // Este efeito é executado apenas no cliente, após a hidratação e após o carregamento inicial estar completo.
+    // This effect runs only on the client, after hydration and after initial loading is complete.
     if (isLoading) return;
 
     const footer = document.getElementById("main-footer");
@@ -37,17 +41,17 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
       const viewportHeight = window.innerHeight;
       const footerHeight = footer.offsetHeight;
 
-      // Um buffer para iniciar o efeito de revelação um pouco antes
+      // A buffer to start the reveal effect a bit earlier
       const revealBuffer = 200; 
       const revealStartPoint = documentHeight - viewportHeight - footerHeight - revealBuffer;
 
-      // Quando o usuário rola perto do final, anima o rodapé para a visão
+      // When the user scrolls near the end, animate the footer into view
       if (scrollPosition >= revealStartPoint) {
         const scrollProgress = (scrollPosition - revealStartPoint) / (footerHeight + revealBuffer);
         const translateYValue = (1 - Math.min(1, scrollProgress)) * 100;
         setFooterStyle({ transform: `translateY(${translateYValue}%)` });
       } else {
-        // Caso contrário, mantém-no escondido abaixo da viewport
+        // Otherwise, keep it hidden below the viewport
         setFooterStyle({ transform: 'translateY(100%)' });
       }
     };
@@ -55,14 +59,14 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
     window.addEventListener('scroll', updateFooterPosition, { passive: true });
     window.addEventListener('resize', updateFooterPosition);
 
-    // Chamada inicial para definir a posição corretamente no carregamento da página
+    // Initial call to set the position correctly on page load
     updateFooterPosition();
 
     return () => {
       window.removeEventListener('scroll', updateFooterPosition);
       window.removeEventListener('resize', updateFooterPosition);
     };
-  }, [isLoading]); // A dependência de isLoading garante que isso seja executado apenas após a página estar pronta
+  }, [isLoading]);
 
   return (
     <AuthProvider>
@@ -76,6 +80,25 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
           </main>
           <Footer style={footerStyle} />
           <Toaster />
+          
+          {/* 
+            The Elfsight widget is placed here, in the global layout.
+            It is always present in the DOM after the first load, allowing music to persist.
+            Its visibility is controlled by CSS based on the current page.
+          */}
+          <div
+            className={cn(
+              "transition-opacity duration-300",
+              isRadioPage
+                ? "opacity-100 pointer-events-auto" // Visible on radio page
+                : "opacity-0 pointer-events-none h-0 w-0" // Hidden on other pages
+            )}
+          >
+            <div className="w-full max-w-3xl mx-auto h-[75px] overflow-hidden rounded-lg">
+               {/* This is the only embed of Elfsight in the entire app */}
+               <div className="elfsight-app-e0d15945-5b55-4388-8217-a91bc7f38c50" data-elfsight-app-lazy></div>
+            </div>
+          </div>
       </ThemeProvider>
     </AuthProvider>
   );

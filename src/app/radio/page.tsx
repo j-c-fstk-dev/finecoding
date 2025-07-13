@@ -2,8 +2,25 @@
 'use client';
 
 import { Headphones } from 'lucide-react';
+import { useEffect } from 'react';
 
 export default function RadioPage() {
+  
+  useEffect(() => {
+    // This script is already loaded in ClientLayout, but calling it here
+    // ensures the widget initializes if it hasn't already.
+    // The main purpose of this page is to provide a UI for the player.
+    const script = document.createElement('script');
+    script.src = "https://static.elfsight.com/platform/platform.js";
+    script.defer = true;
+    document.body.appendChild(script);
+
+    return () => {
+      // It's generally not recommended to remove the script on cleanup
+      // as it might manage global state for the player.
+    }
+  }, []);
+
   return (
     <div className="container mx-auto max-w-3xl px-4 py-16">
       <section className="text-center">
@@ -19,10 +36,12 @@ export default function RadioPage() {
       </section>
       
       <section className="mt-12">
-        <div className="w-full h-[95px] overflow-hidden rounded-lg mx-auto">
-          {/* This is the only embed of Elfsight in the entire app */}
-          <div className="elfsight-app-e0d15945-5b55-4388-8217-a91bc7f38c50" data-elfsight-app-lazy></div>
-        </div>
+        {/* 
+          This div is now a placeholder for the global player to become visible.
+          The actual player logic is in ClientLayout to persist across pages.
+          We just provide a sized box here.
+        */}
+        <div className="w-full h-[75px] mx-auto" />
       </section>
     </div>
   );
