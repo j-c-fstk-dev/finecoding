@@ -2,6 +2,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { usePathname } from 'next/navigation';
 import { AnimatePresence, motion } from 'framer-motion';
 import { SplashScreen } from './SplashScreen';
@@ -10,12 +11,13 @@ import { cn } from '@/lib/utils';
 export function ClientLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [isLoading, setIsLoading] = useState(true);
-  const [isMounted, setIsMounted] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  const [portalTarget, setPortalTarget] = useState<HTMLElement | null>(null);
 
   useEffect(() => {
-    setIsMounted(true);
+    setMounted(true);
 
-    const minDisplayTime = 2000; // 2 seconds
+    const minDisplayTime = 2000;
     const startTime = Date.now();
 
     const handleLoad = () => {
@@ -36,28 +38,45 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
   }, []);
   
   useEffect(() => {
-    if (isMounted) {
-      const script = document.createElement('script');
-      script.src = "https://static.elfsight.com/platform/platform.js";
-      script.defer = true;
-      script.setAttribute('data-use-service-core', '');
-      
-      document.body.appendChild(script);
-
-      return () => {
-        if (script.parentNode) {
-            script.parentNode.removeChild(script);
-        }
+    if (mounted) {
+      // Carrega o script da Elfsight uma única vez
+      const existingScript = document.querySelector('script[src="https://static.elfsight.com/platform/platform.js"]');
+      if (!existingScript) {
+        const script = document.createElement('script');
+        script.src = "https://static.elfsight.com/platform/platform.js";
+        script.defer = true;
+        script.setAttribute('data-use-service-core', '');
+        document.body.appendChild(script);
       }
     }
-  }, [isMounted]);
+  }, [mounted]);
 
-  const isRadioPage = isMounted && pathname === '/radio';
+  // Encontra o portal de destino sempre que o pathname muda
+  useEffect(() => {
+    if (mounted) {
+      setPortalTarget(document.getElementById('radio-player-target'));
+    }
+  }, [mounted, pathname]);
+
+  const isRadioPage = mounted && pathname === '/radio';
+
+  const RadioPlayer = (
+    <div
+      className={cn(
+        'transition-opacity duration-300',
+        isRadioPage ? 'opacity-100' : 'opacity-0 pointer-events-none h-0 w-0 overflow-hidden'
+      )}
+    >
+      <div id="radio-player-container" className="w-full h-[75px] mx-auto overflow-hidden">
+        <div className="elfsight-app-e0d15945-5b55-4388-8217-a91bc7f38c50" data-elfsight-app-lazy></div>
+      </div>
+    </div>
+  );
 
   return (
     <>
       <AnimatePresence>
-        {isLoading && <SplashScreen onExitComplete={() => {}} />}
+        {isLoading && <SplashScreen />}
       </AnimatePresence>
       
       <motion.div
@@ -67,21 +86,9 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
         transition={{ duration: 0.5, delay: 0.2 }}
       >
         {children}
-
-        {/* Radio Player Container - Always in DOM for persistence, visibility controlled by CSS */}
-        <div
-          className={cn(
-            'transition-opacity duration-300',
-            isRadioPage 
-              ? 'opacity-100' // Visible on radio page
-              : 'opacity-0 pointer-events-none' // Hidden everywhere else
-          )}
-        >
-          {/* This div provides the placeholder for the player in the radio page layout */}
-          <div id="radio-player-container" className="w-full h-[75px] mx-auto overflow-hidden">
-            <div className="elfsight-app-e0d15945-5b55-4388-8217-a91bc7f38c50" data-elfsight-app-lazy></div>
-          </div>
-        </div>
+        
+        {/* O player só será teletransportado se o alvo existir */}
+        {portalTarget ? createPortal(RadioPlayer, portalTarget) : RadioPlayer}
       </motion.div>
     </>
   );

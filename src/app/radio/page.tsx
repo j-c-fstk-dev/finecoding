@@ -19,8 +19,9 @@ export default function RadioPage() {
       </section>
       
       <section className="mt-12">
-        <div id="radio-player-container" className="w-full h-[75px] mx-auto overflow-hidden">
-           {/* The radio player from ClientLayout will be positioned here via CSS when on this page */}
+        {/* Este é o alvo para o nosso portal do player de rádio */}
+        <div id="radio-player-target" className="w-full max-w-lg mx-auto">
+           {/* O player de ClientLayout será renderizado aqui */}
         </div>
       </section>
     </div>
