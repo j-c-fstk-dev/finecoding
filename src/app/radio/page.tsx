@@ -8,7 +8,8 @@ import { Headphones } from 'lucide-react';
 export default function RadioPage() {
   const { playRadio } = useRadio();
 
-  // When this page mounts, signal that the radio should start playing.
+  // Ao montar esta página, sinaliza que a rádio deve começar a tocar.
+  // O componente RadioPlayer no layout principal cuidará da renderização.
   useEffect(() => {
     playRadio();
   }, [playRadio]);
@@ -23,13 +24,17 @@ export default function RadioPage() {
           Fine Coding <span className="text-primary">Radio</span>
         </h1>
         <p className="mt-4 text-lg text-muted-foreground sm:text-xl">
-          Chill beats for focused coding sessions.
+          Beats relaxantes para sessões de codificação focadas.
         </p>
       </section>
       
       <section className="mt-12">
-        <p className="text-center text-muted-foreground mb-4">The player below is now active and will continue playing in the background as you navigate the site.</p>
-        <div className="elfsight-app-e0d15945-5b55-4388-8217-a91bc7f38c50" data-elfsight-app-lazy></div>
+        <p className="text-center text-muted-foreground mb-4">O player está ativo abaixo e continuará tocando em segundo plano enquanto você navega pelo site.</p>
+        {/* O player real agora é gerenciado globalmente no ClientLayout e se tornará visível aqui. */}
+        {/* Este espaço é um marcador visual para onde o player aparecerá. */}
+        <div className="relative min-h-[400px]">
+            {/* O #radio-player-container no RadioPlayer.tsx será posicionado aqui */}
+        </div>
       </section>
     </div>
   );

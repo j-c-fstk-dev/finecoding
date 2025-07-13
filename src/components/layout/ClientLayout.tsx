@@ -18,16 +18,16 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
   const [footerStyle, setFooterStyle] = useState<CSSProperties>({ transform: 'translateY(100%)' });
 
   useEffect(() => {
-    // This timer simulates a loading process.
+    // Este timer simula um processo de carregamento.
     const timer = setTimeout(() => {
       setIsLoading(false);
-    }, 2500); // Duration of the splash screen animation
+    }, 2500); // Duração da animação da tela de splash
 
     return () => clearTimeout(timer);
   }, []);
 
   useEffect(() => {
-    // This effect runs only on the client, after hydration and after the initial loading is complete.
+    // Este efeito é executado apenas no cliente, após a hidratação e após o carregamento inicial estar completo.
     if (isLoading) return;
 
     const footer = document.getElementById("main-footer");
@@ -39,17 +39,17 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
       const viewportHeight = window.innerHeight;
       const footerHeight = footer.offsetHeight;
 
-      // A buffer to start the reveal effect a bit earlier
+      // Um buffer para iniciar o efeito de revelação um pouco antes
       const revealBuffer = 200; 
       const revealStartPoint = documentHeight - viewportHeight - footerHeight - revealBuffer;
 
-      // When the user scrolls near the bottom, animate the footer into view
+      // Quando o usuário rola perto do final, anima o rodapé para a visão
       if (scrollPosition >= revealStartPoint) {
         const scrollProgress = (scrollPosition - revealStartPoint) / (footerHeight + revealBuffer);
         const translateYValue = (1 - Math.min(1, scrollProgress)) * 100;
         setFooterStyle({ transform: `translateY(${translateYValue}%)` });
       } else {
-        // Otherwise, keep it hidden below the viewport
+        // Caso contrário, mantém-no escondido abaixo da viewport
         setFooterStyle({ transform: 'translateY(100%)' });
       }
     };
@@ -57,14 +57,14 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
     window.addEventListener('scroll', updateFooterPosition, { passive: true });
     window.addEventListener('resize', updateFooterPosition);
 
-    // Initial call to set position correctly on page load
+    // Chamada inicial para definir a posição corretamente no carregamento da página
     updateFooterPosition();
 
     return () => {
       window.removeEventListener('scroll', updateFooterPosition);
       window.removeEventListener('resize', updateFooterPosition);
     };
-  }, [isLoading]); // Dependency on isLoading ensures this runs only after the page is ready
+  }, [isLoading]); // A dependência de isLoading garante que isso seja executado apenas após a página estar pronta
 
   return (
     <AuthProvider>
