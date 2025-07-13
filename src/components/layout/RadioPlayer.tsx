@@ -32,7 +32,7 @@ export function RadioPlayer() {
         isRadioPage 
           ? 'relative w-full max-w-2xl mx-auto h-auto'
           // Estilos para o mini-player flutuante em outras páginas
-          : 'fixed bottom-4 right-4 z-50 w-80 h-[95px] shadow-2xl rounded-lg bg-background/80 backdrop-blur-sm border'
+          : 'fixed bottom-4 right-4 z-50 w-80 h-[105px] shadow-2xl rounded-lg bg-background/80 backdrop-blur-sm border'
       )}
     >
         {!isRadioPage && (
