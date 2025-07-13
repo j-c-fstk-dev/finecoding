@@ -4,7 +4,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import { Menu, CodeXml } from 'lucide-react';
+import { Menu, CodeXml, Radio } from 'lucide-react';
 import { ThemeSwitch } from '@/components/ui/ThemeSwitch';
 import { useState, useEffect, useRef } from 'react';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
@@ -15,6 +15,7 @@ const navLinks = [
   { href: '/', label: 'Home' },
   { href: '/posts', label: 'All Posts' },
   { href: '/resources', label: 'Resources' },
+  { href: '/radio', label: 'Radio' },
   { href: '/about', label: 'About' },
 ];
 
@@ -92,11 +93,13 @@ export function Header() {
                         <Link
                           href={href}
                           className={cn(
-                            'text-lg text-muted-foreground transition-colors hover:text-foreground',
-                            pathname === href && 'text-foreground'
+                            'text-lg text-muted-foreground transition-colors hover:text-foreground flex items-center gap-3',
+                            pathname === href && 'text-foreground font-semibold',
+                            label === 'Radio' && 'text-primary hover:text-primary/80'
                           )}
                           onClick={() => setIsMobileMenuOpen(false)}
                         >
+                          {label === 'Radio' && <Radio className="h-5 w-5" />}
                           {label}
                         </Link>
                       </SheetTrigger>
@@ -113,13 +116,23 @@ export function Header() {
             </Sheet>
           </div>
 
-          {/* Desktop Navigation Button */}
-          <div className="hidden md:block">
-            <Button variant="ghost" size="icon">
-                <Menu className="h-6 w-6" />
-                <span className="sr-only">Open menu</span>
-            </Button>
-          </div>
+          {/* Desktop Navigation */}
+          <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
+             {navLinks.map(({ href, label }) => (
+                <Link
+                  key={href}
+                  href={href}
+                  className={cn(
+                    'transition-colors hover:text-foreground/80',
+                    pathname === href ? 'text-foreground' : 'text-muted-foreground',
+                     label === 'Radio' && 'text-primary hover:text-primary/80 flex items-center gap-1.5'
+                  )}
+                >
+                  {label === 'Radio' && <Radio className="h-4 w-4" />}
+                  {label}
+                </Link>
+              ))}
+          </nav>
         </div>
 
         {/* Center: Title */}
@@ -141,9 +154,9 @@ export function Header() {
         </div>
 
         {/* Right Side: Search and Theme Switch */}
-        <div className="absolute right-4 top-1/2 -translate-y-1/2 flex flex-col items-end gap-y-2">
-            <ThemeSwitch />
+        <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-4">
             <SearchBar />
+            <ThemeSwitch />
         </div>
       </div>
     </header>

@@ -57,6 +57,7 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Source+Code+Pro:wght@400;500&display=swap" rel="stylesheet" />
+        <script src="https://static.elfsight.com/platform/platform.js" data-use-service-core defer></script>
       </head>
       <body className="flex flex-col min-h-screen">
         {gaId && (

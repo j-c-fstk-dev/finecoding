@@ -7,9 +7,11 @@ import { AnimatePresence } from 'framer-motion';
 import { ThemeProvider } from '@/components/theme-provider';
 import { Toaster } from '@/components/ui/toaster';
 import { AuthProvider } from '@/lib/auth';
+import { RadioProvider } from '@/hooks/use-radio';
 import { SplashScreen } from '@/components/layout/SplashScreen';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
+import { RadioPlayer } from '@/components/layout/RadioPlayer';
 
 export function ClientLayout({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
@@ -67,15 +69,18 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
   return (
     <AuthProvider>
       <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
-        <AnimatePresence>
-          {isLoading && <SplashScreen />}
-        </AnimatePresence>
-        <Header />
-        <main className="flex-1 w-full relative z-10">
-          {children}
-        </main>
-        <Footer style={footerStyle} />
-        <Toaster />
+        <RadioProvider>
+          <AnimatePresence>
+            {isLoading && <SplashScreen />}
+          </AnimatePresence>
+          <Header />
+          <main className="flex-1 w-full relative z-10">
+            {children}
+          </main>
+          <Footer style={footerStyle} />
+          <RadioPlayer />
+          <Toaster />
+        </RadioProvider>
       </ThemeProvider>
     </AuthProvider>
   );
