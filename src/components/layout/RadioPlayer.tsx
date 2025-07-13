@@ -27,12 +27,12 @@ export function RadioPlayer() {
     <div
       id="radio-player-container"
       className={cn(
-        'transition-all duration-500 ease-in-out',
+        'transition-all duration-500 ease-in-out overflow-hidden',
         // Estilos para quando estiver na página /radio
         isRadioPage 
           ? 'relative w-full max-w-2xl mx-auto h-auto'
           // Estilos para o mini-player flutuante em outras páginas
-          : 'fixed bottom-4 right-4 z-50 w-80 h-auto shadow-2xl rounded-lg bg-background/80 backdrop-blur-sm border'
+          : 'fixed bottom-4 right-4 z-50 w-80 h-[95px] shadow-2xl rounded-lg bg-background/80 backdrop-blur-sm border'
       )}
     >
         {!isRadioPage && (
