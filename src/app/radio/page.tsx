@@ -14,15 +14,15 @@ export default function RadioPage() {
           Fine Coding <span className="text-primary">Radio</span>
         </h1>
         <p className="mt-4 text-lg text-muted-foreground sm:text-xl">
-          Relaxing beats for focused coding sessions.
+          Relaxing beats for focused coding sessions. The player will appear at the bottom of the screen.
         </p>
       </section>
       
       <section className="mt-12">
-        {/* Este é o alvo para o nosso portal do player de rádio */}
-        <div id="radio-player-target" className="w-full max-w-lg mx-auto">
-           {/* O player de ClientLayout será renderizado aqui */}
-        </div>
+        {/* This space is intentionally left blank. 
+            The global player in ClientLayout will become visible when on this page.
+            This ensures the player instance persists across navigation.
+        */}
       </section>
     </div>
   );

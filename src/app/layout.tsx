@@ -59,14 +59,14 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Source+Code+Pro:wght@400;500&display=swap" rel="stylesheet" />
       </head>
-      <body className="flex flex-col min-h-screen">
+      <body className="flex flex-col min-h-screen relative">
         <AuthProvider>
           <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
             <ClientLayout>
-              <Header />
-              <main className="flex-1 w-full relative z-10">
-                {children}
-              </main>
+              <div className="flex-1 w-full relative z-10">
+                <Header />
+                <main>{children}</main>
+              </div>
               <Footer />
             </ClientLayout>
             <Toaster />

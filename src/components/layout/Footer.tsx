@@ -7,7 +7,7 @@ export function Footer({ style }: { style?: CSSProperties }) {
   return (
     <footer 
       id="main-footer" 
-      className="relative z-20 w-full border-t border-border/40 bg-muted flex-shrink-0 transition-transform duration-300 ease-out shadow-lg"
+      className="absolute bottom-0 left-0 z-20 w-full border-t border-border/40 bg-muted flex-shrink-0 transition-transform duration-300 ease-out shadow-lg"
       style={style}
     >
       <div className="container mx-auto max-w-5xl px-4 py-12">
