@@ -10,7 +10,9 @@ interface ShareOnXButtonProps {
 }
 
 export function ShareOnXButton({ title, slug }: ShareOnXButtonProps) {
-  const shareUrl = `${process.env.NEXT_PUBLIC_SITE_URL}/posts/${slug}`;
+  // Use the production URL on Netlify, otherwise fallback to the public site URL for local dev
+  const baseUrl = process.env.NEXT_PUBLIC_NETLIFY_URL || process.env.NEXT_PUBLIC_SITE_URL;
+  const shareUrl = `${baseUrl}/posts/${slug}`;
   const text = `Check out this article: "${title}"`;
   // The user's Twitter handle can be added here, e.g., &via=FineCodingBlog
   const twitterIntentUrl = `https://twitter.com/intent/tweet?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(text)}`;

@@ -24,7 +24,9 @@ export function ShareDialog({ open, onOpenChange }: ShareDialogProps) {
 
   useEffect(() => {
     setIsMounted(true);
-    setSiteUrl(window.location.origin);
+    // Use the production URL on Netlify, otherwise fallback to the window origin for local dev
+    const productionUrl = process.env.NEXT_PUBLIC_NETLIFY_URL || window.location.origin;
+    setSiteUrl(productionUrl);
   }, []);
 
   const shareData = {

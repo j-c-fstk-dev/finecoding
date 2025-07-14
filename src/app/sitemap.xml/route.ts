@@ -2,7 +2,8 @@
 import { getPosts } from '@/lib/posts';
 import type { Post } from '@/types';
 
-const URL = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:9002';
+// Use Netlify's production URL if available, otherwise fall back to the public site URL
+const URL = process.env.NEXT_PUBLIC_NETLIFY_URL || process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:9002';
 
 function generateSiteMap(posts: Post[]) {
   return `<?xml version="1.0" encoding="UTF-8"?>
