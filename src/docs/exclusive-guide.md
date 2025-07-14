@@ -627,10 +627,11 @@ From now on, every time you push a change to your `main` branch on GitHub, Netli
 ## 6.3 Domain and SEO
 Once the site is live, there are a few final steps for a professional setup.
 *   **Custom Domain:** In your site's settings on Netlify, go to **"Domain management"** to add your own custom domain (e.g., `www.yourblog.com`). Netlify provides instructions on how to configure your domain's DNS settings.
-*   **Google Search Console:** To ensure your blog gets indexed by Google, you should submit your sitemap.
+*   **Google Search Console:** To ensure your blog gets indexed by Google and to monitor its performance, you should submit your sitemap.
     1.  Go to [Google Search Console](https://search.google.com/search-console/) and add your new domain as a property.
-    2.  Once verified, go to the **"Sitemaps"** section.
-    3.  Enter `sitemap.xml` in the text box and click **"Submit"**. Google will now know to crawl your site and all its posts.
+    2.  Once verified, go to the **"Sitemaps"** section in the left-hand menu.
+    3.  Under "Add a new sitemap", enter `sitemap.xml` and click **"Submit"**.
+    4.  Google will now periodically crawl your sitemap to discover all your pages. If you add many new posts or pages, it's good practice to come back and resubmit the sitemap to encourage faster indexing.
 
 ---
 

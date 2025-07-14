@@ -213,5 +213,3 @@ Environment variables are used to store sensitive information like API keys secu
 ---
 
 That's a wrap for Part 2! Our project is now initialized, our services are configured, and our keys are securely stored. We have a solid, professional foundation to start building upon. In the next part, we'll begin bringing the application to life by setting up our Firebase backend logic and creating the data models for our content.
-
-    
