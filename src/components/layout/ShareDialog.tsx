@@ -24,18 +24,21 @@ export function ShareDialog({ open, onOpenChange }: ShareDialogProps) {
 
   useEffect(() => {
     setIsMounted(true);
-    // Use the production URL on Netlify, otherwise fallback to the window origin for local dev
-    const productionUrl = process.env.NEXT_PUBLIC_NETLIFY_URL || window.location.origin;
-    setSiteUrl(productionUrl);
+    // Set site URL from window.location on the client side
+    if (typeof window !== 'undefined') {
+        setSiteUrl(window.location.origin);
+    }
   }, []);
 
   const shareData = {
     title: 'Fine Coding',
-    text: 'Check out Fine Coding, a blog about software craftsmanship, AI, and modern web development.',
+    // More performant and original share text
+    text: "Diving into the world of software craftsmanship and AI. Check out Fine Coding for articles and resources on modern development. #FineCoding #SoftwareDevelopment #AI",
     url: siteUrl,
   };
 
   const copyToClipboard = () => {
+    if (!siteUrl) return;
     navigator.clipboard.writeText(siteUrl).then(() => {
       toast({ title: 'Link copied to clipboard!' });
       setIsCopied(true);
@@ -46,6 +49,7 @@ export function ShareDialog({ open, onOpenChange }: ShareDialogProps) {
   };
 
   const nativeShare = async () => {
+    if (!siteUrl) return;
     if (navigator.share) {
       try {
         await navigator.share(shareData);
@@ -58,6 +62,7 @@ export function ShareDialog({ open, onOpenChange }: ShareDialogProps) {
   };
 
   const shareOnX = () => {
+    if (!siteUrl) return;
     const twitterUrl = `https://twitter.com/intent/tweet?url=${encodeURIComponent(shareData.url)}&text=${encodeURIComponent(shareData.text)}`;
     window.open(twitterUrl, '_blank', 'width=600,height=400');
   }
@@ -77,7 +82,7 @@ export function ShareDialog({ open, onOpenChange }: ShareDialogProps) {
         </DialogHeader>
         <div className="flex flex-col items-center gap-6 py-4">
           <div className="rounded-lg border-4 border-primary p-2 bg-white">
-            {isMounted ? (
+            {isMounted && siteUrl ? (
                 <QRCode
                     value={siteUrl}
                     size={160}
@@ -92,15 +97,15 @@ export function ShareDialog({ open, onOpenChange }: ShareDialogProps) {
           </div>
           <div className="flex w-full items-center space-x-2">
             <Input id="link" value={siteUrl} readOnly className="flex-1" />
-            <Button type="button" size="icon" onClick={copyToClipboard} aria-label="Copy link">
+            <Button type="button" size="icon" onClick={copyToClipboard} disabled={!siteUrl} aria-label="Copy link">
               {isCopied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
             </Button>
           </div>
           <div className="grid w-full grid-cols-2 gap-2">
-             <Button onClick={shareOnX} variant="outline">
+             <Button onClick={shareOnX} variant="outline" disabled={!siteUrl}>
                 <Twitter className="mr-2 h-4 w-4" /> Share on X
              </Button>
-             <Button onClick={nativeShare}>
+             <Button onClick={nativeShare} disabled={!siteUrl}>
                 <Share2 className="mr-2 h-4 w-4" /> More Options
              </Button>
           </div>
