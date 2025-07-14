@@ -21,6 +21,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { cn } from '@/lib/utils';
 import { PostNavigation } from '@/components/blog/PostNavigation';
+import { ShareOnXButton } from './ShareButtons';
 
 interface PostInteractionProps {
   post: Post;
@@ -105,12 +106,13 @@ export function PostInteraction({ post, initialComments, previousPost, nextPost 
     <div className="mt-16 space-y-12">
       <Separator />
       
-      <div className="flex items-center justify-center">
+      <div className="flex items-center justify-center gap-4">
         <Button onClick={handleLike} disabled={isLiked || isLiking} variant="outline" size="lg" className="group rounded-full px-6 py-3 text-lg transition-transform hover:scale-105">
           <Heart className={cn("mr-2 h-6 w-6 transition-colors", isLiked ? 'text-red-500 fill-current' : 'group-hover:text-red-500')} />
           {isLiking ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
           <span className="font-semibold">{likes}</span>
         </Button>
+        <ShareOnXButton title={post.title} slug={post.slug} />
       </div>
       
       <PostNavigation previousPost={previousPost} nextPost={nextPost} />
