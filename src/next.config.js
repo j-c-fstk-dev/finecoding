@@ -8,8 +8,8 @@ const withPWA = require('next-pwa')({
 });
 
 const nextConfig = {
-  // env block is removed. Next.js automatically handles NEXT_PUBLIC_ variables.
-  // This was the source of the issue.
+  // O bloco 'env' foi removido. O Next.js lida automaticamente com as variáveis NEXT_PUBLIC_.
+  // Esta era a fonte do problema.
   images: {
     remotePatterns: [
       {
