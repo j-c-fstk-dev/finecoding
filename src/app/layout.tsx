@@ -9,7 +9,7 @@ import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:9002'),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://finecoding.netlify.app'),
   title: {
     default: 'Fine Coding - AI, Software Craftsmanship, and Modern Development',
     template: '%s | Fine Coding',
@@ -59,7 +59,7 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Source+Code+Pro:wght@400;500&display=swap" rel="stylesheet" />
       </head>
-      <body className="relative">
+      <body>
         <AuthProvider>
           <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
             <ClientLayout>
