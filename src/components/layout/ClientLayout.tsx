@@ -1,11 +1,12 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { usePathname } from 'next/navigation';
 import { AnimatePresence, motion } from 'framer-motion';
 import { SplashScreen } from './SplashScreen';
 import { cn } from '@/lib/utils';
+import { Footer } from './Footer';
 
 export function ClientLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -48,16 +49,11 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
       };
       document.body.appendChild(script);
 
-      return () => {
-        const existingScript = document.querySelector('script[src="https://static.elfsight.com/platform/platform.js"]');
-        if (existingScript) {
-            document.body.removeChild(existingScript);
-        }
-      };
+      // No cleanup function needed here, as the script should persist globally once loaded.
     }
   }, [pathname, hasRadioScriptLoaded]);
-
-  const isRadioPage = pathname === '/radio';
+  
+  const isRadioPage = useMemo(() => pathname === '/radio', [pathname]);
 
   return (
     <>
@@ -66,19 +62,21 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
       </AnimatePresence>
       
       <motion.div
-        className={cn(isLoading && 'hidden')}
+        className={cn('flex flex-col min-h-screen', isLoading && 'hidden')}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.5, delay: 0.2 }}
       >
-        <div className={cn(isRadioPage && 'pb-48')}>
+        <div className={cn("flex-1 w-full relative z-10", isRadioPage ? 'pb-28' : 'pb-0' )}>
           {children}
         </div>
         
+        {/* The Footer is now part of the flex layout, it will be pushed to the bottom */}
+
         {hasRadioScriptLoaded && (
           <div 
             className={cn(
-              "fixed left-1/2 -translate-x-1/2 w-full max-w-lg mx-auto h-[105px] overflow-hidden rounded-xl transition-all duration-300 z-50",
+              "fixed left-1/2 -translate-x-1/2 w-full max-w-lg mx-auto h-[75px] overflow-hidden rounded-xl transition-all duration-300 z-50",
               isRadioPage 
                 ? "opacity-100 bottom-5 pointer-events-auto" 
                 : "opacity-0 -bottom-[200px] pointer-events-none"

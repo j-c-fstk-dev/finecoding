@@ -4,9 +4,9 @@ import './globals.css';
 import { ThemeProvider } from '@/components/theme-provider';
 import { Toaster } from '@/components/ui/toaster';
 import { AuthProvider } from '@/lib/auth';
+import { ClientLayout } from '@/components/layout/ClientLayout';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
-import { ClientLayout } from '@/components/layout/ClientLayout';
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:9002'),
@@ -41,7 +41,7 @@ export const metadata: Metadata = {
   alternates: {
     canonical: '/',
   },
-  manifest: '/public/manifest.json',
+  manifest: '/manifest.json',
 };
 
 export default function RootLayout({
@@ -59,15 +59,13 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Source+Code+Pro:wght@400;500&display=swap" rel="stylesheet" />
       </head>
-      <body className="flex flex-col min-h-screen relative">
+      <body className="relative">
         <AuthProvider>
           <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
             <ClientLayout>
-              <div className="flex-1 w-full relative z-10">
                 <Header />
                 <main>{children}</main>
-              </div>
-              <Footer />
+                <Footer />
             </ClientLayout>
             <Toaster />
           </ThemeProvider>
