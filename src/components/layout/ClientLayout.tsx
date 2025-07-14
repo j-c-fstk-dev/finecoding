@@ -11,19 +11,18 @@ import { cn } from '@/lib/utils';
 export function ClientLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [isLoading, setIsLoading] = useState(true);
-  const [mounted, setMounted] = useState(false);
   const [portalTarget, setPortalTarget] = useState<HTMLElement | null>(null);
+  const [hasRadioScriptLoaded, setHasRadioScriptLoaded] = useState(false);
+  const [isRadioVisible, setIsRadioVisible] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
-
     const minDisplayTime = 2000;
     const startTime = Date.now();
 
     const handleLoad = () => {
       const elapsedTime = Date.now() - startTime;
       const remainingTime = minDisplayTime - elapsedTime;
-      
+
       setTimeout(() => {
         setIsLoading(false);
       }, Math.max(0, remainingTime));
@@ -37,34 +36,42 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
     }
   }, []);
   
+  // Effect to load the radio script ONCE.
   useEffect(() => {
-    if (mounted) {
-      // Carrega o script da Elfsight uma única vez
-      const existingScript = document.querySelector('script[src="https://static.elfsight.com/platform/platform.js"]');
-      if (!existingScript) {
-        const script = document.createElement('script');
-        script.src = "https://static.elfsight.com/platform/platform.js";
-        script.defer = true;
-        script.setAttribute('data-use-service-core', '');
-        document.body.appendChild(script);
-      }
+    const isRadioPage = pathname === '/radio';
+    if (isRadioPage && !hasRadioScriptLoaded) {
+      const script = document.createElement('script');
+      script.src = "https://static.elfsight.com/platform/platform.js";
+      script.defer = true;
+      script.setAttribute('data-use-service-core', '');
+      script.onload = () => {
+        console.log('Elfsight script loaded.');
+        // Set the flag to true only after the script has successfully loaded.
+        setHasRadioScriptLoaded(true);
+      };
+      script.onerror = () => {
+        console.error('Failed to load Elfsight script.');
+      };
+      document.body.appendChild(script);
     }
-  }, [mounted]);
+  }, [pathname, hasRadioScriptLoaded]);
 
-  // Encontra o portal de destino sempre que o pathname muda
+  // Effect to find the portal target and control visibility.
   useEffect(() => {
-    if (mounted) {
-      setPortalTarget(document.getElementById('radio-player-target'));
+    const targetEl = document.getElementById('radio-player-target');
+    if (targetEl) {
+      setPortalTarget(targetEl);
+      setIsRadioVisible(true);
+    } else {
+      setIsRadioVisible(false);
     }
-  }, [mounted, pathname]);
-
-  const isRadioPage = mounted && pathname === '/radio';
+  }, [pathname]);
 
   const RadioPlayer = (
     <div
       className={cn(
         'transition-opacity duration-300',
-        isRadioPage ? 'opacity-100' : 'opacity-0 pointer-events-none h-0 w-0 overflow-hidden'
+        isRadioVisible ? 'opacity-100' : 'opacity-0 pointer-events-none'
       )}
     >
       <div id="radio-player-container" className="w-full h-[75px] mx-auto overflow-hidden">
@@ -87,8 +94,15 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
       >
         {children}
         
-        {/* O player só será teletransportado se o alvo existir */}
-        {portalTarget ? createPortal(RadioPlayer, portalTarget) : RadioPlayer}
+        {/* Render the player structure permanently but hidden if the script has loaded */}
+        {hasRadioScriptLoaded && (
+          <div className="hidden">
+            <div className="elfsight-app-e0d15945-5b55-4388-8217-a91bc7f38c50"></div>
+          </div>
+        )}
+
+        {/* Use the portal to move the visible player to the target div on the radio page */}
+        {isRadioVisible && portalTarget ? createPortal(RadioPlayer, portalTarget) : null}
       </motion.div>
     </>
   );
