@@ -41,7 +41,7 @@ export const metadata: Metadata = {
   alternates: {
     canonical: '/',
   },
-  manifest: '/manifest.json',
+  manifest: '/public/manifest.json',
 };
 
 export default function RootLayout({
