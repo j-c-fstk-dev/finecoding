@@ -2,20 +2,21 @@
   "name": "Fine Coding",
   "short_name": "FineCoding",
   "description": "A modern blog about software development, AI, and the art of fine coding.",
-  "start_url": "/",
-  "display": "standalone",
-  "background_color": "#1A1A1A",
-  "theme_color": "#1A1A1A",
   "icons": [
     {
-      "src": "https://res.cloudinary.com/dr0weongo/image/upload/v1751503667/20250702_212403_0000_2_pp63nm.svg",
+      "src": "/android-chrome-192x192.png",
       "sizes": "192x192",
-      "type": "image/svg+xml"
+      "type": "image/png"
     },
     {
-      "src": "https://res.cloudinary.com/dr0weongo/image/upload/v1751503667/20250702_212403_0000_2_pp63nm.svg",
+      "src": "/android-chrome-512x512.png",
       "sizes": "512x512",
-      "type": "image/svg+xml"
+      "type": "image/png"
     }
-  ]
+  ],
+  "theme_color": "#1A1A1A",
+  "background_color": "#1A1A1A",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait"
 }
