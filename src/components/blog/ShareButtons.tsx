@@ -1,7 +1,6 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Twitter } from 'lucide-react';
 
@@ -11,20 +10,14 @@ interface ShareOnXButtonProps {
 }
 
 export function ShareOnXButton({ title, slug }: ShareOnXButtonProps) {
-  const [baseUrl, setBaseUrl] = useState('');
-
-  useEffect(() => {
-    // Set base URL from window.location on the client side
-    if (typeof window !== 'undefined') {
-      setBaseUrl(window.location.origin);
-    }
-  }, []);
+  // Use the canonical site URL from environment variables.
+  // This ensures we always share the production link.
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || '';
   
   const handleClick = () => {
-    if (!baseUrl) return; // Don't do anything if base URL isn't set yet
+    if (!baseUrl) return;
 
     const shareUrl = `${baseUrl}/posts/${slug}`;
-    // More performant and original tweet text
     const text = `Just read a great piece on Fine Coding: "${title}". A must-read for anyone interested in modern tech. #TechBlog #Developer`;
     
     const twitterIntentUrl = `https://twitter.com/intent/tweet?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(text)}`;

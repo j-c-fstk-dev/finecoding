@@ -18,21 +18,19 @@ interface ShareDialogProps {
 export function ShareDialog({ open, onOpenChange }: ShareDialogProps) {
   const { toast } = useToast();
   const { resolvedTheme } = useTheme();
-  const [siteUrl, setSiteUrl] = useState('');
   const [isCopied, setIsCopied] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
 
+  // Use the canonical site URL from environment variables.
+  // This ensures we always share the production link.
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || '';
+
   useEffect(() => {
     setIsMounted(true);
-    // Set site URL from window.location on the client side
-    if (typeof window !== 'undefined') {
-        setSiteUrl(window.location.origin);
-    }
   }, []);
 
   const shareData = {
     title: 'Fine Coding',
-    // More performant and original share text
     text: "Diving into the world of software craftsmanship and AI. Check out Fine Coding for articles and resources on modern development. #FineCoding #SoftwareDevelopment #AI",
     url: siteUrl,
   };
