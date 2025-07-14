@@ -12,7 +12,7 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
   const [hasRadioScriptLoaded, setHasRadioScriptLoaded] = useState(false);
 
-  // Effect for the splash screen
+  // Effect for the splash screen with a minimum display time
   useEffect(() => {
     const minDisplayTime = 2000;
     const startTime = Date.now();
@@ -48,7 +48,6 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
       };
       document.body.appendChild(script);
 
-      // Cleanup function to remove script if component unmounts, though unlikely in a layout.
       return () => {
         const existingScript = document.querySelector('script[src="https://static.elfsight.com/platform/platform.js"]');
         if (existingScript) {
@@ -72,11 +71,10 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
         animate={{ opacity: 1 }}
         transition={{ duration: 0.5, delay: 0.2 }}
       >
-        <div className={cn('pb-28', isRadioPage && 'pb-48')}>
+        <div className={cn(isRadioPage && 'pb-48')}>
           {children}
         </div>
         
-        {/* The player is always in the DOM if the script has loaded, but its visibility is controlled by CSS */}
         {hasRadioScriptLoaded && (
           <div 
             className={cn(
