@@ -5,6 +5,13 @@ if (!process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID) {
   throw new Error("NEXT_PUBLIC_FIREBASE_PROJECT_ID is not set. Please check your .env.local file.");
 }
 
+const withPWA = require('next-pwa')({
+  dest: 'public',
+  register: true,
+  skipWaiting: true,
+  disable: process.env.NODE_ENV === 'development',
+});
+
 const nextConfig = {
   images: {
     remotePatterns: [
@@ -30,4 +37,4 @@ const nextConfig = {
   },
 };
 
-module.exports = nextConfig;
+module.exports = withPWA(nextConfig);

@@ -40,7 +40,8 @@ export const metadata: Metadata = {
   },
   alternates: {
     canonical: '/',
-  }
+  },
+  manifest: '/manifest.json',
 };
 
 export default function RootLayout({
@@ -52,7 +53,6 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <head>
         <meta name="theme-color" content="#1A1A1A" />
-        <link rel="manifest" href="/manifest.json" />
         <link rel="icon" href="https://res.cloudinary.com/dr0weongo/image/upload/v1751503667/20250702_212403_0000_2_pp63nm.svg" type="image/svg+xml" />
         <link rel="apple-touch-icon" href="https://res.cloudinary.com/dr0weongo/image/upload/v1751503667/20250702_212403_0000_2_pp63nm.svg" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />

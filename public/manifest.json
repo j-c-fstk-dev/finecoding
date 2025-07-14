@@ -1,23 +1,21 @@
 {
-    "name": "Fine Coding",
-    "short_name": "Fine Coding",
-    "icons": [
-        {
-            "src": "https://res.cloudinary.com/dr0weongo/image/upload/v1751503667/20250702_212403_0000_2_pp63nm.svg",
-            "sizes": "192x192",
-            "type": "image/svg+xml",
-            "purpose": "any maskable"
-        },
-        {
-            "src": "https://res.cloudinary.com/dr0weongo/image/upload/v1751503667/20250702_212403_0000_2_pp63nm.svg",
-            "sizes": "512x512",
-            "type": "image/svg+xml",
-            "purpose": "any maskable"
-        }
-    ],
-    "theme_color": "#1A1A1A",
-    "background_color": "#1A1A1A",
-    "start_url": "/",
-    "display": "standalone",
-    "orientation": "portrait"
+  "name": "Fine Coding",
+  "short_name": "FineCoding",
+  "description": "A modern blog about software development, AI, and the art of fine coding.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#1A1A1A",
+  "theme_color": "#1A1A1A",
+  "icons": [
+    {
+      "src": "https://res.cloudinary.com/dr0weongo/image/upload/v1751503667/20250702_212403_0000_2_pp63nm.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "https://res.cloudinary.com/dr0weongo/image/upload/v1751503667/20250702_212403_0000_2_pp63nm.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml"
+    }
+  ]
 }
