@@ -84,8 +84,8 @@ export function ShareDialog({ open, onOpenChange }: ShareDialogProps) {
                 <QRCode
                     value={siteUrl}
                     size={160}
-                    bgColor={qrBgColor}
-                    fgColor={qrFgColor}
+                    bgColor="#FFFFFF" // Always use white background for better scannability
+                    fgColor="#000000" // Always use black foreground
                     level="H"
                     includeMargin={false}
                 />

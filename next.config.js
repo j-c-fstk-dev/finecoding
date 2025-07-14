@@ -8,7 +8,7 @@ const withPWA = require('next-pwa')({
 });
 
 const nextConfig = {
-  // Pass public environment variables to the client-side
+  // Pass all NEXT_PUBLIC_ variables to the client-side
   env: {
     NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
     NEXT_PUBLIC_FIREBASE_API_KEY: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,

@@ -2,7 +2,8 @@
 import { getPosts } from '@/lib/posts';
 import type { Post } from '@/types';
 
-const URL = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:9002';
+// Fallback to a default production URL if the env var is not set.
+const URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://finecoding.netlify.app';
 
 function generateSiteMap(posts: Post[]) {
   return `<?xml version="1.0" encoding="UTF-8"?>
@@ -41,8 +42,8 @@ function generateSiteMap(posts: Post[]) {
             return ''; // Skip invalid entries
          }
          // Ensure date is valid before trying to format it.
-         const lastMod = (date instanceof Date && !isNaN(date.getTime()))
-           ? date.toISOString()
+         const lastMod = (date && new Date(date))
+           ? new Date(date).toISOString()
            : new Date().toISOString();
            
          return `
