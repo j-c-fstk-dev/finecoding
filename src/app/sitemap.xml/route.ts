@@ -2,8 +2,8 @@
 import { getPosts } from '@/lib/posts';
 import type { Post } from '@/types';
 
-// Fallback to a default production URL if the env var is not set.
-const URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://finecoding.netlify.app';
+// The canonical site URL should always point to production.
+const URL = 'https://finecoding.netlify.app';
 
 function generateSiteMap(posts: Post[]) {
   return `<?xml version="1.0" encoding="UTF-8"?>

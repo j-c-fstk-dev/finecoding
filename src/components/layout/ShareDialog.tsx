@@ -8,7 +8,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { Copy, Share2, Twitter, Check } from 'lucide-react';
-import { useTheme } from 'next-themes';
 
 interface ShareDialogProps {
   open: boolean;
@@ -17,7 +16,6 @@ interface ShareDialogProps {
 
 export function ShareDialog({ open, onOpenChange }: ShareDialogProps) {
   const { toast } = useToast();
-  const { resolvedTheme } = useTheme();
   const [isCopied, setIsCopied] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
 
@@ -64,10 +62,6 @@ export function ShareDialog({ open, onOpenChange }: ShareDialogProps) {
     const twitterUrl = `https://twitter.com/intent/tweet?url=${encodeURIComponent(shareData.url)}&text=${encodeURIComponent(shareData.text)}`;
     window.open(twitterUrl, '_blank', 'width=600,height=400');
   }
-
-  // Ensure QR code colors match the theme, but only render when mounted to avoid SSR mismatch
-  const qrBgColor = resolvedTheme === 'dark' ? '#171717' : '#FFFFFF'; // --card for dark, white for light
-  const qrFgColor = resolvedTheme === 'dark' ? '#FFFFFF' : '#000000'; // white for dark, black for light
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
