@@ -27,6 +27,7 @@ This project serves as both a ready-to-deploy blog and a comprehensive portfolio
 ---
 
 ## About The Project
+https://finecoding.netlify.app/
 
 In a world of fast-paced development, **Fine Coding** champions the timeless principles of software craftsmanship. This blog is not just a platform; it's a statement. It demonstrates that software can be functional, beautiful, maintainable, and a joy to use.
 
