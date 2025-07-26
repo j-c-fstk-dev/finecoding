@@ -15,10 +15,15 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
 
   // Effect for the splash screen with a minimum display time
   useEffect(() => {
-    const minDisplayTime = 2000;
-    const startTime = Date.now();
+    // This is a failsafe. If the load event doesn't fire, hide the splash screen anyway.
+    const failsafeTimeout = setTimeout(() => {
+      setIsLoading(false);
+    }, 4000);
 
     const handleLoad = () => {
+      clearTimeout(failsafeTimeout);
+      const minDisplayTime = 1800;
+      const startTime = Date.now();
       const elapsedTime = Date.now() - startTime;
       const remainingTime = minDisplayTime - elapsedTime;
       setTimeout(() => {
@@ -30,7 +35,10 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
       handleLoad();
     } else {
       window.addEventListener('load', handleLoad);
-      return () => window.removeEventListener('load', handleLoad);
+      return () => {
+        window.removeEventListener('load', handleLoad);
+        clearTimeout(failsafeTimeout);
+      };
     }
   }, []);
   
@@ -58,20 +66,20 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
   return (
     <>
       <AnimatePresence>
-        {isLoading && <SplashScreen />}
+        {isLoading && <SplashScreen onExitComplete={() => {}} />}
       </AnimatePresence>
       
       <motion.div
-        className={cn('flex flex-col min-h-screen', isLoading && 'hidden')}
+        className={cn('flex flex-col min-h-screen', isLoading ? 'opacity-0' : 'opacity-100')}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.5, delay: 0.2 }}
       >
-        <div className={cn("flex-1 w-full relative z-10", isRadioPage ? 'pb-28' : 'pb-0' )}>
+        <div className="flex-1 w-full">
           {children}
         </div>
         
-        {/* The Footer is now part of the flex layout, it will be pushed to the bottom */}
+        <Footer />
 
         {hasRadioScriptLoaded && (
           <div 

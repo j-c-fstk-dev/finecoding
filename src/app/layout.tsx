@@ -6,7 +6,6 @@ import { Toaster } from '@/components/ui/toaster';
 import { AuthProvider } from '@/lib/auth';
 import { ClientLayout } from '@/components/layout/ClientLayout';
 import { Header } from '@/components/layout/Header';
-import { Footer } from '@/components/layout/Footer';
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://finecoding.netlify.app'),
@@ -65,7 +64,6 @@ export default function RootLayout({
             <ClientLayout>
                 <Header />
                 <main>{children}</main>
-                <Footer />
             </ClientLayout>
             <Toaster />
           </ThemeProvider>
