@@ -1,48 +1,55 @@
-
 rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Helper function to check for authenticated admin
+    // Helper function to check for authenticated admin user
     function isAdmin() {
       return request.auth != null;
     }
 
-    // POSTS: Public can read, only admin can write
+    // --- Posts Collection ---
+    // Anyone can read posts. Only admins can write.
     match /posts/{postId} {
       allow read: if true;
       allow write: if isAdmin();
 
-      // COMMENTS on posts: Public can read and create, only admin can delete
+      // --- Comments Subcollection ---
+      // Anyone can read and create comments. Only admins can delete.
       match /comments/{commentId} {
         allow read, create: if true;
         allow update, delete: if isAdmin();
       }
     }
 
-    // RESOURCES: Public can read, only admin can write
+    // --- Resources Collection ---
+    // Anyone can read resources. Only admins can write.
     match /resources/{resourceId} {
       allow read: if true;
       allow write: if isAdmin();
-
-      // COMMENTS on resources: Public can read and create, only admin can delete
+      
+      // --- Comments Subcollection ---
+      // Anyone can read and create comments. Only admins can delete.
       match /comments/{commentId} {
         allow read, create: if true;
         allow update, delete: if isAdmin();
       }
     }
 
-    // SUBSCRIBERS: Public can create (subscribe), only admin can read/delete
+    // --- Subscribers Collection ---
+    // Anyone can add their email. Only admins can read the list.
     match /subscribers/{subscriberId} {
-      allow read, delete: if isAdmin();
+      allow read: if isAdmin();
       allow create: if true;
+      allow update, delete: if false; // Nobody can update or delete
     }
-    
-    // WISHLIST: Public can create (suggest), only admin can read/delete
+
+    // --- Wishlist Collection ---
+    // Anyone can add a tool name. Only admins can read the list.
     match /wishlist/{wishId} {
-        allow read, delete: if isAdmin();
-        allow create: if true;
+      allow read: if isAdmin();
+      allow create: if true;
+      allow update, delete: if false; // Nobody can update or delete
     }
   }
 }
