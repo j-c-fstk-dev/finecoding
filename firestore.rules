@@ -1,51 +1,48 @@
+
 rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-    
-    // Default: Deny all reads and writes by default.
-    match /{document=**} {
-      allow read, write: if false;
+
+    // Helper function to check for authenticated admin
+    function isAdmin() {
+      return request.auth != null;
     }
 
-    // Posts are publicly readable.
-    // Writes are handled by server-side logic (admin panel),
-    // so client-side writes can be disabled.
+    // POSTS: Public can read, only admin can write
     match /posts/{postId} {
       allow read: if true;
-      allow write: if request.auth != null; // Only authenticated users (admins)
+      allow write: if isAdmin();
+
+      // COMMENTS on posts: Public can read and create, only admin can delete
+      match /comments/{commentId} {
+        allow read, create: if true;
+        allow update, delete: if isAdmin();
+      }
     }
 
-    // Anyone can read and add comments to posts.
-    match /posts/{postId}/comments/{commentId} {
-      allow read: if true;
-      allow create: if true;
-      allow update, delete: if request.auth != null; // Only admins can moderate
-    }
-
-    // Resources are publicly readable.
+    // RESOURCES: Public can read, only admin can write
     match /resources/{resourceId} {
       allow read: if true;
-      allow write: if request.auth != null; // Only authenticated users (admins)
+      allow write: if isAdmin();
+
+      // COMMENTS on resources: Public can read and create, only admin can delete
+      match /comments/{commentId} {
+        allow read, create: if true;
+        allow update, delete: if isAdmin();
+      }
     }
 
-    // Anyone can read and add comments to resources.
-    match /resources/{resourceId}/comments/{commentId} {
-      allow read: if true;
-      allow create: if true;
-      allow update, delete: if request.auth != null; // Only admins can moderate
-    }
-
-    // Anyone can subscribe (create), but no one can read the list from the client.
+    // SUBSCRIBERS: Public can create (subscribe), only admin can read/delete
     match /subscribers/{subscriberId} {
-      allow read, update, delete: if request.auth != null; // Only admins
+      allow read, delete: if isAdmin();
       allow create: if true;
     }
-
-    // Anyone can add to the wishlist, but no one can read it from the client.
+    
+    // WISHLIST: Public can create (suggest), only admin can read/delete
     match /wishlist/{wishId} {
-      allow read, update, delete: if request.auth != null; // Only admins
-      allow create: if true;
+        allow read, delete: if isAdmin();
+        allow create: if true;
     }
   }
 }
