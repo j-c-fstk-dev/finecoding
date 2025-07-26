@@ -77,5 +77,5 @@ export function CodeRain() {
   }
 
   // Once mounted on the client, if the theme is dark, we render the canvas.
-  return <canvas ref={canvasRef} className="fixed top-0 left-0 w-full h-full z-0 opacity-20"></canvas>;
+  return <canvas ref={canvasRef} className="fixed top-0 left-0 w-full h-full -z-10 opacity-20"></canvas>;
 }
