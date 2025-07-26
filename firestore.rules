@@ -2,17 +2,12 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-    
-    // PUBLIC ACCESS: Allow anyone to read posts and resources, as well as their comments.
-    // This is required for the website pages to be built and displayed correctly.
+
+    // Allow public read access to posts and their comments.
+    // Writes are restricted to authenticated users (admins).
     match /posts/{postId} {
       allow get, list: if true;
-
-      // Allow anyone to create comments and like posts (update).
-      allow create, update: if true; 
-
-      // Only authenticated users (admins) can delete posts.
-      allow delete: if request.auth != null;
+      allow write: if request.auth != null;
 
       match /comments/{commentId} {
         allow get, list, create: if true;
@@ -20,30 +15,28 @@ service cloud.firestore {
       }
     }
 
+    // Allow public read access to resources and their comments.
+    // Writes are restricted to authenticated users (admins).
     match /resources/{resourceId} {
       allow get, list: if true;
-      
-      // Allow anyone to create comments and favorite resources (update).
-      allow create, update: if true;
+      allow write: if request.auth != null;
 
-      // Only authenticated users (admins) can delete resources.
-      allow delete: if request.auth != null;
-      
       match /comments/{commentId} {
         allow get, list, create: if true;
         allow update, delete: if request.auth != null;
       }
     }
 
-    // SECURE ACCESS: Only allow specific actions on sensitive collections.
+    // Allow anyone to subscribe, but only admins can read or manage the list.
     match /subscribers/{subscriberId} {
-      allow create: if true; // Anyone can subscribe
-      allow read, delete, list: if request.auth != null; // Only admins can manage list
+      allow create: if true;
+      allow read, list, update, delete: if request.auth != null;
     }
 
+    // Allow anyone to add to the wishlist, but only admins can manage it.
     match /wishlist/{wishId} {
-      allow create: if true; // Anyone can submit to wishlist
-      allow read, delete, list: if request.auth != null; // Only admins can manage list
+      allow create: if true;
+      allow read, list, update, delete: if request.auth != null;
     }
   }
 }
