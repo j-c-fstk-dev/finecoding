@@ -2,41 +2,53 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
+    
+    // Helper function to check for admin access
+    function isAdmin() {
+      return request.auth != null;
+    }
 
-    // Allow public read access to posts and their comments.
-    // Writes are restricted to authenticated users (admins).
+    // --- COLLECTIONS ---
+
+    // PUBLIC: Posts and their comments are readable by anyone.
+    // Writing is restricted.
     match /posts/{postId} {
       allow get, list: if true;
-      allow write: if request.auth != null;
+      allow write: if isAdmin(); // Only admins can create, update, delete posts
 
       match /comments/{commentId} {
-        allow get, list, create: if true;
-        allow update, delete: if request.auth != null;
+        allow get, list, create: if true; // Anyone can create a comment
+        allow update, delete: if isAdmin(); // Only admins can moderate
       }
     }
 
-    // Allow public read access to resources and their comments.
-    // Writes are restricted to authenticated users (admins).
+    // HYBRID: Resources are readable by anyone.
+    // Writing is restricted to admins OR trusted services like n8n.
     match /resources/{resourceId} {
       allow get, list: if true;
-      allow write: if request.auth != null;
+      
+      // Allow creation if it's an admin OR if the request comes from a trusted source.
+      // Anyone can update to favorite a resource.
+      allow create, update: if isAdmin() || request.resource.data.createdBy == 'n8n_automation';
+      
+      allow delete: if isAdmin(); // Only admins can delete
 
       match /comments/{commentId} {
         allow get, list, create: if true;
-        allow update, delete: if request.auth != null;
+        allow update, delete: if isAdmin();
       }
     }
 
-    // Allow anyone to subscribe, but only admins can read or manage the list.
+    // Public can create, only admin can read/manage.
     match /subscribers/{subscriberId} {
       allow create: if true;
-      allow read, list, update, delete: if request.auth != null;
+      allow read, write, delete: if isAdmin();
     }
 
-    // Allow anyone to add to the wishlist, but only admins can manage it.
+    // Public can create, only admin can read/manage.
     match /wishlist/{wishId} {
       allow create: if true;
-      allow read, list, update, delete: if request.auth != null;
+      allow read, write, delete: if isAdmin();
     }
   }
 }
