@@ -22,7 +22,7 @@ export interface Comment {
 
 // --- New Types for Resources ---
 
-export const resourceCategories = ['AI & Machine Learning', 'Developer Tools', 'DevOps & Hosting', 'Productivity', 'Books & Courses', 'UI & Design', 'Repositories', 'Cloud Platforms', 'APIs & Backends', 'Testing & Quality', 'Docs & Knowledge', 'Browser Extensions'] as const;
+export const resourceCategories = ['No-Code', 'AI & Machine Learning', 'Developer Tools', 'DevOps & Hosting', 'Productivity', 'Books & Courses', 'UI & Design', 'Repositories', 'Cloud Platforms', 'APIs & Backends', 'Testing & Quality', 'Docs & Knowledge', 'Browser Extensions', 'E-commerce', 'Automation'] as const;
 export type ResourceCategory = typeof resourceCategories[number];
 
 export const pricingModels = ['Free', 'Free Tier', 'Paid', 'Open Source'] as const;
@@ -55,3 +55,4 @@ export interface SearchResult {
   thumbnail: string | null;
   tags: string[];
 }
+
