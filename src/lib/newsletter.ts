@@ -69,30 +69,37 @@ export async function subscribeToNewsletter(email: string): Promise<{ success: b
 
     // Perform side-effects: sync to Beehiiv and send admin notification
     // We run them in parallel to not slow down the user's request.
-    await Promise.all([
-      syncWithBeehiiv(email),
-      (async () => {
-        if (resend) {
-          const adminEmail = process.env.ADMIN_EMAIL;
-          if (adminEmail) {
-            try {
-              await resend.emails.send({
-                from: 'Matrix Coder <onboarding@resend.dev>',
-                to: adminEmail,
-                subject: 'New Newsletter Subscriber!',
-                html: `<p>A new user has subscribed to your newsletter:</p><p><strong>${email}</strong></p>`,
-              });
-            } catch (emailError) {
-              console.error('Failed to send notification email:', emailError);
-            }
-          } else {
-            console.warn('ADMIN_EMAIL environment variable not set. Skipping notification.');
-          }
-        } else {
-          console.warn('RESEND_API_KEY not found. Skipping email notification.');
-        }
-      })()
-    ]);
+    const sideEffects = [];
+
+    // Beehiiv Sync
+    if (process.env.BEEHIIV_API_KEY && process.env.BEEHIIV_PUBLICATION_ID) {
+      sideEffects.push(syncWithBeehiiv(email));
+    }
+
+    // Resend Notification
+    if (resend) {
+      const adminEmail = process.env.ADMIN_EMAIL;
+      if (adminEmail) {
+        sideEffects.push(
+          resend.emails.send({
+            from: 'Matrix Coder <onboarding@resend.dev>',
+            to: adminEmail,
+            subject: 'New Newsletter Subscriber!',
+            html: `<p>A new user has subscribed to your newsletter:</p><p><strong>${email}</strong></p>`,
+          }).catch(emailError => {
+            // Catch errors inside the promise to not fail the Promise.all
+            console.error('Failed to send notification email:', emailError);
+          })
+        );
+      } else {
+        console.warn('ADMIN_EMAIL environment variable not set. Skipping notification.');
+      }
+    } else {
+      console.warn('RESEND_API_KEY not found. Skipping email notification.');
+    }
+    
+    // Wait for all side-effects to complete (or fail gracefully)
+    await Promise.all(sideEffects);
 
     return { success: true };
   } catch (error) {
