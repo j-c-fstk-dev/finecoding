@@ -2,22 +2,18 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-
-    // Helper function to check for admin role
+    
+    // Helper function to check for admin access (logged in user)
     function isAdmin() {
       return request.auth != null;
     }
 
     // PUBLIC ACCESS: Allow anyone to read posts and resources.
-    // This is required for the website pages to be built and displayed correctly.
     match /posts/{postId} {
+      // Any user or service can read posts for building pages or newsletters
       allow get, list: if true;
-
-      // Allow anyone to create comments and like posts (update).
-      allow create, update: if true; 
-
-      // Only authenticated users (admins) can delete posts.
-      allow delete: if isAdmin();
+      // Only authenticated admins can write to posts
+      allow create, update, delete: if isAdmin();
 
       match /comments/{commentId} {
         allow get, list, create: if true;
@@ -27,12 +23,8 @@ service cloud.firestore {
 
     match /resources/{resourceId} {
       allow get, list: if true;
-      
-      // Allow admins OR an n8n automation to create/update resources.
-      // Allow anyone to favorite resources (update).
-      allow create, update: if isAdmin() || request.resource.data.createdBy == 'n8n_automation' || request.resource.data.favorites > resource.data.favorites;
-
-      // Only authenticated users (admins) can delete resources.
+      // An admin OR an authenticated service (like n8n) can create/update resources
+      allow create, update: if isAdmin() || request.auth.token.firebase.sign_in_provider == 'gcp';
       allow delete: if isAdmin();
       
       match /comments/{commentId} {
@@ -43,13 +35,13 @@ service cloud.firestore {
 
     // SECURE ACCESS: Only allow specific actions on sensitive collections.
     match /subscribers/{subscriberId} {
-      allow create: if true; // Anyone can subscribe
-      allow read, delete, list: if isAdmin(); // Only admins can manage list
+      allow create: if true;
+      allow read, delete, list: if isAdmin();
     }
 
     match /wishlist/{wishId} {
-      allow create: if true; // Anyone can submit to wishlist
-      allow read, delete, list: if isAdmin(); // Only admins can manage list
+      allow create: if true;
+      allow read, delete, list: if isAdmin();
     }
   }
 }
