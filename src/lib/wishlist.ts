@@ -1,9 +1,9 @@
 'use server';
 
-import { db } from '@/lib/firebase';
+import { adminDb } from '@/lib/firebase-admin';
 import { z } from 'zod';
 import { Resend } from 'resend';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { FieldValue } from 'firebase-admin/firestore';
 
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 const adminEmail = process.env.ADMIN_EMAIL;
@@ -20,10 +20,9 @@ export async function addToWishlist(toolName: string): Promise<{ success: boolea
   }
 
   try {
-    const wishlistCollection = collection(db, 'wishlist');
-    await addDoc(wishlistCollection, {
-      name: toolName,
-      requestedAt: serverTimestamp(),
+    await adminDb().collection('wishlist').add({
+      name: result.data.toolName,
+      requestedAt: FieldValue.serverTimestamp(),
     });
 
     // Now, attempt to send the email notification. This is a secondary action.

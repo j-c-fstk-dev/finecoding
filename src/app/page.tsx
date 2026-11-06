@@ -5,6 +5,11 @@ import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import type { Metadata } from 'next';
 
+// Re-fetch from Firestore at most every 5 minutes (ISR). Saving a post in the
+// dashboard also refreshes this page immediately via revalidatePath.
+export const revalidate = 300;
+
+
 export const metadata: Metadata = {
   // The title and description are inherited from the root layout, 
   // so we don't need to redefine them here unless we want to be more specific.

@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { deleteResource } from "@/lib/resources";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/lib/auth";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -28,11 +29,12 @@ export function DeleteResourceButton({ resourceId, resourceName }: DeleteResourc
   const [isDeleting, setIsDeleting] = useState(false);
   const router = useRouter();
   const { toast } = useToast();
+  const { getIdToken } = useAuth();
 
   const handleDelete = async () => {
     setIsDeleting(true);
     try {
-      await deleteResource(resourceId);
+      await deleteResource(await getIdToken(), resourceId);
       toast({
         title: "Resource Deleted",
         description: `"${resourceName}" has been successfully deleted.`,

@@ -9,6 +9,10 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
 import { format } from 'date-fns';
 import { DeleteResourceButton } from "@/components/admin/DeleteResourceButton";
 
+// Always render with fresh data; this page is only for the admin.
+export const dynamic = 'force-dynamic';
+
+
 export default async function ResourcesDashboardPage() {
     const resources = await getResources();
 

@@ -11,6 +11,8 @@ This project serves as both a ready-to-deploy blog and a comprehensive portfolio
 
 ---
 
+> **Configuração (Netlify + Firebase Admin):** veja [docs/CONFIGURACAO.md](docs/CONFIGURACAO.md).
+
 ## Table of Contents
 
 - [About The Project](#about-the-project)

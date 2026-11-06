@@ -1,25 +1,21 @@
-
-
-
 'use server';
 
-import { db } from '@/lib/firebase';
-import type { Resource } from '@/types';
-import { 
-  collection, 
-  getDocs, 
-  getDoc, 
-  addDoc, 
-  updateDoc, 
-  deleteDoc, 
-  doc,
-  orderBy, 
-  Timestamp,
-  serverTimestamp,
-  query,
-  increment,
-} from 'firebase/firestore';
+import { adminDb, requireAdmin } from '@/lib/firebase-admin';
+import { pricingModels, resourceCategories, type Resource } from '@/types';
+import { FieldValue, Timestamp } from 'firebase-admin/firestore';
 import { revalidatePath } from 'next/cache';
+import { z } from 'zod';
+
+const ResourceInputSchema = z.object({
+  name: z.string().min(3),
+  description: z.string().min(10).max(300),
+  link: z.string().url(),
+  category: z.enum(resourceCategories),
+  pricing: z.enum(pricingModels),
+  icon: z.string().optional(),
+});
+
+export type ResourceInput = z.input<typeof ResourceInputSchema>;
 
 
 // Hardcoded list of resources to ensure they are always present.
@@ -524,96 +520,92 @@ const hardcodedRepositories: Resource[] = [
     },
 ];
 
+function toDate(value: unknown): Date {
+  if (value instanceof Timestamp) return value.toDate();
+  if (value instanceof Date) return value;
+  if (typeof value === 'string' || typeof value === 'number') return new Date(value);
+  return new Date(0);
+}
+
+function revalidateResourcePages() {
+  revalidatePath('/resources');
+  revalidatePath('/dashboard/resources');
+}
+
+/**
+ * Throws if Firestore is unreachable so a failed build/ISR regeneration keeps
+ * the last good page instead of silently dropping every Firestore resource.
+ */
 export async function getResources(): Promise<Resource[]> {
-  let firestoreResources: Resource[] = [];
-  try {
-    const resourcesCollection = collection(db, 'resources');
-    const q = query(resourcesCollection, orderBy('createdAt', 'desc'));
-    const querySnapshot = await getDocs(q);
-    
-    firestoreResources = querySnapshot.docs.map(doc => {
-      const data = doc.data();
-      return {
-        id: doc.id,
-        ...data,
-        createdAt: (data.createdAt as Timestamp).toDate(),
-      } as Resource;
-    });
-  } catch (error) {
-    console.error("Error fetching resources from Firestore:", error);
-  }
+  const snapshot = await adminDb().collection('resources').orderBy('createdAt', 'desc').get();
+
+  const firestoreResources = snapshot.docs.map((doc) => {
+    const data = doc.data();
+    return {
+      ...data,
+      id: doc.id,
+      favorites: typeof data.favorites === 'number' ? data.favorites : 0,
+      createdAt: toDate(data.createdAt),
+    } as Resource;
+  });
 
   const allResources = [...firestoreResources, ...hardcodedRepositories];
-
-  // Sort all resources by date descending
   allResources.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
-
   return allResources;
 }
 
 export async function getResourceById(id: string): Promise<Resource | null> {
-    const hardcodedResource = hardcodedRepositories.find(repo => repo.id === id);
-    if (hardcodedResource) {
-        return hardcodedResource;
-    }
-    try {
-        const resourceRef = doc(db, 'resources', id);
-        const docSnap = await getDoc(resourceRef);
+  const hardcodedResource = hardcodedRepositories.find((repo) => repo.id === id);
+  if (hardcodedResource) return hardcodedResource;
 
-        if (!docSnap.exists()) {
-            return null;
-        }
-
-        const data = docSnap.data();
-        return {
-            id: docSnap.id,
-            ...data,
-            createdAt: (data.createdAt as Timestamp).toDate(),
-        } as Resource;
-
-    } catch (error) {
-        console.error("Error fetching resource by id:", error);
-        return null;
-    }
+  const snap = await adminDb().collection('resources').doc(id).get();
+  if (!snap.exists) return null;
+  const data = snap.data()!;
+  return {
+    ...data,
+    id: snap.id,
+    favorites: typeof data.favorites === 'number' ? data.favorites : 0,
+    createdAt: toDate(data.createdAt),
+  } as Resource;
 }
 
-export async function addResource(resourceData: Omit<Resource, 'id' | 'createdAt' | 'favorites'>) {
-    const newResource = {
-        ...resourceData,
-        favorites: 0,
-        createdAt: serverTimestamp(),
-    };
-    
-    const resourcesCollection = collection(db, 'resources');
-    await addDoc(resourcesCollection, newResource);
-    revalidatePath('/resources');
-    revalidatePath('/dashboard/resources');
+export async function addResource(idToken: string, input: ResourceInput) {
+  await requireAdmin(idToken);
+  const data = ResourceInputSchema.parse(input);
+  await adminDb().collection('resources').add({
+    ...data,
+    favorites: 0,
+    createdAt: FieldValue.serverTimestamp(),
+  });
+  revalidateResourcePages();
 }
 
-export async function updateResource(id: string, resourceData: Partial<Omit<Resource, 'favorites'>>) {
-    const resourceRef = doc(db, 'resources', id);
-    await updateDoc(resourceRef, resourceData);
-    revalidatePath('/resources');
-    revalidatePath('/dashboard/resources');
+export async function updateResource(idToken: string, id: string, input: ResourceInput) {
+  await requireAdmin(idToken);
+  if (hardcodedRepositories.some((repo) => repo.id === id)) {
+    throw new Error('Built-in resources are defined in code (src/lib/resources.ts) and cannot be edited here.');
+  }
+  const data = ResourceInputSchema.parse(input);
+  await adminDb().collection('resources').doc(id).update(data);
+  revalidateResourcePages();
 }
 
-export async function deleteResource(id: string) {
-    const resourceRef = doc(db, 'resources', id);
-    await deleteDoc(resourceRef);
-    revalidatePath('/resources');
-    revalidatePath('/dashboard/resources');
+export async function deleteResource(idToken: string, id: string) {
+  await requireAdmin(idToken);
+  if (hardcodedRepositories.some((repo) => repo.id === id)) {
+    throw new Error('Built-in resources are defined in code (src/lib/resources.ts) and cannot be deleted here.');
+  }
+  await adminDb().collection('resources').doc(id).delete();
+  revalidateResourcePages();
 }
 
+/** Public action: anyone can favorite a resource. Only increments the counter. */
 export async function likeResource(id: string) {
-    const hardcodedResource = hardcodedRepositories.find(repo => repo.id === id);
-    if (hardcodedResource) {
-        console.warn(`Liking a hardcoded resource (${id}) is not persisted.`);
-        // This action won't be saved for hardcoded items.
-        return;
-    }
-    const resourceRef = doc(db, 'resources', id);
-    await updateDoc(resourceRef, {
-        favorites: increment(1)
-    });
-    revalidatePath('/resources');
+  if (typeof id !== 'string' || !id) throw new Error('Invalid resource id.');
+  if (hardcodedRepositories.some((repo) => repo.id === id)) {
+    // Built-in resources live in code, so their counters are not persisted.
+    return;
+  }
+  await adminDb().collection('resources').doc(id).update({ favorites: FieldValue.increment(1) });
+  revalidatePath('/resources');
 }

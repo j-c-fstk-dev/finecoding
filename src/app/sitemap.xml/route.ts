@@ -3,7 +3,10 @@ import { getPosts } from '@/lib/posts';
 import type { Post } from '@/types';
 
 // The canonical site URL should always point to production.
-const URL = 'https://finecoding.netlify.app';
+const URL = (process.env.NEXT_PUBLIC_SITE_URL || 'https://finecoding.netlify.app').replace(/\/$/, '');
+
+// Rendered on request and cached by the CDN for an hour (see Cache-Control below).
+export const dynamic = 'force-dynamic';
 
 function generateSiteMap(posts: Post[]) {
   return `<?xml version="1.0" encoding="UTF-8"?>
@@ -60,29 +63,16 @@ function generateSiteMap(posts: Post[]) {
 }
 
 export async function GET() {
-  try {
-    const posts = await getPosts();
-    const body = generateSiteMap(posts);
+  // If Firestore is unreachable this throws (HTTP 500) instead of serving a
+  // sitemap without posts; crawlers simply retry later.
+  const posts = await getPosts();
+  const body = generateSiteMap(posts);
 
-    return new Response(body, {
-      status: 200,
-      headers: {
-        'Content-Type': 'application/xml',
-        'Cache-Control': 's-maxage=86400, stale-while-revalidate', // Cache for 24 hours
-      },
-    });
-  } catch (error) {
-    console.error('Failed to generate sitemap:', error);
-    // Return a minimal valid sitemap on error to avoid HTML error pages
-    const errorSitemap = `<?xml version="1.0" encoding="UTF-8"?>
-      <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-        <url>
-          <loc>${URL}</loc>
-        </url>
-      </urlset>`;
-    return new Response(errorSitemap, { 
-      status: 500,
-      headers: { 'Content-Type': 'application/xml' },
-    });
-  }
+  return new Response(body, {
+    status: 200,
+    headers: {
+      'Content-Type': 'application/xml',
+      'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=86400',
+    },
+  });
 }

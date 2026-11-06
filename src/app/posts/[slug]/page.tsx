@@ -8,6 +8,11 @@ import { format } from 'date-fns';
 import { MarkdownRenderer } from '@/components/blog/MarkdownRenderer';
 import { PostInteraction } from '@/components/blog/PostInteraction';
 
+// Re-fetch from Firestore at most every 5 minutes (ISR). Saving a post in the
+// dashboard also refreshes this page immediately via revalidatePath.
+export const revalidate = 300;
+
+
 type Props = {
   params: { slug: string }
 }

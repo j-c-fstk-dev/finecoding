@@ -10,6 +10,7 @@
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
+import {requireAdmin} from '@/lib/firebase-admin';
 
 const SuggestTagsInputSchema = z.object({
   postContent: z.string().describe('The content of the blog post.'),
@@ -21,7 +22,9 @@ const SuggestTagsOutputSchema = z.object({
 });
 export type SuggestTagsOutput = z.infer<typeof SuggestTagsOutputSchema>;
 
-export async function suggestTags(input: SuggestTagsInput): Promise<SuggestTagsOutput> {
+export async function suggestTags(idToken: string, input: SuggestTagsInput): Promise<SuggestTagsOutput> {
+  // Only the blog owner may spend AI quota.
+  await requireAdmin(idToken);
   return suggestTagsFlow(input);
 }
 
