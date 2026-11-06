@@ -14,6 +14,8 @@ interface AuthContextType {
   loading: boolean;
   login: (email: string, password: string) => Promise<any>;
   logout: () => Promise<any>;
+  /** Fresh Firebase ID token, sent to admin Server Actions so the server can verify who is calling. */
+  getIdToken: () => Promise<string>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -39,7 +41,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return signOut(auth);
   };
 
-  const value = { user, loading, login, logout };
+  const getIdToken = async () => {
+    if (!auth.currentUser) {
+      throw new Error('You must be logged in to do this.');
+    }
+    return auth.currentUser.getIdToken();
+  };
+
+  const value = { user, loading, login, logout, getIdToken };
 
   return (
     <AuthContext.Provider value={value}>

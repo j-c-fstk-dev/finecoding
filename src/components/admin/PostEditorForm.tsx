@@ -15,6 +15,7 @@ import type { Post } from "@/types";
 import { Badge } from "@/components/ui/badge";
 import { addPost, updatePost } from "@/lib/posts";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/lib/auth";
 
 const formSchema = z.object({
   title: z.string().min(5, { message: "Title must be at least 5 characters." }),
@@ -37,6 +38,7 @@ export function PostEditorForm({ post }: PostEditorFormProps) {
   const [currentTagInput, setCurrentTagInput] = useState('');
   const { toast } = useToast();
   const router = useRouter();
+  const { getIdToken } = useAuth();
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -79,7 +81,7 @@ export function PostEditorForm({ post }: PostEditorFormProps) {
       return;
     }
     try {
-      const result = await suggestTags({ postContent: content });
+      const result = await suggestTags(await getIdToken(), { postContent: content });
       const newTags = [...new Set([...tags, ...result.tags])];
       form.setValue("tags", newTags, { shouldValidate: true });
       toast({ title: "Tags suggested!", description: "AI has added new tags based on your content." });
@@ -95,7 +97,7 @@ export function PostEditorForm({ post }: PostEditorFormProps) {
     setIsSubmitting(true);
     try {
       if (post && post.id) {
-        await updatePost(post.id, values);
+        await updatePost(await getIdToken(), post.id, values);
         toast({
           title: "Post Updated!",
           description: `"${values.title}" has been saved.`,
@@ -103,7 +105,7 @@ export function PostEditorForm({ post }: PostEditorFormProps) {
         router.push('/dashboard');
         router.refresh();
       } else {
-        await addPost(values);
+        await addPost(await getIdToken(), values);
         toast({
           title: "Post Created!",
           description: `"${values.title}" has been published.`,

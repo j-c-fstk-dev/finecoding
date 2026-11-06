@@ -15,7 +15,8 @@
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
-    "deploy:rules": "firebase deploy --only firestore:rules --project finecoding"
+    "backup": "node scripts/backup.mjs",
+    "deploy:rules": "firebase deploy --only firestore:rules"
   },
   "dependencies": {
     "@genkit-ai/googleai": "1.1.0",
@@ -47,6 +48,7 @@
     "date-fns": "^3.6.0",
     "dotenv": "^16.5.0",
     "firebase": "^11.9.1",
+    "firebase-admin": "^13.10.0",
     "framer-motion": "^11.5.7",
     "genkit": "1.1.0",
     "lucide-react": "^0.475.0",
@@ -64,6 +66,7 @@
     "recharts": "^2.15.1",
     "remark-gfm": "^4.0.0",
     "resend": "^3.5.0",
+    "server-only": "^0.0.1",
     "tailwind-merge": "^3.0.1",
     "tailwindcss-animate": "^1.0.7",
     "use-debounce": "^10.0.1",

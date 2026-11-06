@@ -2,6 +2,11 @@ import { getPosts } from '@/lib/posts';
 import { FilterablePostGrid } from '@/components/blog/FilterablePostGrid';
 import type { Metadata } from 'next';
 
+// Re-fetch from Firestore at most every 5 minutes (ISR). Saving a post in the
+// dashboard also refreshes this page immediately via revalidatePath.
+export const revalidate = 300;
+
+
 export const metadata: Metadata = {
   title: 'All Posts',
   description: 'Browse all articles and tutorials from Fine Coding, or filter by specific tags like AI, Next.js, and Software Development.',

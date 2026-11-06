@@ -5,15 +5,17 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, Download } from "lucide-react";
 import { getSubscribersAsCsv } from "@/lib/newsletter";
+import { useAuth } from "@/lib/auth";
 
 export function ExportSubscribersButton() {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
+  const { getIdToken } = useAuth();
 
   const handleExport = async () => {
     setIsLoading(true);
     try {
-      const csvData = await getSubscribersAsCsv();
+      const csvData = await getSubscribersAsCsv(await getIdToken());
 
       if (!csvData) {
         toast({

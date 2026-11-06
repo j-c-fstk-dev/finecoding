@@ -1,9 +1,9 @@
 'use server';
 
-import { db } from '@/lib/firebase';
+import { adminDb, requireAdmin } from '@/lib/firebase-admin';
 import { z } from 'zod';
 import { Resend } from 'resend';
-import { collection, addDoc, serverTimestamp, query, where, getDocs, orderBy, Timestamp } from 'firebase/firestore';
+import { FieldValue, Timestamp } from 'firebase-admin/firestore';
 
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
@@ -53,18 +53,18 @@ export async function subscribeToNewsletter(email: string): Promise<{ success: b
   }
 
   try {
-    const newsletterCollection = collection(db, 'subscribers');
+    const subscribers = adminDb().collection('subscribers');
+    const normalizedEmail = email.trim().toLowerCase();
 
-    const q = query(newsletterCollection, where('email', '==', email));
-    const querySnapshot = await getDocs(q);
-    if (!querySnapshot.empty) {
+    const existing = await subscribers.where('email', '==', normalizedEmail).limit(1).get();
+    if (!existing.empty) {
       return { success: false, error: 'This email is already subscribed.' };
     }
 
     // Save to Firestore first, as it's our primary source of truth
-    await addDoc(newsletterCollection, {
-      email: email,
-      subscribedAt: serverTimestamp(),
+    await subscribers.add({
+      email: normalizedEmail,
+      subscribedAt: FieldValue.serverTimestamp(),
     });
 
     // Perform side-effects: sync to Beehiiv and send admin notification
@@ -73,7 +73,7 @@ export async function subscribeToNewsletter(email: string): Promise<{ success: b
 
     // Beehiiv Sync
     if (process.env.BEEHIIV_API_KEY && process.env.BEEHIIV_PUBLICATION_ID) {
-      sideEffects.push(syncWithBeehiiv(email));
+      sideEffects.push(syncWithBeehiiv(normalizedEmail));
     }
 
     // Resend Notification
@@ -85,7 +85,7 @@ export async function subscribeToNewsletter(email: string): Promise<{ success: b
             from: 'Matrix Coder <onboarding@resend.dev>',
             to: adminEmail,
             subject: 'New Newsletter Subscriber!',
-            html: `<p>A new user has subscribed to your newsletter:</p><p><strong>${email}</strong></p>`,
+            html: `<p>A new user has subscribed to your newsletter:</p><p><strong>${normalizedEmail}</strong></p>`,
           }).catch(emailError => {
             // Catch errors inside the promise to not fail the Promise.all
             console.error('Failed to send notification email:', emailError);
@@ -108,11 +108,10 @@ export async function subscribeToNewsletter(email: string): Promise<{ success: b
   }
 }
 
-export async function getSubscribersAsCsv(): Promise<string | null> {
+export async function getSubscribersAsCsv(idToken: string): Promise<string | null> {
+  await requireAdmin(idToken);
   try {
-    const subscribersCollection = collection(db, 'subscribers');
-    const q = query(subscribersCollection, orderBy('subscribedAt', 'desc'));
-    const querySnapshot = await getDocs(q);
+    const querySnapshot = await adminDb().collection('subscribers').orderBy('subscribedAt', 'desc').get();
 
     if (querySnapshot.empty) {
       return null;
@@ -122,7 +121,7 @@ export async function getSubscribersAsCsv(): Promise<string | null> {
     const rows = querySnapshot.docs.map(doc => {
       const data = doc.data();
       const email = data.email || '';
-      const subscribedAt = data.subscribedAt ? (data.subscribedAt as Timestamp).toDate().toISOString() : '';
+      const subscribedAt = data.subscribedAt instanceof Timestamp ? data.subscribedAt.toDate().toISOString() : '';
       return `"${email}","${subscribedAt}"`;
     });
 

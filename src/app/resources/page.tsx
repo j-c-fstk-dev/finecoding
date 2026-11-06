@@ -4,6 +4,11 @@ import { WishlistForm } from '@/components/resources/WishlistForm';
 import { Separator } from '@/components/ui/separator';
 import type { Metadata } from 'next';
 
+// Re-fetch from Firestore at most every 5 minutes (ISR). Saving a post in the
+// dashboard also refreshes this page immediately via revalidatePath.
+export const revalidate = 300;
+
+
 export const metadata: Metadata = {
   title: 'Resource Hub',
   description: 'A curated collection of tools, libraries, and learning materials for developers, covering AI, DevOps, Design, and more.',

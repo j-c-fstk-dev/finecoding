@@ -15,14 +15,13 @@ export function MarkdownRenderer({ content }: { content: string }) {
     <ReactMarkdown
       remarkPlugins={[remarkGfm]}
       components={{
-        code({ node, className, children, ...props }) {
+        code({ node: _node, className, children, ...props }) {
           const match = /language-(\w+)/.exec(className || '');
           return match ? (
             <SyntaxHighlighter
               style={codeTheme}
               language={match[1]}
               PreTag="div"
-              {...props}
             >
               {String(children).replace(/\n$/, '')}
             </SyntaxHighlighter>

@@ -8,8 +8,7 @@ const withPWA = require('next-pwa')({
 });
 
 const nextConfig = {
-  // env block is removed. Next.js automatically handles NEXT_PUBLIC_ variables.
-  // This was the source of the issue.
+  // NEXT_PUBLIC_* variables are inlined automatically; no `env` block needed.
   images: {
     remotePatterns: [
       {
@@ -26,10 +25,12 @@ const nextConfig = {
       },
     ],
   },
-  typescript: {
-    ignoreBuildErrors: true,
+  experimental: {
+    // Keep the Admin SDK as a regular Node dependency instead of bundling it.
+    serverComponentsExternalPackages: ['firebase-admin'],
   },
   eslint: {
+    // No ESLint config is set up in this project yet.
     ignoreDuringBuilds: true,
   },
 };

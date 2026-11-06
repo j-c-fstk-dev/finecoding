@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { deletePost } from "@/lib/posts";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/lib/auth";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -28,11 +29,12 @@ export function DeletePostButton({ postId, postTitle }: DeletePostButtonProps) {
   const [isDeleting, setIsDeleting] = useState(false);
   const router = useRouter();
   const { toast } = useToast();
+  const { getIdToken } = useAuth();
 
   const handleDelete = async () => {
     setIsDeleting(true);
     try {
-      await deletePost(postId);
+      await deletePost(await getIdToken(), postId);
       toast({
         title: "Post Deleted",
         description: `"${postTitle}" has been successfully deleted.`,
