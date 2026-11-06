@@ -4,7 +4,8 @@
 import Script from 'next/script';
 
 export function GoogleAnalytics() {
-  const gaId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
+  // Accept both names: Netlify was configured with NEXT_PUBLIC_GA_ID.
+  const gaId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID || process.env.NEXT_PUBLIC_GA_ID;
 
   // Se o ID do Google Analytics não estiver definido, não renderize nada.
   if (!gaId) {
