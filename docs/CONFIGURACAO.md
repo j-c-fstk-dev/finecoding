@@ -49,6 +49,7 @@ vinda do navegador (o servidor e o n8n usam service account e não são afetados
 
 ```sh
 npx firebase login
+npx firebase use --add      # só na primeira vez: escolha o projeto do blog
 npm run deploy:rules
 ```
 

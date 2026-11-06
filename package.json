@@ -16,7 +16,7 @@
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
     "backup": "node scripts/backup.mjs",
-    "deploy:rules": "firebase deploy --only firestore:rules --project finecoding"
+    "deploy:rules": "firebase deploy --only firestore:rules"
   },
   "dependencies": {
     "@genkit-ai/googleai": "1.1.0",
