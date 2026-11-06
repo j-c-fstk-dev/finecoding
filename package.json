@@ -15,6 +15,7 @@
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
+    "backup": "node scripts/backup.mjs",
     "deploy:rules": "firebase deploy --only firestore:rules --project finecoding"
   },
   "dependencies": {

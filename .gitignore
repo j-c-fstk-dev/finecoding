@@ -51,3 +51,6 @@ ui-debug.log
 # firebase service account keys (never commit)
 *-firebase-adminsdk-*.json
 service-account*.json
+
+# content backups (contain subscriber emails)
+/backups/

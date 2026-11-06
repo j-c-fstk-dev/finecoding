@@ -66,3 +66,21 @@ npm run dev                  # http://localhost:9003
   post são atualizadas na hora.
 - Fora isso, as páginas públicas buscam dados novos no Firestore a cada 5 minutos.
 - Editar o título de um post **não muda mais o slug (URL)**, então links já compartilhados continuam funcionando.
+
+## Backup do conteúdo
+
+```sh
+npm run backup                   # salva em backups/<data-hora>/
+npm run backup -- ~/meu-backup   # ou numa pasta à sua escolha
+```
+
+Usa as mesmas credenciais do `.env.local` (`FIREBASE_CLIENT_EMAIL`, `FIREBASE_PRIVATE_KEY`,
+`NEXT_PUBLIC_FIREBASE_PROJECT_ID`). Gera:
+
+- `posts/<slug>.md`: um arquivo Markdown por post, com título, data, tags etc. no
+  cabeçalho (front matter). Abre em qualquer editor e serve para importar em outras
+  plataformas (Supabase, Astro, Hugo, Ghost...).
+- `data.json`: tudo (posts com comentários, recursos, inscritos da newsletter e wishlist).
+
+A pasta `backups/` fica fora do Git porque contém e-mails de inscritos. Guarde o
+backup num lugar seguro (Google Drive, HD externo etc.).
