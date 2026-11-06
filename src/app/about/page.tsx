@@ -1,16 +1,17 @@
 import Image from 'next/image';
+import Link from 'next/link';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'About',
-  description: 'Learn about the philosophy and mission of Fine Coding. A commitment to software craftsmanship, AI exploration, and modern web development.',
+  description: 'Fine Coding is a hands-on blog about building real things with AI, code and no-code tools: what works, what breaks, and how to fix it.',
   openGraph: {
     title: 'About | Fine Coding',
-    description: 'Learn about the philosophy and mission of Fine Coding.',
+    description: 'A hands-on blog about building real things with AI, code and no-code tools.',
   },
   twitter: {
     title: 'About | Fine Coding',
-    description: 'Learn about the philosophy and mission of Fine Coding.',
+    description: 'A hands-on blog about building real things with AI, code and no-code tools.',
   }
 };
 
@@ -22,38 +23,56 @@ export default function AboutPage() {
           About <span className="text-primary">Fine Coding</span>
         </h1>
         <p className="mt-4 text-lg text-muted-foreground sm:text-xl">
-          Crafting code with purpose and precision.
+          Notes from someone building real things with AI, code and no-code tools.
         </p>
       </section>
-      
+
       <section className="mt-12 prose prose-lg dark:prose-invert max-w-none font-body">
-        <Image 
+        <Image
           src="https://res.cloudinary.com/dr0weongo/image/upload/v1751168647/file_00000000591c61f59c33352b1d8f37fd_ncuhov.png"
-          alt="A portrait of the author"
+          alt="Fine Coding banner with a digital, Matrix-inspired look"
           width={800}
           height={400}
           className="rounded-lg object-cover aspect-[2/1]"
-          data-ai-hint="portrait author"
         />
-        <h2>Our Philosophy</h2>
+
+        <h2>Why this blog exists</h2>
         <p>
-          "Fine Coding" is more than a name—it's a commitment. In a world of fast-paced development cycles and fleeting tech trends, we champion the timeless principles of software craftsmanship. We believe that the best software is not just functional, but also beautiful, maintainable, and a joy to use.
+          I like building things. Lately that means pairing with AI, wiring up automations in n8n,
+          and shipping web apps with Next.js and Firebase, often faster than I fully understand them.
+          That speed is exciting. It is also how projects quietly break.
         </p>
+        <p>
+          Fine Coding is where I slow down and write about it: what I built, the decisions behind it,
+          the bugs that cost me days, and what I would do differently. Not polished success stories.
+          Working notes from the middle of the process.
+        </p>
+
         <blockquote>
-          <p>We are building a platform for developers who see code as a craft, not just a commodity.</p>
+          <p>
+            AI makes it easy to write code. Fine coding is understanding it well enough to keep it running.
+          </p>
         </blockquote>
-        <h2>What You'll Find Here</h2>
+
+        <h2>This blog is the first case study</h2>
         <p>
-          This blog is a journey into the heart of modern software development. We explore:
+          I built this site with AI-assisted tools. It worked, then it didn&apos;t: posts disappeared,
+          the dashboard stopped saving, and I got tired of fighting errors I didn&apos;t understand, so I
+          walked away for a while. Coming back meant finding the real cause, fixing it properly and
+          learning from it. That is the kind of story you&apos;ll find here.
         </p>
+
+        <h2>What you&apos;ll find here</h2>
         <ul>
-          <li><strong>Artificial Intelligence:</strong> Demystifying complex topics and showcasing practical applications of GenAI.</li>
-          <li><strong>Software Architecture:</strong> Best practices for building scalable, resilient systems.</li>
-          <li><strong>Web Technologies:</strong> Deep dives into frameworks like Next.js, and the art of creating stunning user interfaces.</li>
-          <li><strong>Developer Mindset:</strong> Reflections on productivity, career growth, and the philosophy of coding.</li>
+          <li><strong>Building with AI:</strong> practical workflows, prompts that actually help, and where AI-generated code tends to go wrong.</li>
+          <li><strong>Automation &amp; no-code:</strong> n8n flows, integrations and the glue that connects tools together.</li>
+          <li><strong>Web development:</strong> Next.js, Firebase and the details that matter once a project is live.</li>
+          <li><strong>Lessons learned:</strong> post-mortems, refactors and the habits that keep side projects alive.</li>
         </ul>
         <p>
-          This entire blog was built with the principles we advocate, utilizing Next.js, Tailwind CSS, and Firebase, with a design aesthetic inspired by the digital frontier. Welcome to the hub for Fine Coders.
+          Start with the <Link href="/posts">latest posts</Link>, or browse the{' '}
+          <Link href="/resources">Resource Hub</Link> for the tools I use and recommend.
+          If something here helps you, or you think I got it wrong, I&apos;d love to hear about it in the comments.
         </p>
       </section>
     </div>
