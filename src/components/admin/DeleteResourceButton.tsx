@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { deleteResource } from "@/lib/resources";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/lib/auth";
+import { unwrap } from "@/lib/action-result";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -34,7 +35,7 @@ export function DeleteResourceButton({ resourceId, resourceName }: DeleteResourc
   const handleDelete = async () => {
     setIsDeleting(true);
     try {
-      await deleteResource(await getIdToken(), resourceId);
+      unwrap(await deleteResource(await getIdToken(), resourceId));
       toast({
         title: "Resource Deleted",
         description: `"${resourceName}" has been successfully deleted.`,
@@ -45,7 +46,7 @@ export function DeleteResourceButton({ resourceId, resourceName }: DeleteResourc
       console.error("Failed to delete resource:", error);
       toast({
         title: "Error",
-        description: "Could not delete the resource. Please try again.",
+        description: error instanceof Error ? error.message : "Could not delete the resource. Please try again.",
         variant: "destructive",
       });
     } finally {

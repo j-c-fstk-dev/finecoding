@@ -6,6 +6,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Loader2, Download } from "lucide-react";
 import { getSubscribersAsCsv } from "@/lib/newsletter";
 import { useAuth } from "@/lib/auth";
+import { unwrap } from "@/lib/action-result";
 
 export function ExportSubscribersButton() {
   const [isLoading, setIsLoading] = useState(false);
@@ -15,7 +16,7 @@ export function ExportSubscribersButton() {
   const handleExport = async () => {
     setIsLoading(true);
     try {
-      const csvData = await getSubscribersAsCsv(await getIdToken());
+      const csvData = unwrap(await getSubscribersAsCsv(await getIdToken()));
 
       if (!csvData) {
         toast({
@@ -48,7 +49,7 @@ export function ExportSubscribersButton() {
       console.error("Failed to export subscribers:", error);
       toast({
         title: "Error",
-        description: "Could not export subscribers. Please check the logs.",
+        description: error instanceof Error ? error.message : "Could not export subscribers.",
         variant: "destructive",
       });
     } finally {
