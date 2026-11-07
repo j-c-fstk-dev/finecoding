@@ -4,7 +4,7 @@ import { getPosts } from '@/lib/posts';
 import { getComments } from '@/lib/comments';
 import { Badge } from '@/components/ui/badge';
 import { Calendar, Tag } from 'lucide-react';
-import { format } from 'date-fns';
+import { formatPostDate } from '@/lib/dates';
 import { MarkdownRenderer } from '@/components/blog/MarkdownRenderer';
 import { PostInteraction } from '@/components/blog/PostInteraction';
 
@@ -98,7 +98,7 @@ export default async function PostPage({ params }: { params: { slug: string } })
         <div className="mt-4 flex items-center space-x-4 text-sm text-muted-foreground">
           <div className="flex items-center gap-2">
             <Calendar className="h-4 w-4" />
-            <span>{format(new Date(post.date), 'MMMM d, yyyy')}</span>
+            <span>{formatPostDate(post.date)}</span>
           </div>
           <div className="flex items-center gap-2">
             <Tag className="h-4 w-4" />
