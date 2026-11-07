@@ -52,3 +52,6 @@ service-account*.json
 # leftovers from the old next-pwa setup
 /public/workbox-*.js
 /public/workbox-*.js.map
+
+# Local Netlify folder
+.netlify
