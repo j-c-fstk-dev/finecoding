@@ -4,6 +4,7 @@ import { adminDb, requireAdmin } from '@/lib/firebase-admin';
 import type { Post } from '@/types';
 import { FieldValue, Timestamp, type DocumentData } from 'firebase-admin/firestore';
 import { revalidatePath } from 'next/cache';
+import { runAction } from '@/lib/action-result';
 import { z } from 'zod';
 
 const PostInputSchema = z.object({
@@ -73,46 +74,52 @@ export async function getPostBySlug(slug: string): Promise<Post | null> {
 }
 
 export async function addPost(idToken: string, input: PostInput) {
-  await requireAdmin(idToken);
-  const data = PostInputSchema.parse(input);
-  const slug = createSlug(data.title);
+  return runAction('addPost', async () => {
+    await requireAdmin(idToken);
+    const data = PostInputSchema.parse(input);
+    const slug = createSlug(data.title);
 
-  const existing = await adminDb().collection('posts').where('slug', '==', slug).limit(1).get();
-  if (!existing.empty) {
-    throw new Error('A post with this title already exists. Choose a different title.');
-  }
+    const existing = await adminDb().collection('posts').where('slug', '==', slug).limit(1).get();
+    if (!existing.empty) {
+      throw new Error('A post with this title already exists. Choose a different title.');
+    }
 
-  await adminDb().collection('posts').add({
-    ...data,
-    slug,
-    likes: 0,
-    date: Timestamp.now(),
+    await adminDb().collection('posts').add({
+      ...data,
+      slug,
+      likes: 0,
+      date: Timestamp.now(),
+    });
+
+    revalidatePostPages(slug);
   });
-
-  revalidatePostPages(slug);
 }
 
 export async function updatePost(idToken: string, id: string, input: PostInput) {
-  await requireAdmin(idToken);
-  const data = PostInputSchema.parse(input);
+  return runAction('updatePost', async () => {
+    await requireAdmin(idToken);
+    const data = PostInputSchema.parse(input);
 
-  const ref = adminDb().collection('posts').doc(id);
-  const current = await ref.get();
-  if (!current.exists) throw new Error('Post not found.');
+    const ref = adminDb().collection('posts').doc(id);
+    const current = await ref.get();
+    if (!current.exists) throw new Error('Post not found.');
 
-  // Keep the existing slug so shared links and SEO don't break when a title is edited.
-  const slug: string = current.data()?.slug || createSlug(data.title);
+    // Keep the existing slug so shared links and SEO don't break when a title is edited.
+    const slug: string = current.data()?.slug || createSlug(data.title);
 
-  await ref.update({ ...data, slug });
-  revalidatePostPages(slug);
+    await ref.update({ ...data, slug });
+    revalidatePostPages(slug);
+  });
 }
 
 export async function deletePost(idToken: string, id: string) {
-  await requireAdmin(idToken);
-  const ref = adminDb().collection('posts').doc(id);
-  const current = await ref.get();
-  await ref.delete();
-  revalidatePostPages(current.data()?.slug);
+  return runAction('deletePost', async () => {
+    await requireAdmin(idToken);
+    const ref = adminDb().collection('posts').doc(id);
+    const current = await ref.get();
+    await ref.delete();
+    revalidatePostPages(current.data()?.slug);
+  });
 }
 
 /** Public action: anyone can like a post. Only increments the counter. */

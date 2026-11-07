@@ -3,6 +3,7 @@
 import { adminDb, requireAdmin } from '@/lib/firebase-admin';
 import { z } from 'zod';
 import { Resend } from 'resend';
+import { runAction } from '@/lib/action-result';
 import { FieldValue, Timestamp } from 'firebase-admin/firestore';
 
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
@@ -108,9 +109,9 @@ export async function subscribeToNewsletter(email: string): Promise<{ success: b
   }
 }
 
-export async function getSubscribersAsCsv(idToken: string): Promise<string | null> {
-  await requireAdmin(idToken);
-  try {
+export async function getSubscribersAsCsv(idToken: string) {
+  return runAction('getSubscribersAsCsv', async () => {
+    await requireAdmin(idToken);
     const querySnapshot = await adminDb().collection('subscribers').orderBy('subscribedAt', 'desc').get();
 
     if (querySnapshot.empty) {
@@ -126,8 +127,5 @@ export async function getSubscribersAsCsv(idToken: string): Promise<string | nul
     });
 
     return [headers.join(','), ...rows].join('\n');
-  } catch (error) {
-    console.error("Error exporting subscribers to CSV:", error);
-    throw new Error("Failed to export subscribers.");
-  }
+  });
 }

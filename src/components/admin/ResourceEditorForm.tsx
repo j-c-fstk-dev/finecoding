@@ -16,6 +16,7 @@ import { resourceCategories, pricingModels } from "@/types";
 import { addResource, updateResource } from "@/lib/resources";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth";
+import { unwrap } from "@/lib/action-result";
 
 const formSchema = z.object({
   name: z.string().min(3, { message: "Name must be at least 3 characters." }),
@@ -54,13 +55,13 @@ export function ResourceEditorForm({ resource }: ResourceEditorFormProps) {
     setIsSubmitting(true);
     try {
       if (resource && resource.id) {
-        await updateResource(await getIdToken(), resource.id, values);
+        unwrap(await updateResource(await getIdToken(), resource.id, values));
         toast({
           title: "Resource Updated!",
           description: `"${values.name}" has been saved.`,
         });
       } else {
-        await addResource(await getIdToken(), values);
+        unwrap(await addResource(await getIdToken(), values));
         toast({
           title: "Resource Created!",
           description: `"${values.name}" has been added.`,

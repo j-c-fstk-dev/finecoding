@@ -16,6 +16,7 @@ import { Badge } from "@/components/ui/badge";
 import { addPost, updatePost } from "@/lib/posts";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth";
+import { unwrap } from "@/lib/action-result";
 
 const formSchema = z.object({
   title: z.string().min(5, { message: "Title must be at least 5 characters." }),
@@ -81,13 +82,13 @@ export function PostEditorForm({ post }: PostEditorFormProps) {
       return;
     }
     try {
-      const result = await suggestTags(await getIdToken(), { postContent: content });
+      const result = unwrap(await suggestTags(await getIdToken(), { postContent: content }));
       const newTags = [...new Set([...tags, ...result.tags])];
       form.setValue("tags", newTags, { shouldValidate: true });
       toast({ title: "Tags suggested!", description: "AI has added new tags based on your content." });
     } catch (error) {
       console.error("Error suggesting tags:", error);
-      toast({ title: "Error", description: "Could not suggest tags.", variant: "destructive" });
+      toast({ title: "Error", description: error instanceof Error ? error.message : "Could not suggest tags.", variant: "destructive" });
     } finally {
       setIsSuggesting(false);
     }
@@ -97,7 +98,7 @@ export function PostEditorForm({ post }: PostEditorFormProps) {
     setIsSubmitting(true);
     try {
       if (post && post.id) {
-        await updatePost(await getIdToken(), post.id, values);
+        unwrap(await updatePost(await getIdToken(), post.id, values));
         toast({
           title: "Post Updated!",
           description: `"${values.title}" has been saved.`,
@@ -105,7 +106,7 @@ export function PostEditorForm({ post }: PostEditorFormProps) {
         router.push('/dashboard');
         router.refresh();
       } else {
-        await addPost(await getIdToken(), values);
+        unwrap(await addPost(await getIdToken(), values));
         toast({
           title: "Post Created!",
           description: `"${values.title}" has been published.`,

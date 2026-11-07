@@ -4,6 +4,7 @@ import { adminDb, requireAdmin } from '@/lib/firebase-admin';
 import { pricingModels, resourceCategories, type Resource } from '@/types';
 import { FieldValue, Timestamp } from 'firebase-admin/firestore';
 import { revalidatePath } from 'next/cache';
+import { runAction } from '@/lib/action-result';
 import { z } from 'zod';
 
 const ResourceInputSchema = z.object({
@@ -570,33 +571,39 @@ export async function getResourceById(id: string): Promise<Resource | null> {
 }
 
 export async function addResource(idToken: string, input: ResourceInput) {
-  await requireAdmin(idToken);
-  const data = ResourceInputSchema.parse(input);
-  await adminDb().collection('resources').add({
-    ...data,
-    favorites: 0,
-    createdAt: FieldValue.serverTimestamp(),
+  return runAction('addResource', async () => {
+    await requireAdmin(idToken);
+    const data = ResourceInputSchema.parse(input);
+    await adminDb().collection('resources').add({
+      ...data,
+      favorites: 0,
+      createdAt: FieldValue.serverTimestamp(),
+    });
+    revalidateResourcePages();
   });
-  revalidateResourcePages();
 }
 
 export async function updateResource(idToken: string, id: string, input: ResourceInput) {
-  await requireAdmin(idToken);
-  if (hardcodedRepositories.some((repo) => repo.id === id)) {
-    throw new Error('Built-in resources are defined in code (src/lib/resources.ts) and cannot be edited here.');
-  }
-  const data = ResourceInputSchema.parse(input);
-  await adminDb().collection('resources').doc(id).update(data);
-  revalidateResourcePages();
+  return runAction('updateResource', async () => {
+    await requireAdmin(idToken);
+    if (hardcodedRepositories.some((repo) => repo.id === id)) {
+      throw new Error('Built-in resources are defined in code (src/lib/resources.ts) and cannot be edited here.');
+    }
+    const data = ResourceInputSchema.parse(input);
+    await adminDb().collection('resources').doc(id).update(data);
+    revalidateResourcePages();
+  });
 }
 
 export async function deleteResource(idToken: string, id: string) {
-  await requireAdmin(idToken);
-  if (hardcodedRepositories.some((repo) => repo.id === id)) {
-    throw new Error('Built-in resources are defined in code (src/lib/resources.ts) and cannot be deleted here.');
-  }
-  await adminDb().collection('resources').doc(id).delete();
-  revalidateResourcePages();
+  return runAction('deleteResource', async () => {
+    await requireAdmin(idToken);
+    if (hardcodedRepositories.some((repo) => repo.id === id)) {
+      throw new Error('Built-in resources are defined in code (src/lib/resources.ts) and cannot be deleted here.');
+    }
+    await adminDb().collection('resources').doc(id).delete();
+    revalidateResourcePages();
+  });
 }
 
 /** Public action: anyone can favorite a resource. Only increments the counter. */

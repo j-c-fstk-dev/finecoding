@@ -76,7 +76,16 @@ export async function requireAdmin(idToken: string | undefined | null) {
     throw new Error('Not authenticated.');
   }
 
-  const decoded = await adminAuth().verifyIdToken(idToken);
+  let decoded;
+  try {
+    decoded = await adminAuth().verifyIdToken(idToken);
+  } catch (error) {
+    const reason = error instanceof Error ? error.message : String(error);
+    throw new Error(
+      `Could not verify your login: ${reason} ` +
+        '(check that NEXT_PUBLIC_FIREBASE_PROJECT_ID and the service account belong to the same Firebase project).'
+    );
+  }
 
   const allowedUids = parseList(process.env.ADMIN_UIDS);
   const allowedEmails = parseList(process.env.ADMIN_EMAILS);
@@ -89,7 +98,9 @@ export async function requireAdmin(idToken: string | undefined | null) {
   const emailOk = !!decoded.email && allowedEmails.includes(decoded.email.toLowerCase());
 
   if (!uidOk && !emailOk) {
-    throw new Error('You are not allowed to perform this action.');
+    throw new Error(
+      `Logged in as ${decoded.email || decoded.uid}, which is not listed in ADMIN_EMAILS / ADMIN_UIDS.`
+    );
   }
 
   return decoded;

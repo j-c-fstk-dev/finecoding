@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { deletePost } from "@/lib/posts";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/lib/auth";
+import { unwrap } from "@/lib/action-result";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -34,7 +35,7 @@ export function DeletePostButton({ postId, postTitle }: DeletePostButtonProps) {
   const handleDelete = async () => {
     setIsDeleting(true);
     try {
-      await deletePost(await getIdToken(), postId);
+      unwrap(await deletePost(await getIdToken(), postId));
       toast({
         title: "Post Deleted",
         description: `"${postTitle}" has been successfully deleted.`,
@@ -45,7 +46,7 @@ export function DeletePostButton({ postId, postTitle }: DeletePostButtonProps) {
       console.error("Failed to delete post:", error);
       toast({
         title: "Error",
-        description: "Could not delete the post. Please try again.",
+        description: error instanceof Error ? error.message : "Could not delete the post. Please try again.",
         variant: "destructive",
       });
     } finally {
