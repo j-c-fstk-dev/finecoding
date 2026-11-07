@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { formatDistanceToNow } from 'date-fns';
+import { RelativeTime } from '@/components/ui/RelativeTime';
 import { Star, MessageSquare, Loader2, User, Send } from 'lucide-react';
 
 import type { Resource, ResourceComment } from '@/types';
@@ -160,7 +160,7 @@ export function ResourceCardActions({ resource }: { resource: Resource }) {
               <div key={comment.id} className="flex items-start space-x-3">
                 <Avatar className="h-8 w-8 border"><AvatarFallback><User className="h-4 w-4 text-muted-foreground" /></AvatarFallback></Avatar>
                 <div className="flex-1 text-sm">
-                  <div className="flex items-baseline justify-between"><p className="font-semibold text-card-foreground">{comment.name}</p><p className="text-xs text-muted-foreground">{formatDistanceToNow(new Date(comment.createdAt), { addSuffix: true })}</p></div>
+                  <div className="flex items-baseline justify-between"><p className="font-semibold text-card-foreground">{comment.name}</p><p className="text-xs text-muted-foreground"><RelativeTime date={comment.createdAt} /></p></div>
                   <p className="mt-1 text-muted-foreground">{comment.comment}</p>
                 </div>
               </div>

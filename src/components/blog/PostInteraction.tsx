@@ -6,7 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { useRouter } from 'next/navigation';
 import { Heart, MessageSquare, Loader2, User } from 'lucide-react';
-import { formatDistanceToNow } from 'date-fns';
+import { RelativeTime } from '@/components/ui/RelativeTime';
 
 import type { Post, Comment } from '@/types';
 import { likePost } from '@/lib/posts';
@@ -178,7 +178,7 @@ export function PostInteraction({ post, initialComments, previousPost, nextPost 
                             <div className="flex items-baseline justify-between">
                                 <p className="font-semibold text-card-foreground">{comment.name}</p>
                                 <p className="text-xs text-muted-foreground">
-                                    {formatDistanceToNow(new Date(comment.createdAt), { addSuffix: true })}
+                                    <RelativeTime date={comment.createdAt} />
                                 </p>
                             </div>
                             <p className="mt-2 text-muted-foreground prose dark:prose-invert max-w-none">{comment.comment}</p>

@@ -4,7 +4,7 @@ import { CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from 
 import { Badge } from '@/components/ui/badge';
 import type { Post } from '@/types';
 import { Calendar } from 'lucide-react';
-import { format } from 'date-fns';
+import { formatPostDate } from '@/lib/dates';
 
 interface PostCardProps {
   post: Post;
@@ -34,7 +34,7 @@ export function PostCard({ post }: PostCardProps) {
           </CardTitle>
           <CardDescription className="flex items-center gap-2 pt-2 text-xs">
             <Calendar className="h-4 w-4" />
-            <span>{format(new Date(post.date), 'MMMM d, yyyy')}</span>
+            <span>{formatPostDate(post.date)}</span>
           </CardDescription>
         </CardHeader>
         <CardContent className="flex-grow">

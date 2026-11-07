@@ -6,7 +6,7 @@ import { getPosts } from "@/lib/posts";
 import { Badge } from "@/components/ui/badge";
 import { PlusCircle, MoreHorizontal } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { format } from 'date-fns';
+import { formatShortDate } from '@/lib/dates';
 import { DeletePostButton } from "@/components/admin/DeletePostButton";
 
 // Always render with fresh data; this page is only for the admin.
@@ -54,7 +54,7 @@ export default async function DashboardPage() {
                                             ))}
                                         </div>
                                     </TableCell>
-                                    <TableCell className="hidden md:table-cell">{format(post.date, 'MMM d, yyyy')}</TableCell>
+                                    <TableCell className="hidden md:table-cell">{formatShortDate(post.date)}</TableCell>
                                     <TableCell>
                                         <DropdownMenu>
                                             <DropdownMenuTrigger asChild>
