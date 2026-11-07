@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Github, Twitter, Instagram } from 'lucide-react';
+import { Github, Twitter, Instagram } from '@/components/icons/brands';
 import { EmailSignup } from '@/components/blog/EmailSignup';
 
 export function Footer() {

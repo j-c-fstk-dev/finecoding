@@ -85,3 +85,9 @@ Usa as mesmas credenciais do `.env.local` (`FIREBASE_CLIENT_EMAIL`, `FIREBASE_PR
 
 A pasta `backups/` fica fora do Git porque contém e-mails de inscritos. Guarde o
 backup num lugar seguro (Google Drive, HD externo etc.).
+
+## Versões
+
+- Node.js **22** ou mais novo (o Netlify já usa 22 via `netlify.toml`).
+- Next.js 16 + React 19. A sugestão de tags usa o modelo `gemini-flash-latest`
+  (sempre o Flash atual do Google), com a chave em `GOOGLE_API_KEY` ou `GEMINI_API_KEY`.

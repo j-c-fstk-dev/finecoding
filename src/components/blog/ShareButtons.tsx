@@ -2,7 +2,7 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { Twitter } from 'lucide-react';
+import { Twitter } from '@/components/icons/brands';
 
 interface ShareOnXButtonProps {
   title: string;

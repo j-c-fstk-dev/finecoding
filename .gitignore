@@ -37,12 +37,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 
-# next-pwa generated service worker
-/public/sw.js
-/public/sw.js.map
-/public/workbox-*.js
-/public/workbox-*.js.map
-
 # firebase emulator / CLI logs
 firebase-debug.log
 firestore-debug.log
@@ -54,3 +48,7 @@ service-account*.json
 
 # content backups (contain subscriber emails)
 /backups/
+
+# leftovers from the old next-pwa setup
+/public/workbox-*.js
+/public/workbox-*.js.map
