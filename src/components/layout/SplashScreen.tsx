@@ -1,8 +1,8 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { motion, type Variants } from 'framer-motion';
 
-const logoVariants = {
+const logoVariants: Variants = {
   hidden: { 
     filter: 'blur(12px)',
     opacity: 0,
@@ -14,12 +14,12 @@ const logoVariants = {
     scale: 1,
     transition: { 
       duration: 1.2,
-      ease: [0.25, 1, 0.5, 1],
+      ease: [0.25, 1, 0.5, 1] as const,
     }
   },
 };
 
-const textVariants = {
+const textVariants: Variants = {
   hidden: {
     opacity: 0,
     y: 20

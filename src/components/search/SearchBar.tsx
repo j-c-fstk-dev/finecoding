@@ -132,7 +132,7 @@ export function SearchBar() {
       <Command className="relative overflow-visible bg-transparent">
         <div 
           className={cn(
-            "group relative flex h-10 items-center rounded-lg border border-input bg-background cursor-pointer transition-all duration-300",
+            "group relative flex h-10 items-center overflow-hidden rounded-lg border border-input bg-background cursor-pointer transition-all duration-300",
             isOpen ? "w-64 md:w-80" : "w-10",
             "focus-within:w-64 focus-within:md:w-80"
           )}

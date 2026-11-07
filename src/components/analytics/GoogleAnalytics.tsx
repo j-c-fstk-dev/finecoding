@@ -9,7 +9,9 @@ export function GoogleAnalytics() {
 
   // Se o ID do Google Analytics não estiver definido, não renderize nada.
   if (!gaId) {
-    console.warn("Google Analytics Measurement ID is not set. Tracking is disabled.");
+    if (process.env.NODE_ENV === 'development') {
+      console.warn("Google Analytics ID (NEXT_PUBLIC_GA_ID) is not set. Tracking is disabled.");
+    }
     return null;
   }
 

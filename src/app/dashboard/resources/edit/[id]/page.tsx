@@ -3,8 +3,9 @@ import { getResourceById } from "@/lib/resources";
 import { ResourceEditorForm } from "@/components/admin/ResourceEditorForm";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
-export default async function EditResourcePage({ params }: { params: { id: string } }) {
-    const resource = await getResourceById(params.id);
+export default async function EditResourcePage({ params }: { params: Promise<{ id: string }> }) {
+    const { id } = await params;
+    const resource = await getResourceById(id);
 
     if (!resource) {
         notFound();

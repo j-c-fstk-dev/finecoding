@@ -10,8 +10,8 @@ import {
   Palette,
   Component, // Default/fallback icon
   ExternalLink,
-  Github,
 } from 'lucide-react';
+import { Github } from './brands';
 
 export const iconMap = {
   BrainCircuit,

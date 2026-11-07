@@ -2,12 +2,13 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import QRCode from 'qrcode.react';
+import { QRCodeSVG } from 'qrcode.react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
-import { Copy, Share2, Twitter, Check } from 'lucide-react';
+import { Copy, Share2, Check } from 'lucide-react';
+import { Twitter } from '@/components/icons/brands';
 
 interface ShareDialogProps {
   open: boolean;
@@ -75,13 +76,13 @@ export function ShareDialog({ open, onOpenChange }: ShareDialogProps) {
         <div className="flex flex-col items-center gap-6 py-4">
           <div className="rounded-lg border-4 border-primary p-2 bg-white">
             {isMounted && siteUrl ? (
-                <QRCode
+                <QRCodeSVG
                     value={siteUrl}
                     size={160}
                     bgColor="#FFFFFF" // Always use white background for better scannability
                     fgColor="#000000" // Always use black foreground
                     level="H"
-                    includeMargin={false}
+                    marginSize={0}
                 />
             ) : (
                 <div className="h-[160px] w-[160px] bg-muted animate-pulse rounded-sm" />

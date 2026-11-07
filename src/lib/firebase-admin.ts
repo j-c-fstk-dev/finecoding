@@ -76,9 +76,11 @@ export async function requireAdmin(idToken: string | undefined | null) {
     throw new Error('Not authenticated.');
   }
 
+  // Created outside the try so a credentials problem keeps its own message.
+  const auth = adminAuth();
   let decoded;
   try {
-    decoded = await adminAuth().verifyIdToken(idToken);
+    decoded = await auth.verifyIdToken(idToken);
   } catch (error) {
     const reason = error instanceof Error ? error.message : String(error);
     throw new Error(

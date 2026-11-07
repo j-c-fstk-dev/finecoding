@@ -14,7 +14,7 @@ export const revalidate = 300;
 
 
 type Props = {
-  params: { slug: string }
+  params: Promise<{ slug: string }>
 }
 
 export async function generateMetadata(
@@ -22,7 +22,8 @@ export async function generateMetadata(
   parent: ResolvingMetadata
 ): Promise<Metadata> {
   const posts = await getPosts();
-  const post = posts.find(p => p.slug === params.slug);
+  const { slug } = await params;
+  const post = posts.find(p => p.slug === slug);
  
   if (!post) {
     return {
@@ -69,9 +70,10 @@ export async function generateStaticParams() {
   }));
 }
 
-export default async function PostPage({ params }: { params: { slug: string } }) {
+export default async function PostPage({ params }: Props) {
+  const { slug } = await params;
   const allPosts = await getPosts();
-  const currentPostIndex = allPosts.findIndex(p => p.slug === params.slug);
+  const currentPostIndex = allPosts.findIndex(p => p.slug === slug);
 
   if (currentPostIndex === -1) {
     notFound();

@@ -16,7 +16,7 @@ export async function addToWishlist(toolName: string): Promise<{ success: boolea
   const result = WishlistSchema.safeParse({ toolName });
 
   if (!result.success) {
-    return { success: false, error: result.error.errors[0].message };
+    return { success: false, error: result.error.issues[0].message };
   }
 
   try {

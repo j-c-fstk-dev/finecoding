@@ -23,8 +23,8 @@ import dotenv from 'dotenv';
 import { cert, initializeApp } from 'firebase-admin/app';
 import { getFirestore, Timestamp } from 'firebase-admin/firestore';
 
-dotenv.config({ path: '.env.local' });
-dotenv.config(); // .env as fallback (does not override)
+dotenv.config({ path: '.env.local', quiet: true });
+dotenv.config({ quiet: true }); // .env as fallback (does not override)
 
 function loadCredentials() {
   const json = process.env.FIREBASE_SERVICE_ACCOUNT_KEY;

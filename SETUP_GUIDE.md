@@ -6,7 +6,7 @@ This guide provides a step-by-step checklist to initialize a new project with th
 
 Before you begin, ensure you have the following tools installed on your system:
 
--   **Node.js:** Version 20.x or later.
+-   **Node.js:** Version 22.x or later.
 -   **A Package Manager:** `npm` (included with Node.js), `yarn`, or `pnpm`.
 -   **Git:** For version control.
 -   **A Code Editor:** We recommend Visual Studio Code.
@@ -71,7 +71,7 @@ Set up the required cloud services before initializing the project.
 
 1.  Install the required `npm` packages for functionality:
     ```sh
-    npm install firebase genkit @genkit-ai/googleai zod @hookform/resolvers lucide-react framer-motion date-fns react-markdown remark-gfm react-syntax-highlighter resend next-pwa qrcode.react patch-package use-debounce
+    npm install firebase firebase-admin genkit @genkit-ai/google-genai zod @hookform/resolvers lucide-react framer-motion date-fns react-markdown remark-gfm react-syntax-highlighter resend qrcode.react use-debounce server-only
     ```
 
 2.  Install the required development dependencies:

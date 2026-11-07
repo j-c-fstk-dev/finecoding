@@ -1,38 +1,14 @@
 /** @type {import('next').NextConfig} */
-
-const withPWA = require('next-pwa')({
-  dest: 'public',
-  register: true,
-  skipWaiting: true,
-  disable: process.env.NODE_ENV === 'development',
-});
-
 const nextConfig = {
   // NEXT_PUBLIC_* variables are inlined automatically; no `env` block needed.
   images: {
     remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: 'placehold.co',
-        port: '',
-        pathname: '/**',
-      },
-      {
-        protocol: 'https',
-        hostname: 'res.cloudinary.com',
-        port: '',
-        pathname: '/**',
-      },
+      { protocol: 'https', hostname: 'placehold.co', pathname: '/**' },
+      { protocol: 'https', hostname: 'res.cloudinary.com', pathname: '/**' },
     ],
   },
-  experimental: {
-    // Keep the Admin SDK as a regular Node dependency instead of bundling it.
-    serverComponentsExternalPackages: ['firebase-admin'],
-  },
-  eslint: {
-    // No ESLint config is set up in this project yet.
-    ignoreDuringBuilds: true,
-  },
+  // Keep these as regular Node dependencies instead of bundling them.
+  serverExternalPackages: ['firebase-admin', 'genkit', '@genkit-ai/google-genai'],
 };
 
-module.exports = withPWA(nextConfig);
+module.exports = nextConfig;

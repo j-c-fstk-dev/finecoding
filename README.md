@@ -82,7 +82,7 @@ To get a local copy up and running, follow these simple steps.
 
 ### Prerequisites
 
--   **Node.js**: Version 20.x or later.
+-   **Node.js**: Version 22.x or later.
 -   **npm** or **yarn**.
 -   **Firebase Account**: You will need a Firebase project to handle authentication and the database.
 
