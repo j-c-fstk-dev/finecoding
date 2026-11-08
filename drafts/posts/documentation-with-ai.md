@@ -7,6 +7,8 @@ imageUrl: "https://res.cloudinary.com/dr0weongo/image/upload/v1751679753/file_00
 ---
 ![An AI assistant writing structured documentation on a screen.](https://res.cloudinary.com/dr0weongo/image/upload/v1751679753/file_00000000381461f8a81cb6f8ac984057_mzs4mk.png)
 
+# Write docs for future you (AI makes it almost painless)
+
 When I came back to this blog after more than a year away, my first thought was: there were some bugs along the way, and I don't even remember what they were anymore.
 
 The code was there. The commit history was there. But nothing explained what state the project was in, what was broken, or how to run it. I had to rediscover all of it.

@@ -7,6 +7,8 @@ imageUrl: "https://res.cloudinary.com/dr0weongo/image/upload/v1751161181/file_00
 ---
 ![Green code falling down a dark screen, Matrix-style.](https://res.cloudinary.com/dr0weongo/image/upload/v1751161181/file_0000000057246246b1cfd5b4e2cd868b_dxn5sr.png)
 
+# Fine Coding: using AI without handing it the keys
+
 AI can write a working login page in thirty seconds. It can also write one that lets anyone in, and it'll look exactly the same.
 
 That's the problem I want to write about here.

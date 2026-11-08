@@ -7,6 +7,8 @@ imageUrl: "https://res.cloudinary.com/dr0weongo/image/upload/v1751764348/file_00
 ---
 ![A compass pointing toward technology icons, with a magnifying glass over a changing landscape.](https://res.cloudinary.com/dr0weongo/image/upload/v1751764348/file_00000000127c6230849d727c26dc2b38_ag7oqj.png)
 
+# Keeping up with AI without drowning in it
+
 I stepped away from this blog for a bit over a year. When I came back:
 
 - Next.js had gone from version 14 to 16, and the way pages receive their route parameters had changed.

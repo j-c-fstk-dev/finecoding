@@ -7,6 +7,8 @@ imageUrl: "https://res.cloudinary.com/dr0weongo/image/upload/v1751331160/file_00
 ---
 ![A dashboard of connected tool icons with green lines between them.](https://res.cloudinary.com/dr0weongo/image/upload/v1751331160/file_0000000030e46230bd6b86d6d58d07ac_g4dzh6.png)
 
+# The tools behind this blog, and what they cost me
+
 The first version of this post recommended Docker, Kubernetes, SonarQube, Cloudflare Workers and a dozen other tools. I didn't use most of them.
 
 This version only lists what I actually used to build and run this blog. Total hosting cost so far: **$0 per month.**

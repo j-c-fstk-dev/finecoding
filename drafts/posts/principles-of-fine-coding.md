@@ -7,6 +7,8 @@ imageUrl: "https://res.cloudinary.com/dr0weongo/image/upload/v1751250980/file_00
 ---
 ![Three interlocked gears, one glowing with an AI symbol.](https://res.cloudinary.com/dr0weongo/image/upload/v1751250980/file_0000000062746243a34f80f9ee1a5910_pijtu1.png)
 
+# Three rules I try to follow when coding with AI
+
 When I first wrote about the principles of Fine Coding, I listed nine bullet points with an emoji each. Reading it again a year later, I couldn't tell you which ones I actually followed.
 
 So here's the short version. Three rules. Each one comes from a mistake I made building this blog.

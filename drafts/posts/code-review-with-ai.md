@@ -7,6 +7,8 @@ imageUrl: "https://res.cloudinary.com/dr0weongo/image/upload/v1751667267/file_00
 ---
 ![An AI icon overseeing lines of code, with highlighted issues.](https://res.cloudinary.com/dr0weongo/image/upload/v1751667267/file_00000000954461f992e8e606c8ab91ef_nrk69v.png)
 
+# Let AI review your code, but know what it can't see
+
 An AI assistant wrote most of this blog's first version. An AI assistant also found its worst bugs, a year later.
 
 Same kind of tool, very different results. What changed was how I used it: the first time I asked it to *build*, the second time I asked it to *review*.

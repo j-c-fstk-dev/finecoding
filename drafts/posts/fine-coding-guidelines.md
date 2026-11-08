@@ -7,6 +7,8 @@ imageUrl: "https://res.cloudinary.com/dr0weongo/image/upload/v1751252874/file_00
 ---
 ![A magnifying glass over lines of code, with a shield and a seal of approval.](https://res.cloudinary.com/dr0weongo/image/upload/v1751252874/file_00000000a94061f88036e5c555267bd8_whc2cf.png)
 
+# My checklist before shipping AI-written code
+
 "Always review AI-generated code" is advice everyone agrees with and nobody can follow, because it doesn't say *what* to look for.
 
 So here's my actual checklist. It's short on purpose. Each item exists because this blog had that exact problem at some point.

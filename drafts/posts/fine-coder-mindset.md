@@ -7,6 +7,8 @@ imageUrl: "https://res.cloudinary.com/dr0weongo/image/upload/v1751331160/file_00
 ---
 ![A stylized brain with green neural connections surrounded by lines of code.](https://res.cloudinary.com/dr0weongo/image/upload/v1751331160/file_00000000ea3061fb9c48006473d49daf_pcqduj.png)
 
+# Thinking before typing: the part of the job AI doesn't do
+
 Writing code used to be the slow part. Now an assistant can write a full feature while I'm still reading the task.
 
 So what's left for the developer? After a year of building with AI, my answer is: the thinking that happens before and after the code. Three habits in particular.

@@ -7,6 +7,8 @@ imageUrl: "https://res.cloudinary.com/dr0weongo/image/upload/v1751331160/file_00
 ---
 ![A web of connected nodes with glowing green lines, representing Git's distributed history.](https://res.cloudinary.com/dr0weongo/image/upload/v1751331160/file_0000000039c8622fbd3a9397bac867ef_oblbx2.png)
 
+# Git is the undo button for AI-written code
+
 When you code with AI, changes happen fast. You ask for one fix and the assistant edits six files. Something breaks two changes later and you're not sure which one did it.
 
 That's when Git stops being "the thing you push to GitHub" and becomes the most important tool you have.

@@ -7,6 +7,8 @@ imageUrl: "https://res.cloudinary.com/dr0weongo/image/upload/v1751203453/file_00
 ---
 ![Fine Coding architecture: Next.js on Netlify talking to Firebase.](https://res.cloudinary.com/dr0weongo/image/upload/v1751203453/file_000000007744622fab2a22ae34c687d6_y77ccb.png)
 
+# How I built this blog with AI, and what I got wrong about it
+
 *Updated in November 2026. The first version of this post described an architecture this blog never had. This one describes what's actually running.*
 
 In June 2025 I wrote a post explaining how this blog was built. It said I used the Next.js Pages Router, pre-rendered everything as static HTML, and handled the dashboard with Firebase Functions.

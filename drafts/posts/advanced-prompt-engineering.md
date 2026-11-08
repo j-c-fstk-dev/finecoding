@@ -7,6 +7,8 @@ imageUrl: "https://res.cloudinary.com/dr0weongo/image/upload/v1751655139/file_00
 ---
 ![Human thoughts connecting to a neural network, with the words clarity, context and iteration floating around.](https://res.cloudinary.com/dr0weongo/image/upload/v1751655139/file_00000000c928620aa75b5e163d51a8fb_1_mctlle.png)
 
+# How I write prompts for code now
+
 Here's a real prompt I sent to an AI assistant while this blog was broken:
 
 > "Nothing changed. Can you check before changing something, please?"

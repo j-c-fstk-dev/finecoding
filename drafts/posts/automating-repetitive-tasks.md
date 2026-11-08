@@ -7,6 +7,8 @@ imageUrl: "https://res.cloudinary.com/dr0weongo/image/upload/v1751665965/file_00
 ---
 ![A robot arm interacting with code on a screen.](https://res.cloudinary.com/dr0weongo/image/upload/v1751665965/file_00000000dea461fdbfcbd46337d72433_bwuarl.png)
 
+# What I automate with AI, and what I never will
+
 There's a version of this post that lists twenty things AI can automate for developers. You've read it. Probably several times.
 
 This one is shorter. It's what I actually automate, and the line I've learned not to cross.
