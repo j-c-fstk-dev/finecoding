@@ -46,7 +46,7 @@ export default function AboutPage() {
         </h1>
       </header>
 
-      <PostCover seed="about" motif="tree" className="mx-auto mb-14 mt-12 max-w-[880px] md:mt-14" />
+      <PostCover seed="about" motif="pixels" className="mx-auto mb-14 mt-12 max-w-[880px] md:mt-14" />
 
       <div className="mx-auto max-w-[640px]">
         <div className="mb-12 overflow-hidden rounded-lg border bg-card font-mono text-[13.5px]">

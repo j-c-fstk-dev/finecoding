@@ -57,8 +57,6 @@ export default function RootLayout({
       <head>
         <GoogleAnalytics />
         <meta name="theme-color" content="#07090a" />
-        <link rel="icon" href="https://res.cloudinary.com/dr0weongo/image/upload/v1751503667/20250702_212403_0000_2_pp63nm.svg" type="image/svg+xml" />
-        <link rel="apple-touch-icon" href="https://res.cloudinary.com/dr0weongo/image/upload/v1751503667/20250702_212403_0000_2_pp63nm.svg" />
       </head>
       <body>
         <AuthProvider>

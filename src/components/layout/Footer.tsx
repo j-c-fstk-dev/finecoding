@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { Github, Twitter, Instagram } from '@/components/icons/brands';
 import { EmailSignup } from '@/components/blog/EmailSignup';
 import { SITE } from '@/lib/site';
+import { LogoMark } from '@/components/icons/LogoMark';
 
 const columns = [
   { title: 'Blog', links: [{ href: '/posts', label: 'Posts' }, { href: '/sitemap.xml', label: 'Sitemap' }] },
@@ -32,8 +33,8 @@ export function Footer() {
       <div className="border-t">
         <div className="mx-auto grid max-w-[1280px] gap-10 px-4 py-12 sm:px-6 md:grid-cols-[2fr_1fr_1fr_1fr] lg:px-10">
           <div>
-            <Link href="/" className="font-mono text-[15px] font-medium text-foreground">
-              <span className="text-phosphor">&lt;/&gt;</span> fine_coding
+            <Link href="/" className="flex items-center gap-2.5 font-mono text-[15px] font-medium text-foreground">
+              <LogoMark className="h-7 w-7" /> fine_coding
             </Link>
             <p className="mt-3 font-mono text-xs text-muted-foreground/80">Built with Next.js, Firebase &amp; a lot of commits.</p>
             <a href={SITE.links.beregen} target="_blank" rel="noopener noreferrer" className="mt-6 inline-block font-mono text-xs text-muted-foreground/80 transition-colors hover:text-foreground">
