@@ -13,7 +13,7 @@ export const HELP: Line[] = [
   { kind: 'dim', text: '  status                  what is playing right now' },
   { kind: 'out', text: 'styles' },
   { kind: 'dim', text: '  styles                  list the presets' },
-  { kind: 'dim', text: '  style <name>            ambient | lofi | deep | rain' },
+  { kind: 'dim', text: '  style <name>            ambient | lofi | deep | techno | rain' },
   { kind: 'out', text: 'tweak' },
   { kind: 'dim', text: '  bpm <40-160>            tempo' },
   { kind: 'dim', text: '  key <C..B>              musical key (minor)' },

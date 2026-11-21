@@ -18,7 +18,7 @@ export type FxId = (typeof FX)[number];
 export const KEYS = ['C', 'D', 'E', 'F', 'G', 'A', 'B'] as const;
 export type KeyName = (typeof KEYS)[number];
 
-type Pattern = 'none' | 'lofi' | 'deep';
+type Pattern = 'none' | 'lofi' | 'deep' | 'techno';
 
 export interface StyleDef {
   description: string;
@@ -49,6 +49,12 @@ export const STYLES: Record<string, StyleDef> = {
     bpm: 118, swing: 0, chordBars: 2, keysDensity: 0.35, pattern: 'deep',
     layers: { pad: 55, bass: 80, keys: 40, drums: 80, rain: 0, vinyl: 0 },
     fx: { reverb: 35, delay: 40, lofi: 10 },
+  },
+  techno: {
+    description: 'four-on-the-floor, rolling acid bass, hypnotic loop',
+    bpm: 128, swing: 0, chordBars: 4, keysDensity: 1, pattern: 'techno',
+    layers: { pad: 35, bass: 80, keys: 50, drums: 85, rain: 0, vinyl: 0 },
+    fx: { reverb: 25, delay: 45, lofi: 5 },
   },
   rain: {
     description: 'rain on the window and a soft drone',
@@ -174,6 +180,8 @@ const CHORDS = [
 ];
 const BASS = ['A1', 'F1', 'C2', 'G1'];
 const MELODY = ['A4', 'C5', 'D5', 'E5', 'G5', 'A5', 'C6'];
+// Techno: a fixed one-bar figure repeated (and slightly varied) for a hypnotic loop
+const TECHNO_MOTIF: Record<number, string> = { 0: 'A3', 3: 'A3', 6: 'C4', 8: 'A3', 11: 'E4', 14: 'D4' };
 const KEY_OFFSET: Record<KeyName, number> = { C: 3, D: 5, E: -5, F: -4, G: -2, A: 0, B: 2 };
 
 async function buildGraph(): Promise<Graph> {
@@ -319,6 +327,9 @@ function tick(time: number) {
       if (pos === 10) graph.bass.triggerAttackRelease(root, '8n', time, 0.6);
     } else if (style.pattern === 'deep') {
       if (pos % 4 === 2) graph.bass.triggerAttackRelease(root, '16n', time, 0.85);
+    } else if (style.pattern === 'techno') {
+      // rolling bass: every 16th except where the kick hits
+      if (pos % 4 !== 0) graph.bass.triggerAttackRelease(root, '32n', time, pos % 4 === 2 ? 0.95 : 0.55);
     } else if (pos === 0 && bar % style.chordBars === 0) {
       graph.bass.triggerAttackRelease(root, '1m', time, 0.5);
     }
@@ -334,10 +345,22 @@ function tick(time: number) {
       if (pos === 4 || pos === 12) graph.snare.triggerAttackRelease('16n', time, 0.6);
       if (pos % 4 === 2) graph.hat.triggerAttackRelease('16n', time, 0.8);
       else if (rnd() < 0.3) graph.hat.triggerAttackRelease('32n', time, 0.25);
+    } else if (style.pattern === 'techno') {
+      if (pos % 4 === 0) graph.kick.triggerAttackRelease('C1', '8n', time, 1);
+      if (pos === 4 || pos === 12) graph.snare.triggerAttackRelease('16n', time, 0.55);
+      // 16th hats with an accented, longer "open" hat on the offbeat
+      if (pos % 4 === 2) graph.hat.triggerAttackRelease('8n', time, 0.9);
+      else graph.hat.triggerAttackRelease('32n', time, 0.25 + rnd() * 0.2);
     }
   }
 
-  if (layerOn('keys') && pos % 2 === 0 && rnd() < style.keysDensity) {
+  if (style.pattern === 'techno') {
+    if (layerOn('keys') && TECHNO_MOTIF[pos]) {
+      // every 4th bar, shift the last note up an octave for movement
+      const note = bar % 4 === 3 && pos === 14 ? 'D5' : TECHNO_MOTIF[pos];
+      graph.keys.triggerAttackRelease(t(note), '16n', time, 0.5 + rnd() * 0.3);
+    }
+  } else if (layerOn('keys') && pos % 2 === 0 && rnd() < style.keysDensity) {
     graph.keys.triggerAttackRelease(t(MELODY[Math.floor(rnd() * MELODY.length)]), '8n', time, 0.4 + rnd() * 0.4);
   }
 
@@ -368,6 +391,11 @@ function apply() {
   graph.reverbSend.gain.rampTo((s.fx.reverb / 100) * 0.6, 0.3);
   graph.delay.wet.rampTo((s.fx.delay / 100) * 0.6, 0.3);
   graph.lofiFilter.frequency.rampTo(18000 - s.fx.lofi * 140, 0.3);
+  // acid-style resonant bass for techno, round bass otherwise
+  const acid = style.pattern === 'techno';
+  graph.bass.filter.Q.value = acid ? 7 : 1;
+  graph.bass.filterEnvelope.octaves = acid ? 3.5 : 2.5;
+  graph.bass.filterEnvelope.baseFrequency = acid ? 90 : 120;
 }
 
 function updateMediaSession() {
