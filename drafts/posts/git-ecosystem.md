@@ -59,7 +59,7 @@ Two lessons from that:
 1. **Commit messages are for future you.** "nothing works" tells me how I felt, not what changed. When I came back to this project a year later, those messages didn't help me find a single bug. A message like `Fix share links using the post URL instead of the home page` would have.
 2. **Your history is public if your repo is.** One of those prompts included an API key, so the key ended up in a commit message on a public repository. Removing it from the history doesn't help once it's been public. The fix is to revoke the key and create a new one.
 
-> ✍️ **YOUR STORY:** how did you learn Git? Is there a moment where it saved you (or where not using it cost you)?
+I learned Git by using it. After taking CS50, I went looking for a free Git course online and practiced on my own projects. It has saved me more times than I can count: being able to go back and forth between versions to track down a bug, and having a history that documents how a project came together. It matters even more when I'm working with other people.
 
 ## The short version
 

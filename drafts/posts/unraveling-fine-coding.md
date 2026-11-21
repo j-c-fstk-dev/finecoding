@@ -13,7 +13,9 @@ AI can write a working login page in thirty seconds. It can also write one that 
 
 That's the problem I want to write about here.
 
-> ✍️ **YOUR STORY:** where did the idea of "Fine Coding" come from? A project, a moment, a frustration? Two or three sentences in your own words make a much stronger opening than any definition.
+The name came from frustration. When "vibecoding" took off, I watched a wave of people with no background in programming call themselves vibecoders, as if typing "build me an app" into a chat made them experts. Part of it was ego. Part of it was a sales pitch: the promise that one prompt is enough to ship a real product to production, sold to people who didn't know better. It wasn't true then, and it still isn't.
+
+Meanwhile I was doing the opposite: researching before building, planning the structure of each project, and breaking the work into defined steps so the AI could help me deliver faster *and* safer, with far fewer bugs along the way. That way of working needed a name that wasn't more of the same. So I called it Fine Coding.
 
 ## Two ways to get it wrong
 
@@ -63,6 +65,6 @@ The AI didn't do anything wrong. It answered the question I asked. Fine Coding i
 
 I'm going to write about building real things with AI: what worked, what broke, and what I'd do differently. Less "10 tools you must try", more "here's the exact bug, here's what I learned".
 
-> ✍️ **YOUR STORY:** what are you building right now, or planning to build? Naming one or two real projects tells readers why they should follow along.
+I've used this approach on a bit of everything: a task app with shared workspaces and cloud sync, dApps that reward communities working in regenerative finance (ReFi), websites for people and companies, lightweight Linux desktop setups with i3 for old, low-end PCs, a clipboard manager, Python game bots that use computer vision, and productivity and family apps, both web and native. Today I work as a freelancer, build tools for the audience of my social media profiles, and make apps that simply make my own life easier. You'll see pieces of all of that here.
 
 If you've ever shipped something you didn't fully understand (I have), I'd like to hear how it went. What's the AI-written bug that taught you the most?

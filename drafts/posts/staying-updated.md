@@ -26,7 +26,7 @@ That's what "staying updated" means to me now. Not following every AI announceme
 
 **One or two communities, not twenty.** I joined NoCodeCrew, a community with a section for sharing projects. One place where people show what they built teaches more than ten news feeds.
 
-> ✍️ **YOUR STORY:** which sources do you actually read? A newsletter, a YouTuber, a Discord, a person on X? Name two or three and why. Real recommendations from you are worth more than any generic list.
+My own setup is simple. I follow a few people on social media for tips and opportunities, and I have an email address used only for AI newsletters. Once a week, I ask an AI to read that inbox and write me a report of the news that matters. If something catches my attention, I go deep on that one thing. Everything else can wait.
 
 **What I stopped:** "Top 10 AI tools this week" posts, launch hype threads, and benchmark wars. They're fun, but they rarely change what I build on Monday.
 

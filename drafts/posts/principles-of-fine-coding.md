@@ -1,17 +1,17 @@
 ---
-title: "Three rules I try to follow when coding with AI"
+title: "Four rules I try to follow when coding with AI"
 slug: "principles-of-fine-coding-clarity-efficiency-and-amplified-collaboration"
-excerpt: "Say what you want, delegate the boring parts, and get a second opinion. Simple rules I learned by breaking them."
+excerpt: "Say what you want, delegate the boring parts, get a second opinion and give the AI just enough freedom. Rules I learned by breaking them."
 tags: ["ai", "fine-coding", "prompting"]
 imageUrl: "https://res.cloudinary.com/dr0weongo/image/upload/v1751250980/file_0000000062746243a34f80f9ee1a5910_pijtu1.png"
 ---
 ![Three interlocked gears, one glowing with an AI symbol.](https://res.cloudinary.com/dr0weongo/image/upload/v1751250980/file_0000000062746243a34f80f9ee1a5910_pijtu1.png)
 
-# Three rules I try to follow when coding with AI
+# Four rules I try to follow when coding with AI
 
 When I first wrote about the principles of Fine Coding, I listed nine bullet points with an emoji each. Reading it again a year later, I couldn't tell you which ones I actually followed.
 
-So here's the short version. Three rules. Each one comes from a mistake I made building this blog.
+So here's the short version. Four rules. Each one comes from a mistake I made building this blog.
 
 ## 1. Say what you want, not just what's wrong
 
@@ -60,12 +60,17 @@ What works better:
 
 That third question, browser or server, is the one that would have saved this blog months of being broken.
 
-> ✍️ **YOUR STORY:** is there a rule of your own you'd add here? Something you do (or wish you did) every time you work with AI?
+## 4. Give it just enough freedom
+
+The last rule is about autonomy. Open-ended instructions ("do whatever you think is best") let the AI make decisions you never agreed to, unless you've already told it *how* to make that kind of choice. But there's a balance: make your instructions too rigid and it stops doing things that were obviously part of the job, just because you didn't spell them out.
+
+What helps me find that balance is research before I prompt. I gather the how, the why and what it's for, so the AI has enough context to make good small decisions on its own, and clear limits on the big ones. And whatever it gives me, I never treat the result as final until I've checked it.
 
 ## The short version
 
 1. Describe the expected result, not just the problem.
 2. Let AI do the boring work; read every line of the dangerous work.
 3. Review with fresh eyes: a new chat, a specific question, or another person.
+4. Research first, then give the AI enough context to decide the small things, and clear limits on the big ones.
 
 Which of these do you break most often? For me it's the first one.

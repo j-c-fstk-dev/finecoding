@@ -83,7 +83,7 @@ The disappearing posts had a related cause: the home page was generated once, at
 - **Don't stack fixes.** When a fix doesn't work, undo it before asking for the next one. Otherwise you're debugging the fixes, not the bug.
 - **An error that's swallowed is worse than one that crashes.** The empty home page was harder to understand than any error message.
 
-> ✍️ **YOUR STORY:** one or two sentences on how it felt to come back to the project after a year. Did you consider starting over from scratch? What made you decide to fix it instead?
+I always liked writing and sharing what I learn, and I was proud of how this blog turned out. But in the year after the bugs stopped me from posting, I had few chances to sit down and really build. When I started experimenting with Claude Code, I decided to give this project another chance: not to start over, but to restore it and make it better. Fixing it meant I could write again, and get better at my own work along the way.
 
 ## What's next
 

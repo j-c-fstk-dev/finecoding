@@ -28,7 +28,7 @@ npm run backup
 
 **Workflows between tools.** I use n8n to connect services around the blog, like adding new entries to the resource hub. AI helps me write the small bits of code inside those workflows.
 
-> ✍️ **YOUR STORY:** what's the n8n automation you're proudest of (or most annoyed by)? What does it do, and how much time does it save you? A concrete example here is worth more than the rest of this post.
+I don't have a favorite automation; it really depends on the context. What bothers me isn't the automations themselves, it's where they run. I don't have much access to cloud servers right now, so most of my workflows run locally and depend on my machine being on. What I love is how n8n lets me build them visually, with simple logic I can still read months later.
 
 ## What I don't hand over (anymore)
 

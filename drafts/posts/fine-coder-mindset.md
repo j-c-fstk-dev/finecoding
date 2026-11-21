@@ -37,7 +37,7 @@ It sounds basic. It's the root cause of the biggest bug this blog ever had: serv
 
 AI-generated code often looks correct line by line and is wrong about *where* it is. Reading for context ("what environment is this in, what does it have access to?") catches things that reading for syntax never will.
 
-> ✍️ **YOUR STORY:** what's a question you've learned to always ask, about AI code or code in general? Where did you learn it the hard way?
+My own version of this habit comes before any code at all: **has someone already solved this?** How did they do it, and which solutions worked best for this specific problem? Most problems aren't new. When the existing answers aren't good enough, that's when I start questioning the problem itself, looking for the gaps and the angle nobody tried.
 
 ## 3. Break the problem down before handing it over
 

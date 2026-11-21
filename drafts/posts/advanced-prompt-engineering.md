@@ -62,7 +62,9 @@ The second version almost answers itself: a server function using the web SDK ha
 
 **Ask for an explanation before a fix.** "Explain why this happens before changing anything" turns the assistant from a patch machine into a teacher, and stops the cycle of stacking fixes on top of each other.
 
-> ✍️ **YOUR STORY:** do you have a prompt you reuse all the time? Paste it here (with anything private removed). Readers love copying a real one.
+Besides the template, there's one prompt I keep coming back to. Long before AI agents were a product, I put together a format that simulates a team of specialists inside a single chat: I describe an idea, and the model answers from several perspectives at once, like a small team brainstorming. It works surprisingly well even with models that can't run real agents.
+
+For everyday work my habit is simpler: I state the final goal, add the details that matter, and ask for suggestions on how to get there, based on research into the best practices people already use for that specific problem.
 
 ## When to stop prompting
 

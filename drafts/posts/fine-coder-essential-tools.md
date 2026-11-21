@@ -18,10 +18,11 @@ This version only lists what I actually used to build and run this blog. Total h
 | Tool | What I used it for |
 |---|---|
 | **Firebase Studio** | The AI-powered editor where most of the first version was written, by describing features in plain language |
-| **VS Code** | Editing and reviewing code locally |
+| **Claude Code** | What I use most to write code today: it creates the project's folders and files and pushes straight to GitHub, with results good enough that I review instead of rewrite |
+| **VS Code** | Editing projects locally, where I try different coding assistants for quick, surgical edits with well-defined commands |
 | **GitHub** | Code history, pull requests and a small CI check that runs the TypeScript compiler on every change |
 
-> ✍️ **YOUR STORY:** which AI assistant do you use day to day now, and for what? (Writing code, reviewing, explaining errors?) One honest sentence about what it's good and bad at is worth more than a feature list.
+For everything around the code, I mix models on purpose. Gemini, Grok and DeepSeek for general research. Kimi and Z.ai for complex tasks: their free APIs are slower, but the results are good. ChatGPT sits in the middle for me; it's a bit generic, but useful when I'm exploring ideas. None of them is the best at everything, so I pick by task.
 
 ## Running it
 

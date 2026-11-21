@@ -53,7 +53,7 @@ For each problem: the file, the line, why it matters, and a one-line fix idea.
 
 Two details matter: **"don't fix anything yet"** (you want a list you can judge, not a pile of changes), and **"most severe first"** (so the permission bug isn't buried under formatting nitpicks).
 
-> ✍️ **YOUR STORY:** have you had code reviewed by another person, at work or in a community? What did they catch that you or an AI wouldn't have?
+When I work with other developers, the comment I get most isn't about logic. It's that my code comments switch between Portuguese and English. An AI reviewer doesn't care, because it understands both. But I usually work with English-speaking developers, and a Portuguese comment in the middle of a file is a real question mark for them. That's exactly the kind of thing a person catches and a model doesn't: who's going to read this code next.
 
 ## My rule now
 
