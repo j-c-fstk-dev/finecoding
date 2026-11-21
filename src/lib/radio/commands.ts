@@ -22,18 +22,20 @@ export const HELP: Line[] = [
   { kind: 'dim', text: '  vol <layer> <0-100>     volume of one layer' },
   { kind: 'dim', text: '  fx <reverb|delay|lofi> <0-100>' },
   { kind: 'dim', text: '  volume <0-100>          master volume' },
+  { kind: 'dim', text: '  quality <auto|high|lite>  lite = lighter sound engine for slow devices' },
   { kind: 'out', text: 'misc' },
   { kind: 'dim', text: '  reset                   back to the style defaults' },
   { kind: 'dim', text: '  clear                   clear the screen' },
 ];
 
-export const COMMANDS = ['help', 'play', 'stop', 'status', 'styles', 'style', 'bpm', 'key', 'layers', 'on', 'off', 'vol', 'fx', 'volume', 'reset', 'clear'];
+export const COMMANDS = ['help', 'play', 'stop', 'status', 'styles', 'style', 'bpm', 'key', 'layers', 'on', 'off', 'vol', 'fx', 'volume', 'quality', 'reset', 'clear'];
 
 function statusLines(): Line[] {
   const s = radio.getState();
   return [
     { kind: 'out', text: `${s.status === 'playing' ? '▶ playing' : '■ stopped'} · ${s.style} · ${s.bpm} bpm · ${s.key} minor · volume ${s.master}` },
     { kind: 'dim', text: `fx  reverb ${s.fx.reverb} · delay ${s.fx.delay} · lofi ${s.fx.lofi}` },
+    { kind: 'dim', text: `quality ${s.quality}${s.quality === 'auto' ? ` (${radio.quality()})` : ''}` },
   ];
 }
 
@@ -137,6 +139,13 @@ export async function run(input: string): Promise<Line[] | 'clear'> {
       return [{ kind: 'ok', text: `volume → ${radio.getState().master}` }];
     }
 
+    case 'quality': {
+      if (!a) return [{ kind: 'out', text: `quality ${radio.getState().quality} → ${radio.quality()}` }];
+      if (a !== 'auto' && a !== 'high' && a !== 'lite') return [{ kind: 'err', text: 'usage: quality <auto|high|lite>' }];
+      await radio.setQuality(a);
+      return [{ kind: 'ok', text: `quality → ${a}${a === 'auto' ? ` (${radio.quality()})` : ''}` }];
+    }
+
     case 'reset':
       radio.reset();
       return [{ kind: 'ok', text: `reset to ${radio.getState().style} defaults` }, ...statusLines()];
@@ -170,6 +179,7 @@ export function complete(input: string): string {
     cmd === 'style' ? Object.keys(STYLES)
       : ['on', 'off', 'vol'].includes(cmd) ? [...LAYERS]
         : cmd === 'fx' ? [...FX]
+          : cmd === 'quality' ? ['auto', 'high', 'lite']
           : cmd === 'key' ? KEYS.map((k) => k.toLowerCase())
             : [];
   if (parts.length === 2) {

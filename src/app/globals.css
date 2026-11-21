@@ -944,22 +944,10 @@
 
 /* Radio page */
 .radio-viz {
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-  gap: 4px;
+  display: block;
+  width: 100%;
   height: 56px;
 }
-.radio-viz span {
-  width: 6px;
-  height: 100%;
-  background: hsl(var(--phosphor));
-  box-shadow: 0 0 8px hsl(var(--phosphor) / 0.35);
-  transform-origin: bottom;
-  transform: scaleY(0.08);
-  transition: transform 90ms linear;
-}
-.radio-viz span:nth-child(3n) { background: hsl(var(--phosphor-dim)); }
 .radio-live-dot {
   width: 6px;
   height: 6px;

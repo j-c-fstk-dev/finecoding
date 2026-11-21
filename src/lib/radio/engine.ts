@@ -74,6 +74,22 @@ export interface RadioState {
   layers: Record<LayerId, { on: boolean; vol: number }>;
   fx: Record<FxId, number>;
   output: 'media' | 'direct' | null;
+  /** auto picks "lite" on low-end devices */
+  quality: Quality;
+}
+
+export type Quality = 'auto' | 'high' | 'lite';
+
+/** Rough low-end check: few CPU cores or little memory. */
+export function isLowEndDevice(): boolean {
+  if (typeof navigator === 'undefined') return false;
+  const cores = navigator.hardwareConcurrency || 4;
+  const memory = (navigator as Navigator & { deviceMemory?: number }).deviceMemory;
+  return cores <= 4 || (memory !== undefined && memory <= 4);
+}
+
+export function effectiveQuality(q: Quality): 'high' | 'lite' {
+  return q === 'auto' ? (isLowEndDevice() ? 'lite' : 'high') : q;
 }
 
 const STORAGE_KEY = 'fc-radio-v1';
@@ -92,6 +108,7 @@ function stateFromStyle(name: string, keep?: Partial<RadioState>): RadioState {
     layers: Object.fromEntries(LAYERS.map((l) => [l, { on: s.layers[l] > 0, vol: s.layers[l] > 0 ? s.layers[l] : 50 }])) as RadioState['layers'],
     fx: { ...s.fx },
     output: keep?.output ?? null,
+    quality: keep?.quality ?? 'auto',
   };
 }
 
@@ -163,6 +180,7 @@ type Graph = {
   crackle: ToneNS.NoiseSynth;
   audioEl: HTMLAudioElement | null;
   loopId: number | null;
+  quality: 'high' | 'lite';
 };
 
 let graph: Graph | null = null;
@@ -186,6 +204,11 @@ const KEY_OFFSET: Record<KeyName, number> = { C: 3, D: 5, E: -5, F: -4, G: -2, A
 
 async function buildGraph(): Promise<Graph> {
   const Tone = await import('tone');
+  const quality = effectiveQuality(getState().quality);
+  const lite = quality === 'lite';
+  // Larger buffers: the radio doesn't need low latency, and bigger buffers
+  // avoid crackles on slow devices.
+  Tone.setContext(new Tone.Context({ latencyHint: 'playback', lookAhead: lite ? 0.3 : 0.15 }));
   await Tone.start();
   const transport = Tone.getTransport();
 
@@ -193,7 +216,7 @@ async function buildGraph(): Promise<Graph> {
   const comp = new Tone.Compressor({ threshold: -18, ratio: 3, attack: 0.02, release: 0.3 });
   const lofiFilter = new Tone.Filter(12000, 'lowpass');
   const limiter = new Tone.Limiter(-1);
-  const analyser = new Tone.Analyser('fft', 256);
+  const analyser = new Tone.Analyser('fft', lite ? 64 : 128);
   master.chain(comp, lofiFilter, limiter);
   limiter.connect(analyser);
 
@@ -222,7 +245,7 @@ async function buildGraph(): Promise<Graph> {
     output = 'direct';
   }
 
-  const reverb = new Tone.Reverb({ decay: 7, wet: 1, preDelay: 0.03 });
+  const reverb = new Tone.Reverb({ decay: lite ? 3 : 6, wet: 1, preDelay: 0.03 });
   const reverbSend = new Tone.Gain(0.3).connect(reverb);
   reverb.connect(master);
 
@@ -230,15 +253,26 @@ async function buildGraph(): Promise<Graph> {
   LAYERS.forEach((l) => layerVol[l].connect(master));
 
   // pad
-  const pad = new Tone.PolySynth(Tone.Synth, {
-    oscillator: { type: 'fatsawtooth', count: 3, spread: 22 },
-    envelope: { attack: 1.6, decay: 1, sustain: 0.7, release: 3.5 },
+  // Lite: 2 detuned oscillators per voice instead of 3, fewer voices,
+  // no chorus and a static filter instead of an LFO sweep.
+  const pad = new Tone.PolySynth({
+    voice: Tone.Synth,
+    maxPolyphony: lite ? 6 : 10,
+    options: {
+      oscillator: { type: 'fatsawtooth', count: lite ? 2 : 3, spread: lite ? 16 : 22 },
+      envelope: { attack: 1.6, decay: 1, sustain: 0.7, release: lite ? 2.5 : 3.5 },
+    },
   });
-  const padFilter = new Tone.Filter(900, 'lowpass', -24);
-  const padChorus = new Tone.Chorus(0.6, 3.5, 0.5).start();
-  pad.chain(padFilter, padChorus, layerVol.pad);
-  padChorus.connect(reverbSend);
-  new Tone.LFO('0.07hz', 600, 1500).start().connect(padFilter.frequency);
+  const padFilter = new Tone.Filter(lite ? 1000 : 900, 'lowpass', lite ? -12 : -24);
+  if (lite) {
+    pad.chain(padFilter, layerVol.pad);
+    padFilter.connect(reverbSend);
+  } else {
+    const padChorus = new Tone.Chorus(0.6, 3.5, 0.5).start();
+    pad.chain(padFilter, padChorus, layerVol.pad);
+    padChorus.connect(reverbSend);
+    new Tone.LFO('0.07hz', 600, 1500).start().connect(padFilter.frequency);
+  }
 
   // bass
   const bass = new Tone.MonoSynth({
@@ -279,7 +313,7 @@ async function buildGraph(): Promise<Graph> {
   const rain = new Tone.Noise('pink');
   const rainLP = new Tone.Filter(5500, 'lowpass');
   rain.chain(new Tone.Filter(700, 'highpass'), rainLP, layerVol.rain);
-  new Tone.LFO('0.11hz', 4500, 6500).start().connect(rainLP.frequency);
+  if (!lite) new Tone.LFO('0.11hz', 4500, 6500).start().connect(rainLP.frequency);
 
   // vinyl crackle
   const crackle = new Tone.NoiseSynth({ noise: { type: 'brown' }, envelope: { attack: 0.001, decay: 0.008, sustain: 0 } });
@@ -289,8 +323,22 @@ async function buildGraph(): Promise<Graph> {
 
   return {
     Tone, transport, master, lofiFilter, analyser, reverbSend, delay, layerVol,
-    pad, bass, keys, kick, snare, hat, rain, crackle, audioEl, loopId: null,
+    pad, bass, keys, kick, snare, hat, rain, crackle, audioEl, loopId: null, quality,
   };
+}
+
+/** Tear the whole audio graph down (its AudioContext included). */
+function disposeGraph() {
+  if (!graph) return;
+  try {
+    graph.transport.stop();
+    graph.transport.cancel();
+    graph.audioEl?.remove();
+    graph.Tone.getContext().dispose();
+  } catch {
+    /* already closed */
+  }
+  graph = null;
 }
 
 function t(note: string): string {
@@ -344,7 +392,7 @@ function tick(time: number) {
       if (pos % 4 === 0) graph.kick.triggerAttackRelease('C1', '8n', time, 0.95);
       if (pos === 4 || pos === 12) graph.snare.triggerAttackRelease('16n', time, 0.6);
       if (pos % 4 === 2) graph.hat.triggerAttackRelease('16n', time, 0.8);
-      else if (rnd() < 0.3) graph.hat.triggerAttackRelease('32n', time, 0.25);
+      else if (rnd() < (graph.quality === 'lite' ? 0.12 : 0.3)) graph.hat.triggerAttackRelease('32n', time, 0.25);
     } else if (style.pattern === 'techno') {
       if (pos % 4 === 0) graph.kick.triggerAttackRelease('C1', '8n', time, 1);
       if (pos === 4 || pos === 12) graph.snare.triggerAttackRelease('16n', time, 0.55);
@@ -364,7 +412,7 @@ function tick(time: number) {
     graph.keys.triggerAttackRelease(t(MELODY[Math.floor(rnd() * MELODY.length)]), '8n', time, 0.4 + rnd() * 0.4);
   }
 
-  if (layerOn('vinyl') && rnd() < 0.18) {
+  if (layerOn('vinyl') && rnd() < (graph.quality === 'lite' ? 0.1 : 0.18)) {
     graph.crackle.triggerAttackRelease('64n', time, 0.3 + rnd() * 0.5);
   }
 
@@ -462,10 +510,27 @@ export const radio = {
     updateMediaSession();
   },
 
+  /** Change quality; rebuilds the audio graph (and resumes) if needed. */
+  async setQuality(q: Quality) {
+    const s = getState();
+    setState({ quality: q });
+    if (graph && graph.quality !== effectiveQuality(q)) {
+      const wasPlaying = s.status === 'playing';
+      disposeGraph();
+      setState({ status: 'stopped' });
+      if (wasPlaying) await radio.play();
+    }
+  },
+
+  /** Quality in effect right now ("auto" resolved). */
+  quality(): 'high' | 'lite' {
+    return graph?.quality ?? effectiveQuality(getState().quality);
+  },
+
   setStyle(name: string) {
     if (!STYLES[name]) return false;
     const s = getState();
-    setState(stateFromStyle(name, { status: s.status, key: s.key, master: s.master, output: s.output }));
+    setState(stateFromStyle(name, { status: s.status, key: s.key, master: s.master, output: s.output, quality: s.quality }));
     updateMediaSession();
     return true;
   },
@@ -497,7 +562,7 @@ export const radio = {
 
   reset() {
     const s = getState();
-    setState(stateFromStyle(s.style, { status: s.status, output: s.output }));
+    setState(stateFromStyle(s.style, { status: s.status, output: s.output, quality: s.quality }));
   },
 
   /** 0..1 levels for a small visualizer (log-spaced bands), or null when not playing. */

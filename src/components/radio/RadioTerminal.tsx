@@ -16,29 +16,71 @@ function useRadioState() {
   return useSyncExternalStore(radio.subscribe, radio.getState, () => DEFAULT_STATE);
 }
 
+const BARS = 24;
+
+/**
+ * Spectrum bars drawn on a canvas, throttled (24 fps, 12 in lite mode) and
+ * paused while the tab is hidden. Much cheaper than animating DOM nodes.
+ */
 function Visualizer({ playing }: { playing: boolean }) {
-  const barsRef = useRef<(HTMLSpanElement | null)[]>([]);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
   useEffect(() => {
-    if (!playing) {
-      barsRef.current.forEach((el) => { if (el) el.style.transform = 'scaleY(0.08)'; });
-      return;
-    }
+    const canvas = canvasRef.current;
+    const ctx = canvas?.getContext('2d');
+    if (!canvas || !ctx) return;
+    let w = 0;
+    let h = 0;
+    let x0 = 0;
+    const resize = () => {
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      w = canvas.clientWidth;
+      h = canvas.clientHeight;
+      canvas.width = Math.round(w * dpr);
+      canvas.height = Math.round(h * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      x0 = (w - (BARS * barW + (BARS - 1) * gap)) / 2;
+    };
+    const barW = 6;
+    const gap = 4;
+    const css = getComputedStyle(canvas);
+    const on = `hsl(${css.getPropertyValue('--phosphor').trim()})`;
+    const dim = `hsl(${css.getPropertyValue('--phosphor-dim').trim()})`;
+    const levels = new Array<number>(BARS).fill(0.08);
+
+    const paint = () => {
+      ctx.clearRect(0, 0, w, h);
+      for (let i = 0; i < BARS; i++) {
+        const bh = Math.max(2, levels[i] * h);
+        ctx.fillStyle = i % 3 === 2 ? dim : on;
+        ctx.fillRect(x0 + i * (barW + gap), h - bh, barW, bh);
+      }
+    };
+
+    const onResize = () => { resize(); paint(); };
+    onResize();
+    window.addEventListener('resize', onResize);
+    if (!playing) return () => window.removeEventListener('resize', onResize);
+
+    const interval = 1000 / (radio.quality() === 'lite' ? 12 : 24);
     let raf = 0;
-    const draw = () => {
-      const levels = radio.spectrum(barsRef.current.length);
-      if (levels) levels.forEach((v, i) => { const el = barsRef.current[i]; if (el) el.style.transform = `scaleY(${Math.max(0.06, v)})`; });
+    let last = 0;
+    const draw = (now: number) => {
       raf = requestAnimationFrame(draw);
+      if (document.hidden || now - last < interval) return;
+      last = now;
+      const next = radio.spectrum(BARS);
+      if (!next) return;
+      // light smoothing replaces the old CSS transition
+      for (let i = 0; i < BARS; i++) levels[i] = Math.max(0.06, levels[i] * 0.35 + next[i] * 0.65);
+      paint();
     };
     raf = requestAnimationFrame(draw);
-    return () => cancelAnimationFrame(raf);
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener('resize', onResize);
+    };
   }, [playing]);
-  return (
-    <div className="radio-viz" aria-hidden="true">
-      {Array.from({ length: 24 }, (_, i) => (
-        <span key={i} ref={(el) => { barsRef.current[i] = el; }} />
-      ))}
-    </div>
-  );
+  return <canvas ref={canvasRef} className="radio-viz" aria-hidden="true" />;
 }
 
 export function RadioTerminal() {
