@@ -56,7 +56,7 @@ API keys don't belong in code, and they also don't belong in **commit messages**
 
 Not every line, but every piece: what it does, where it runs, what it depends on. If I can't, I'm not done. I ask the AI to explain it to me until I can.
 
-> ✍️ **YOUR STORY:** which item on this list would have saved you the most time on a past project? A sentence or two about it makes this post yours.
+If I had to pick the one item that would have saved me the most, it's number 2. I shipped this blog with database rules that were wide open, and I didn't even notice: they came with the generated code, everything worked, and nothing on screen looked wrong. That's what makes this kind of mistake dangerous. It doesn't break anything. It just waits.
 
 ## What this list doesn't cover
 

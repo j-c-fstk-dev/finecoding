@@ -62,7 +62,22 @@ The second version almost answers itself: a server function using the web SDK ha
 
 **Ask for an explanation before a fix.** "Explain why this happens before changing anything" turns the assistant from a patch machine into a teacher, and stops the cycle of stacking fixes on top of each other.
 
-Besides the template, there's one prompt I keep coming back to. Long before AI agents were a product, I put together a format that simulates a team of specialists inside a single chat: I describe an idea, and the model answers from several perspectives at once, like a small team brainstorming. It works surprisingly well even with models that can't run real agents.
+Besides the template, there's one prompt I keep coming back to. Long before AI agents were a product, I put together a system prompt that turns a single chat into a team of 17 specialists: product manager, tech lead, frontend, backend, DevOps, QA, automation, branding, growth and more. I later packaged it as **FineCoding Pro**.
+
+A few ideas make it work:
+
+- **Each specialist has a trigger.** You call them by name, alone or together:
+
+  ```text
+  @pm Help me define my MVP for a SaaS that helps freelancers manage invoices.
+  @techlead, @devops Review this stack for a two-week launch with a $500 budget.
+  ```
+
+- **They don't just agree with you.** The prompt tells every specialist to challenge shallow ideas, point out risks and ask for goals, constraints and acceptance criteria before proposing anything.
+- **They adapt to you.** On the first interaction, each one asks a few questions to gauge your experience and adjusts the depth of the answer.
+- **Every answer has the same shape:** a short log update (so the context survives long projects), the main response, and a "critical observations" section with risks and weak spots.
+
+It works surprisingly well even with models that can't run real agents, because what you get is several perspectives on the same idea in one conversation, and a team that's allowed to tell you you're wrong.
 
 For everyday work my habit is simpler: I state the final goal, add the details that matter, and ask for suggestions on how to get there, based on research into the best practices people already use for that specific problem.
 

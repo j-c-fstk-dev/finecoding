@@ -31,7 +31,7 @@ ADMIN_EMAILS=
 
 **3. Known problems.** A short list of what's broken or fragile and why. Even "dashboard sometimes fails to save, haven't found out why" is better than nothing. It's where future you starts.
 
-I keep ideas, drafts and docs in Obsidian (and Anytype), tasks in matrix-operator, and the up-to-date overview of each project in its README. What I always forget is the changelog. I try to keep one, but when it falls behind I rebuild it from the commit history, which is one more reason to write good commit messages.
+I keep ideas, drafts and docs in Obsidian (and Anytype), tasks in [matrix-operator](https://matrix-operator.netlify.app/), a retro-terminal workspace I built for myself, and the up-to-date overview of each project in its README. What I always forget is the changelog. I try to keep one, but when it falls behind I rebuild it from the commit history, which is one more reason to write good commit messages.
 
 ## Where AI actually helps
 
