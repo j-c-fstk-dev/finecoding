@@ -42,8 +42,8 @@ export default function RadioPage() {
               {Array.from({ length: 24 }, (_, i) => <span key={i} style={{ animationDelay: `${(i * 137) % 900}ms` }} />)}
             </div>
 
-            {/* The global player is positioned exactly over this slot. */}
-            <div id="radio-slot" className="relative h-[75px] w-full max-w-lg rounded-xl border border-dashed border-input">
+            {/* The global player is positioned over this slot; its height follows the player. */}
+            <div id="radio-slot" className="relative h-[75px] w-full rounded-xl border border-dashed border-input">
               <span className="radio-slot-hint absolute inset-0 flex items-center justify-center font-mono text-xs text-muted-foreground/70">
                 loading player…
               </span>
