@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'Radio',
-  description: 'Fine Coding Radio: beats for focused coding sessions. It keeps playing while you read the blog.',
+  description: 'Fine Coding Radio: ambient beats for coding sessions. It keeps playing while you read the blog.',
 };
 
 // The player itself is a single global instance (see ClientLayout), so music
@@ -19,7 +19,7 @@ export default function RadioPage() {
           Radio
         </h1>
         <p className="mx-auto mt-5 max-w-md text-[17px] leading-relaxed text-muted-foreground">
-          Beats for focused coding sessions. Press play and keep reading: the music follows you around the blog.
+          Ambient beats for coding sessions. Press play and keep reading: the music follows you around the blog.
         </p>
       </header>
 
