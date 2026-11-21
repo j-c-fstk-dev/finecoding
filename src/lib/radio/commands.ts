@@ -14,6 +14,9 @@ export const HELP: Line[] = [
   { kind: 'out', text: 'styles' },
   { kind: 'dim', text: '  styles                  list the presets' },
   { kind: 'dim', text: '  style <name>            ambient | lofi | deep | techno | rain' },
+  { kind: 'out', text: 'song' },
+  { kind: 'dim', text: '  arrange on|off          sections, builds and drops (off = endless loop)' },
+  { kind: 'dim', text: '  next                    jump to the next section' },
   { kind: 'out', text: 'tweak' },
   { kind: 'dim', text: '  bpm <40-160>            tempo' },
   { kind: 'dim', text: '  key <C..B>              musical key (minor)' },
@@ -28,12 +31,13 @@ export const HELP: Line[] = [
   { kind: 'dim', text: '  clear                   clear the screen' },
 ];
 
-export const COMMANDS = ['help', 'play', 'stop', 'status', 'styles', 'style', 'bpm', 'key', 'layers', 'on', 'off', 'vol', 'fx', 'volume', 'quality', 'reset', 'clear'];
+export const COMMANDS = ['help', 'play', 'stop', 'status', 'styles', 'style', 'bpm', 'key', 'layers', 'on', 'off', 'vol', 'fx', 'volume', 'quality', 'arrange', 'next', 'reset', 'clear'];
 
 function statusLines(): Line[] {
   const s = radio.getState();
   return [
     { kind: 'out', text: `${s.status === 'playing' ? '▶ playing' : '■ stopped'} · ${s.style} · ${s.bpm} bpm · ${s.key} minor · volume ${s.master}` },
+    { kind: 'dim', text: `arrange ${s.arrange ? 'on' : 'off'}${s.section ? ` · section ${s.section}` : ''}` },
     { kind: 'dim', text: `fx  reverb ${s.fx.reverb} · delay ${s.fx.delay} · lofi ${s.fx.lofi}` },
     { kind: 'dim', text: `quality ${s.quality}${s.quality === 'auto' ? ` (${radio.quality()})` : ''}` },
   ];
@@ -146,6 +150,15 @@ export async function run(input: string): Promise<Line[] | 'clear'> {
       return [{ kind: 'ok', text: `quality → ${a}${a === 'auto' ? ` (${radio.quality()})` : ''}` }];
     }
 
+    case 'arrange':
+      if (a !== 'on' && a !== 'off') return [{ kind: 'out', text: `arrange ${radio.getState().arrange ? 'on' : 'off'} · usage: arrange <on|off>` }];
+      radio.setArrange(a === 'on');
+      return [{ kind: 'ok', text: a === 'on' ? 'arrange on · sections, builds and drops' : 'arrange off · endless groove' }];
+
+    case 'next':
+      if (!radio.next()) return [{ kind: 'err', text: radio.getState().status !== 'playing' ? 'not playing' : 'arrange is off. try: arrange on' }];
+      return [{ kind: 'ok', text: '→ next section on the next bar' }];
+
     case 'reset':
       radio.reset();
       return [{ kind: 'ok', text: `reset to ${radio.getState().style} defaults` }, ...statusLines()];
@@ -180,6 +193,7 @@ export function complete(input: string): string {
       : ['on', 'off', 'vol'].includes(cmd) ? [...LAYERS]
         : cmd === 'fx' ? [...FX]
           : cmd === 'quality' ? ['auto', 'high', 'lite']
+          : cmd === 'arrange' ? ['on', 'off']
           : cmd === 'key' ? KEYS.map((k) => k.toLowerCase())
             : [];
   if (parts.length === 2) {
