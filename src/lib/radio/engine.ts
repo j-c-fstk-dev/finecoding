@@ -76,6 +76,10 @@ export interface RadioState {
   output: 'media' | 'direct' | null;
   /** auto picks "lite" on low-end devices */
   quality: Quality;
+  /** song structure: sections, builds and drops (off = endless loop) */
+  arrange: boolean;
+  /** current section name while playing (not persisted) */
+  section: string;
 }
 
 export type Quality = 'auto' | 'high' | 'lite';
@@ -109,6 +113,8 @@ function stateFromStyle(name: string, keep?: Partial<RadioState>): RadioState {
     fx: { ...s.fx },
     output: keep?.output ?? null,
     quality: keep?.quality ?? 'auto',
+    arrange: keep?.arrange ?? true,
+    section: keep?.section ?? '',
   };
 }
 
@@ -120,7 +126,7 @@ function loadSaved(): RadioState {
     if (raw) {
       const saved = JSON.parse(raw) as Partial<RadioState>;
       const base = stateFromStyle(saved.style ?? 'lofi');
-      return { ...base, ...saved, status: 'stopped', output: null, layers: { ...base.layers, ...saved.layers }, fx: { ...base.fx, ...saved.fx } };
+      return { ...base, ...saved, status: 'stopped', output: null, section: '', layers: { ...base.layers, ...saved.layers }, fx: { ...base.fx, ...saved.fx } };
     }
   } catch {
     /* storage unavailable */
@@ -143,13 +149,15 @@ function getState(): RadioState {
 function setState(patch: Partial<RadioState>) {
   state = { ...getState(), ...patch };
   try {
-    const { status: _s, output: _o, ...persist } = state;
+    const { status: _s, output: _o, section: _sec, ...persist } = state;
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(persist));
   } catch {
     /* ignore */
   }
   listeners.forEach((l) => l());
-  apply();
+  // the section label alone doesn't touch the audio (and is set from the
+  // audio callback, where apply()'s "now"-based ramps would be mistimed)
+  if (!(Object.keys(patch).length === 1 && 'section' in patch)) apply();
 }
 
 function subscribe(fn: () => void) {
@@ -181,7 +189,15 @@ type Graph = {
   audioEl: HTMLAudioElement | null;
   loopId: number | null;
   quality: 'high' | 'lite';
+  /** per-layer gain the arrangement automates (fades in/out) */
+  arr: Record<ArrLayer, ToneNS.Gain>;
+  /** master high-pass that sweeps up during a build */
+  sweep: ToneNS.Filter;
+  riser: { noise: ToneNS.Noise; filter: ToneNS.Filter; gain: ToneNS.Gain } | null;
 };
+
+const ARR_LAYERS = ['pad', 'bass', 'keys'] as const;
+type ArrLayer = (typeof ARR_LAYERS)[number];
 
 let graph: Graph | null = null;
 let step = 0;
@@ -189,16 +205,72 @@ let chordIndex = 0;
 
 const BASE_DB: Record<LayerId, number> = { pad: -20, bass: -12, keys: -21, drums: -2, rain: -30, vinyl: -24 };
 
-// Progression in A minor (transposed with `key`): Am9, Fmaj7, Cmaj9, G6
-const CHORDS = [
-  ['A2', 'E3', 'G3', 'B3', 'C4'],
-  ['F2', 'C3', 'E3', 'A3', 'C4'],
-  ['C3', 'E3', 'G3', 'B3', 'D4'],
-  ['G2', 'D3', 'E3', 'B3', 'D4'],
+// Chords in A minor (transposed with `key`): voicing + bass note
+const CHORDS: Record<string, { notes: string[]; bass: string }> = {
+  Am9: { notes: ['A2', 'E3', 'G3', 'B3', 'C4'], bass: 'A1' },
+  Fmaj7: { notes: ['F2', 'C3', 'E3', 'A3', 'C4'], bass: 'F1' },
+  Cmaj9: { notes: ['C3', 'E3', 'G3', 'B3', 'D4'], bass: 'C2' },
+  G6: { notes: ['G2', 'D3', 'E3', 'B3', 'D4'], bass: 'G1' },
+  Dm9: { notes: ['D3', 'F3', 'A3', 'C4', 'E4'], bass: 'D2' },
+  Em7: { notes: ['E2', 'B2', 'D3', 'G3', 'B3'], bass: 'E1' },
+};
+// Each drop moves to the next progression
+const PROGRESSIONS = [
+  ['Am9', 'Fmaj7', 'Cmaj9', 'G6'],
+  ['Fmaj7', 'G6', 'Em7', 'Am9'],
+  ['Am9', 'Dm9', 'Fmaj7', 'Em7'],
+  ['Dm9', 'G6', 'Cmaj9', 'Am9'],
 ];
-const BASS = ['A1', 'F1', 'C2', 'G1'];
 const MELODY = ['A4', 'C5', 'D5', 'E5', 'G5', 'A5', 'C6'];
-// Techno: a fixed one-bar figure repeated (and slightly varied) for a hypnotic loop
+const TECHNO_POOL = ['A3', 'C4', 'D4', 'E4', 'G4', 'A4'];
+const TECHNO_RHYTHMS = [[0, 3, 6, 8, 11, 14], [0, 2, 6, 10, 12], [0, 3, 7, 10, 13], [2, 6, 8, 11, 14], [0, 3, 6, 9, 12, 14]];
+
+// ---------------------------------------------------------------------------
+// arrangement: the song is a sequence of sections that loops
+// ---------------------------------------------------------------------------
+
+type DrumMode = 'full' | 'kick' | 'none' | 'build';
+interface Section {
+  name: string;
+  bars: number;
+  drums: DrumMode;
+  /** layer levels 0..1 (missing = 1) */
+  mix: Partial<Record<ArrLayer, number>>;
+  /** bars to fade into the mix (0 = cut) */
+  fade?: number;
+  newMotif?: boolean;
+  newProg?: boolean;
+  /** build: high-pass sweep target in Hz */
+  sweep?: number;
+}
+interface Arrangement { sections: Section[]; loopFrom: number }
+
+const beatArrangement = (introDrums: DrumMode, buildBars: number, sweep: number): Arrangement => ({
+  sections: [
+    { name: 'intro', bars: 8, drums: introDrums, mix: { bass: 0.5, keys: 0.7 } },
+    { name: 'groove', bars: 16, drums: 'full', mix: {}, fade: 1 },
+    { name: 'break', bars: 8, drums: 'none', mix: { bass: 0, keys: 0.9 }, fade: 1, newMotif: true },
+    { name: 'build', bars: buildBars, drums: 'build', mix: { bass: 0.6, pad: 0.7 }, sweep },
+    { name: 'drop', bars: 16, drums: 'full', mix: {}, newMotif: true, newProg: true },
+    { name: 'groove', bars: 16, drums: 'full', mix: { pad: 0.6, keys: 0.5 }, fade: 2 },
+  ],
+  loopFrom: 2,
+});
+
+const ARRANGEMENTS: Record<Pattern, Arrangement> = {
+  lofi: beatArrangement('none', 1, 500),
+  deep: beatArrangement('kick', 4, 900),
+  techno: beatArrangement('kick', 8, 1200),
+  none: {
+    sections: [
+      { name: 'bloom', bars: 16, drums: 'none', mix: {}, fade: 4 },
+      { name: 'drift', bars: 8, drums: 'none', mix: { pad: 0.25, keys: 0.5, bass: 0 }, fade: 4 },
+      { name: 'swell', bars: 16, drums: 'none', mix: {}, fade: 4, newMotif: true, newProg: true },
+    ],
+    loopFrom: 1,
+  },
+};
+// Techno: the first one-bar figure (later ones are generated)
 const TECHNO_MOTIF: Record<number, string> = { 0: 'A3', 3: 'A3', 6: 'C4', 8: 'A3', 11: 'E4', 14: 'D4' };
 const KEY_OFFSET: Record<KeyName, number> = { C: 3, D: 5, E: -5, F: -4, G: -2, A: 0, B: 2 };
 
@@ -217,7 +289,8 @@ async function buildGraph(): Promise<Graph> {
   const lofiFilter = new Tone.Filter(12000, 'lowpass');
   const limiter = new Tone.Limiter(-1);
   const analyser = new Tone.Analyser('fft', lite ? 64 : 128);
-  master.chain(comp, lofiFilter, limiter);
+  const sweep = new Tone.Filter({ frequency: 20, type: 'highpass', rolloff: -12 });
+  master.chain(sweep, comp, lofiFilter, limiter);
   limiter.connect(analyser);
 
   // Output: prefer an <audio> element fed by a MediaStream, so the phone
@@ -251,13 +324,27 @@ async function buildGraph(): Promise<Graph> {
 
   const layerVol = Object.fromEntries(LAYERS.map((l) => [l, new Tone.Volume(BASE_DB[l])])) as Graph['layerVol'];
   LAYERS.forEach((l) => layerVol[l].connect(master));
+  const arr = Object.fromEntries(ARR_LAYERS.map((l) => [l, new Tone.Gain(1)])) as Graph['arr'];
+
+  // build riser: filtered white noise, only scheduled during builds
+  let riser: Graph['riser'] = null;
+  if (!lite) {
+    const noise = new Tone.Noise('white');
+    noise.volume.value = -18;
+    const filter = new Tone.Filter(500, 'bandpass');
+    const gain = new Tone.Gain(0);
+    noise.chain(filter, gain, master);
+    gain.connect(reverbSend);
+    riser = { noise, filter, gain };
+  }
 
   // pad
   // Lite: 2 detuned oscillators per voice instead of 3, fewer voices,
   // no chorus and a static filter instead of an LFO sweep.
   const pad = new Tone.PolySynth({
     voice: Tone.Synth,
-    maxPolyphony: lite ? 6 : 10,
+    // enough for the release tails of two chords plus the next one
+    maxPolyphony: lite ? 12 : 16,
     options: {
       oscillator: { type: 'fatsawtooth', count: lite ? 2 : 3, spread: lite ? 16 : 22 },
       envelope: { attack: 1.6, decay: 1, sustain: 0.7, release: lite ? 2.5 : 3.5 },
@@ -265,11 +352,11 @@ async function buildGraph(): Promise<Graph> {
   });
   const padFilter = new Tone.Filter(lite ? 1000 : 900, 'lowpass', lite ? -12 : -24);
   if (lite) {
-    pad.chain(padFilter, layerVol.pad);
+    pad.chain(arr.pad, padFilter, layerVol.pad);
     padFilter.connect(reverbSend);
   } else {
     const padChorus = new Tone.Chorus(0.6, 3.5, 0.5).start();
-    pad.chain(padFilter, padChorus, layerVol.pad);
+    pad.chain(arr.pad, padFilter, padChorus, layerVol.pad);
     padChorus.connect(reverbSend);
     new Tone.LFO('0.07hz', 600, 1500).start().connect(padFilter.frequency);
   }
@@ -281,7 +368,7 @@ async function buildGraph(): Promise<Graph> {
     envelope: { attack: 0.02, decay: 0.4, sustain: 0.6, release: 0.8 },
     filterEnvelope: { attack: 0.01, decay: 0.3, sustain: 0.3, baseFrequency: 120, octaves: 2.5 },
   });
-  bass.connect(layerVol.bass);
+  bass.chain(arr.bass, layerVol.bass);
 
   // keys
   const keys = new Tone.FMSynth({
@@ -292,7 +379,7 @@ async function buildGraph(): Promise<Graph> {
     modulationEnvelope: { attack: 0.01, decay: 0.3, sustain: 0.1, release: 0.5 },
   });
   const delay = new Tone.FeedbackDelay('8n.', 0.35);
-  keys.chain(delay, layerVol.keys);
+  keys.chain(arr.keys, delay, layerVol.keys);
   delay.connect(reverbSend);
 
   // drums
@@ -324,6 +411,7 @@ async function buildGraph(): Promise<Graph> {
   return {
     Tone, transport, master, lofiFilter, analyser, reverbSend, delay, layerVol,
     pad, bass, keys, kick, snare, hat, rain, crackle, audioEl, loopId: null, quality,
+    arr, sweep, riser,
   };
 }
 
@@ -352,23 +440,158 @@ function layerOn(id: LayerId) {
   return l.on && l.vol > 0;
 }
 
+// arrangement position
+let sectionIdx = -1;
+let barInSection = 0;
+let progIdx = 0;
+let motif: (string | null)[] = [];
+/** set to jump to a section at the next bar (play, style change, `next`) */
+let pending: { idx: number | 'next'; fresh?: boolean } | null = null;
+
+function arrangement(): Arrangement {
+  const style = STYLES[getState().style] ?? STYLES.lofi;
+  return ARRANGEMENTS[style.pattern];
+}
+
+function grooveIndex(): number {
+  const i = arrangement().sections.findIndex((x) => x.name === 'groove');
+  return i >= 0 ? i : 0;
+}
+
+function currentSection(): Section | null {
+  if (!getState().arrange) return null;
+  return arrangement().sections[sectionIdx] ?? null;
+}
+
+/** A melodic phrase: techno = one bar, others = two bars, built by random walk. */
+function makeMotif(style: StyleDef, first = false) {
+  const rnd = Math.random;
+  if (style.pattern === 'techno') {
+    const m: (string | null)[] = new Array(16).fill(null);
+    if (first) {
+      Object.entries(TECHNO_MOTIF).forEach(([k, v]) => { m[Number(k)] = v; });
+    } else {
+      const rhythm = TECHNO_RHYTHMS[Math.floor(rnd() * TECHNO_RHYTHMS.length)];
+      let i = 0;
+      rhythm.forEach((slot, n) => {
+        if (n > 0) i = Math.max(0, Math.min(TECHNO_POOL.length - 1, i + Math.floor(rnd() * 5) - 2));
+        m[slot] = TECHNO_POOL[i];
+      });
+    }
+    motif = m;
+    return;
+  }
+  const m: (string | null)[] = new Array(32).fill(null);
+  let i = Math.floor(rnd() * 3);
+  let count = 0;
+  for (let slot = 0; slot < 32; slot += 2) {
+    if (rnd() < style.keysDensity * 0.9 || (slot === 0 && style.keysDensity > 0)) {
+      i = Math.max(0, Math.min(MELODY.length - 1, i + Math.floor(rnd() * 5) - 2));
+      m[slot] = MELODY[i];
+      count++;
+    }
+  }
+  // the phrase resolves: last note back to the root
+  if (count > 2) m[28] = MELODY[rnd() < 0.5 ? 0 : 5];
+  motif = m;
+}
+
+/** Small variation each time the phrase repeats, so it stays alive. */
+function mutateMotif() {
+  const filled = motif.map((n, i) => (n ? i : -1)).filter((i) => i >= 0);
+  if (!filled.length) return;
+  const slot = filled[Math.floor(Math.random() * filled.length)];
+  const pool = motif.length === 16 ? TECHNO_POOL : MELODY;
+  const i = pool.indexOf(motif[slot]!);
+  motif[slot] = pool[Math.max(0, Math.min(pool.length - 1, i + (Math.random() < 0.5 ? -1 : 1)))];
+}
+
+function enterSection(idx: number, time: number, fresh = false) {
+  if (!graph) return;
+  const style = STYLES[getState().style] ?? STYLES.lofi;
+  const sec = arrangement().sections[idx];
+  sectionIdx = idx;
+  barInSection = 0;
+  const barSec = graph.Tone.Time('1m').toSeconds();
+
+  ARR_LAYERS.forEach((l) => graph!.arr[l].gain.linearRampTo(sec.mix[l] ?? 1, Math.max(0.03, (sec.fade ?? 0) * barSec), time));
+
+  // high-pass sweep + noise riser on builds, snap back on the drop
+  graph.sweep.frequency.cancelScheduledValues(time);
+  graph.riser?.gain.gain.cancelScheduledValues(time);
+  if (sec.sweep) {
+    const dur = sec.bars * barSec * 0.97;
+    graph.sweep.frequency.setValueAtTime(20, time);
+    graph.sweep.frequency.exponentialRampTo(sec.sweep, dur, time);
+    if (graph.riser) {
+      graph.riser.filter.frequency.cancelScheduledValues(time);
+      graph.riser.filter.frequency.setValueAtTime(400, time);
+      graph.riser.filter.frequency.exponentialRampTo(7000, dur, time);
+      graph.riser.gain.gain.setValueAtTime(0, time);
+      graph.riser.gain.gain.linearRampTo(0.9, dur, time);
+      try {
+        graph.riser.noise.start(time).stop(time + dur);
+      } catch {
+        /* still running from a skipped build */
+      }
+    }
+  } else {
+    graph.sweep.frequency.setValueAtTime(20, time);
+    graph.riser?.gain.gain.setValueAtTime(0, time);
+  }
+
+  if (sec.newProg) progIdx = (progIdx + 1) % PROGRESSIONS.length;
+  if (sec.newMotif || fresh) makeMotif(style);
+  if (sec.newProg) chordIndex = -1;
+  setState({ section: getState().arrange ? sec.name : '' });
+}
+
+/** Back to a flat mix (arrangement turned off). */
+function flattenMix() {
+  if (!graph) return;
+  const now = graph.Tone.now();
+  ARR_LAYERS.forEach((l) => graph!.arr[l].gain.linearRampTo(1, 0.5, now));
+  graph.sweep.frequency.cancelScheduledValues(now);
+  graph.sweep.frequency.setValueAtTime(20, now);
+  graph.riser?.gain.gain.cancelScheduledValues(now);
+  graph.riser?.gain.gain.setValueAtTime(0, now);
+}
+
 function tick(time: number) {
   if (!graph) return;
   const s = getState();
   const style = STYLES[s.style] ?? STYLES.lofi;
   const pos = step % 16;
-  const bar = Math.floor(step / 16);
   const rnd = Math.random;
 
-  if (pos === 0 && bar % style.chordBars === 0) {
-    chordIndex = (chordIndex + 1) % CHORDS.length;
+  // section changes happen on the downbeat
+  if (pos === 0) {
+    const arr = arrangement();
+    if (pending) {
+      const { idx, fresh } = pending;
+      pending = null;
+      const next = idx === 'next' ? (sectionIdx + 1 < arr.sections.length ? sectionIdx + 1 : arr.loopFrom) : idx;
+      enterSection(Math.min(next, arr.sections.length - 1), time, fresh);
+    } else if (s.arrange && sectionIdx >= 0 && barInSection >= arr.sections[sectionIdx].bars) {
+      enterSection(sectionIdx + 1 < arr.sections.length ? sectionIdx + 1 : arr.loopFrom, time);
+    }
+    // the phrase repeats with a small change now and then
+    if (barInSection > 0 && barInSection % 2 === 0 && rnd() < 0.3) mutateMotif();
+  }
+  const sec = currentSection();
+  const drums: DrumMode = sec?.drums ?? 'full';
+  const prog = PROGRESSIONS[progIdx];
+
+  if (pos === 0 && barInSection % style.chordBars === 0) {
+    chordIndex = (chordIndex + 1) % prog.length;
     if (layerOn('pad')) {
       const dur = graph.Tone.Time('1m').toSeconds() * style.chordBars * 0.95;
-      graph.pad.triggerAttackRelease(CHORDS[chordIndex].map(t), dur, time, 0.6);
+      graph.pad.triggerAttackRelease(CHORDS[prog[chordIndex]].notes.map(t), dur, time, 0.6);
     }
   }
+  const chord = CHORDS[prog[Math.max(0, chordIndex)]];
 
-  const root = t(BASS[chordIndex]);
+  const root = t(chord.bass);
   if (layerOn('bass')) {
     if (style.pattern === 'lofi') {
       if (pos === 0) graph.bass.triggerAttackRelease(root, '2n', time, 0.8);
@@ -378,13 +601,27 @@ function tick(time: number) {
     } else if (style.pattern === 'techno') {
       // rolling bass: every 16th except where the kick hits
       if (pos % 4 !== 0) graph.bass.triggerAttackRelease(root, '32n', time, pos % 4 === 2 ? 0.95 : 0.55);
-    } else if (pos === 0 && bar % style.chordBars === 0) {
+    } else if (pos === 0 && barInSection % style.chordBars === 0) {
       graph.bass.triggerAttackRelease(root, '1m', time, 0.5);
     }
   }
 
-  if (layerOn('drums')) {
-    if (style.pattern === 'lofi') {
+  if (layerOn('drums') && style.pattern !== 'none' && drums !== 'none') {
+    if (drums === 'kick') {
+      if (pos % 4 === 0) graph.kick.triggerAttackRelease('C1', '8n', time, 0.85);
+      if (pos % 4 === 2) graph.hat.triggerAttackRelease('16n', time, 0.4);
+    } else if (drums === 'build') {
+      // snare roll that speeds up, then one beat of silence before the drop
+      const total = (sec?.bars ?? 1) * 16;
+      const k = barInSection * 16 + pos;
+      const p = k / total;
+      if (k < total - 4) {
+        if (pos % 4 === 0) graph.kick.triggerAttackRelease('C1', '8n', time, 0.9);
+        const every = p < 0.5 ? 4 : p < 0.75 ? 2 : 1;
+        if (k % every === 0 && (p >= 0.25 || pos === 4 || pos === 12)) graph.snare.triggerAttackRelease('16n', time, 0.25 + p * 0.65);
+        if (pos % 2 === 0) graph.hat.triggerAttackRelease('32n', time, 0.3);
+      }
+    } else if (style.pattern === 'lofi') {
       if (pos === 0 || pos === 10 || (pos === 7 && rnd() < 0.35)) graph.kick.triggerAttackRelease('C1', '8n', time, pos === 0 ? 0.9 : 0.6);
       if (pos === 4 || pos === 12) graph.snare.triggerAttackRelease('16n', time, 0.75);
       if (pos % 2 === 0) graph.hat.triggerAttackRelease('32n', time, 0.35 + rnd() * 0.45);
@@ -402,14 +639,13 @@ function tick(time: number) {
     }
   }
 
-  if (style.pattern === 'techno') {
-    if (layerOn('keys') && TECHNO_MOTIF[pos]) {
-      // every 4th bar, shift the last note up an octave for movement
-      const note = bar % 4 === 3 && pos === 14 ? 'D5' : TECHNO_MOTIF[pos];
-      graph.keys.triggerAttackRelease(t(note), '16n', time, 0.5 + rnd() * 0.3);
+  if (layerOn('keys') && motif.length) {
+    const slot = motif.length === 16 ? pos : (barInSection % 2) * 16 + pos;
+    const note = motif[slot];
+    if (note) {
+      const techno = style.pattern === 'techno';
+      graph.keys.triggerAttackRelease(t(note), techno ? '16n' : '8n', time, techno ? 0.5 + rnd() * 0.3 : 0.4 + rnd() * 0.4);
     }
-  } else if (layerOn('keys') && pos % 2 === 0 && rnd() < style.keysDensity) {
-    graph.keys.triggerAttackRelease(t(MELODY[Math.floor(rnd() * MELODY.length)]), '8n', time, 0.4 + rnd() * 0.4);
   }
 
   if (layerOn('vinyl') && rnd() < (graph.quality === 'lite' ? 0.1 : 0.18)) {
@@ -417,6 +653,7 @@ function tick(time: number) {
   }
 
   step++;
+  if (pos === 15) barInSection++;
 }
 
 const toDb = (vol: number, base: number) => base + (vol / 100 - 1) * 30;
@@ -486,6 +723,12 @@ export const radio = {
       apply();
       step = 0;
       chordIndex = -1;
+      barInSection = 0;
+      sectionIdx = -1;
+      progIdx = 0;
+      makeMotif(STYLES[getState().style] ?? STYLES.lofi, true);
+      // arrangement off: stay in the main groove
+      pending = { idx: getState().arrange ? 0 : grooveIndex() };
       graph.rain.start();
       graph.loopId = graph.transport.scheduleRepeat(tick, '16n');
       graph.transport.start('+0.05');
@@ -505,8 +748,10 @@ export const radio = {
       graph.loopId = null;
       graph.rain.stop();
       graph.pad.releaseAll();
+      flattenMix();
     }
-    setState({ status: 'stopped' });
+    pending = null;
+    setState({ status: 'stopped', section: '' });
     updateMediaSession();
   },
 
@@ -522,6 +767,24 @@ export const radio = {
     }
   },
 
+  /** Turn the song structure on/off (off = the endless groove). */
+  setArrange(on: boolean) {
+    setState({ arrange: on });
+    if (getState().status !== 'playing') return;
+    if (on) pending = { idx: 'next' };
+    else {
+      flattenMix();
+      pending = { idx: grooveIndex() };
+    }
+  },
+
+  /** Jump to the next section at the next bar. */
+  next() {
+    if (getState().status !== 'playing' || !getState().arrange) return false;
+    pending = { idx: 'next' };
+    return true;
+  },
+
   /** Quality in effect right now ("auto" resolved). */
   quality(): 'high' | 'lite' {
     return graph?.quality ?? effectiveQuality(getState().quality);
@@ -530,7 +793,9 @@ export const radio = {
   setStyle(name: string) {
     if (!STYLES[name]) return false;
     const s = getState();
-    setState(stateFromStyle(name, { status: s.status, key: s.key, master: s.master, output: s.output, quality: s.quality }));
+    setState(stateFromStyle(name, { status: s.status, key: s.key, master: s.master, output: s.output, quality: s.quality, arrange: s.arrange, section: s.section }));
+    // new style: skip the intro, land in its groove at the next bar
+    if (s.status === 'playing') pending = { idx: grooveIndex(), fresh: true };
     updateMediaSession();
     return true;
   },
@@ -562,7 +827,7 @@ export const radio = {
 
   reset() {
     const s = getState();
-    setState(stateFromStyle(s.style, { status: s.status, output: s.output, quality: s.quality }));
+    setState(stateFromStyle(s.style, { status: s.status, output: s.output, quality: s.quality, arrange: s.arrange, section: s.section }));
   },
 
   /** 0..1 levels for a small visualizer (log-spaced bands), or null when not playing. */

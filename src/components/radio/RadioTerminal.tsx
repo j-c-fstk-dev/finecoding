@@ -135,6 +135,7 @@ export function RadioTerminal() {
   const chips: { label: string; cmd: string; active?: boolean }[] = [
     { label: playing ? '■ stop' : state.status === 'loading' ? '… loading' : '▶ play', cmd: playing ? 'stop' : 'play', active: playing },
     ...Object.keys(STYLES).map((name) => ({ label: name, cmd: `style ${name}`, active: state.style === name })),
+    ...(playing && state.arrange ? [{ label: 'next ›', cmd: 'next' }] : []),
     { label: 'layers', cmd: 'layers' },
     { label: 'help', cmd: 'help' },
   ];
@@ -161,6 +162,7 @@ export function RadioTerminal() {
         <div className="mt-4 flex flex-wrap items-center justify-between gap-x-4 gap-y-1 text-xs">
           <span className={playing ? 'text-phosphor' : 'text-muted-foreground'}>
             {playing ? '▶' : '■'} {state.style} · {state.bpm} bpm · {state.key} minor
+            {playing && state.section && <span className="text-muted-foreground"> · [{state.section}]</span>}
           </span>
           <span className="text-muted-foreground/80">
             {LAYERS.map((l) => (
