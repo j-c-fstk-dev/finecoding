@@ -10,6 +10,7 @@ import { Sheet, SheetContent, SheetTitle, SheetTrigger } from '@/components/ui/s
 import { SearchBar } from '@/components/search/SearchBar';
 import { ShareDialog } from '@/components/layout/ShareDialog';
 import { LogoMark } from '@/components/icons/LogoMark';
+import { RadioIndicator } from '@/components/radio/RadioIndicator';
 
 const navLinks = [
   { href: '/', label: 'Home' },
@@ -60,6 +61,7 @@ export function Header() {
             </nav>
             <span className="h-[18px] w-px bg-input" aria-hidden="true" />
             <div className="flex items-center gap-2">
+              <RadioIndicator />
               <SearchBar />
               <button
                 onClick={() => setIsShareOpen(true)}
@@ -77,6 +79,7 @@ export function Header() {
 
           {/* Mobile */}
           <div className="flex items-center gap-2 md:hidden">
+            <RadioIndicator />
             <SearchBar />
             <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
               <SheetTrigger asChild>

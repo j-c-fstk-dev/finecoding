@@ -1,0 +1,164 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><script src="https://cdn.jsdelivr.net/npm/tone@15.1.22/build/Tone.js"></script></head>
+<body>
+<script>
+// Fine Coding Radio: generative "lo-fi focus" demo, rendered offline.
+const BPM = 128;
+const BARS = 24;
+const barSec = (60 / BPM) * 4;
+const DURATION = BARS * barSec + 4; // + reverb tail
+
+// Seeded random so the demo is reproducible
+let seed = 42;
+const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+
+const CHORDS = [
+  ['A2', 'E3', 'G3', 'B3', 'C4'],   // Am9
+  ['F2', 'C3', 'E3', 'A3', 'C4'],   // Fmaj7
+  ['C3', 'E3', 'G3', 'B3', 'D4'],   // Cmaj9
+  ['G2', 'D3', 'E3', 'B3', 'D4'],   // G6
+];
+const BASS = ['A1', 'F1', 'C2', 'G1'];
+const SCALE = ['A4', 'C5', 'D5', 'E5', 'G5', 'A5', 'C6']; // A minor pentatonic
+
+async function render() {
+  const buffer = await Tone.Offline(({ transport }) => {
+    transport.bpm.value = BPM;
+    transport.swing = 0;
+    transport.swingSubdivision = '8n';
+
+    // ---------- master ----------
+    const master = new Tone.Compressor({ threshold: -18, ratio: 3, attack: 0.02, release: 0.3 });
+    const warmth = new Tone.Filter(9000, 'lowpass');
+    const limiter = new Tone.Limiter(-1);
+    const fader = new Tone.Gain(1);
+    master.chain(fader, warmth, limiter, Tone.getDestination());
+
+    const reverb = new Tone.Reverb({ decay: 7, wet: 1, preDelay: 0.03 });
+    const reverbSend = new Tone.Gain(0.15).connect(reverb);
+    reverb.connect(master);
+
+    // ---------- pad ----------
+    const pad = new Tone.PolySynth(Tone.Synth, {
+      oscillator: { type: 'fatsawtooth', count: 3, spread: 22 },
+      envelope: { attack: 1.6, decay: 1, sustain: 0.7, release: 3.5 },
+    });
+    const padFilter = new Tone.Filter(900, 'lowpass', -24);
+    const padChorus = new Tone.Chorus(0.6, 3.5, 0.5).start();
+    pad.volume.value = -29;
+    pad.chain(padFilter, padChorus, master);
+    padChorus.connect(reverbSend);
+    const padLfo = new Tone.LFO('0.07hz', 600, 1500).start();
+    padLfo.connect(padFilter.frequency);
+
+    // ---------- bass ----------
+    const bass = new Tone.MonoSynth({
+      oscillator: { type: 'triangle' },
+      filter: { Q: 7, type: 'lowpass', rolloff: -24 },
+      envelope: { attack: 0.02, decay: 0.4, sustain: 0.6, release: 0.8 },
+      filterEnvelope: { attack: 0.005, decay: 0.18, sustain: 0.2, baseFrequency: 90, octaves: 3.5 },
+    });
+    bass.volume.value = -14;
+    bass.connect(master);
+
+    // ---------- arp / keys ----------
+    const keys = new Tone.FMSynth({
+      harmonicity: 2, modulationIndex: 3,
+      oscillator: { type: 'sine' },
+      envelope: { attack: 0.005, decay: 0.6, sustain: 0.1, release: 1.2 },
+      modulation: { type: 'triangle' },
+      modulationEnvelope: { attack: 0.01, decay: 0.3, sustain: 0.1, release: 0.5 },
+    });
+    const delay = new Tone.FeedbackDelay('8n.', 0.35);
+    delay.wet.value = 0.3;
+    keys.volume.value = -22;
+    keys.chain(delay, master);
+    delay.connect(reverbSend);
+
+    // ---------- drums ----------
+    const kick = new Tone.MembraneSynth({ pitchDecay: 0.04, octaves: 6, envelope: { attack: 0.001, decay: 0.45, sustain: 0, release: 0.2 } });
+    kick.volume.value = -9;
+    kick.connect(master);
+
+    const snareFilter = new Tone.Filter(1800, 'bandpass', -12);
+    const snare = new Tone.NoiseSynth({ noise: { type: 'pink' }, envelope: { attack: 0.001, decay: 0.18, sustain: 0 } });
+    snare.volume.value = -20;
+    snare.chain(snareFilter, master);
+    snareFilter.connect(reverbSend);
+
+    const hatFilter = new Tone.Filter(8000, 'highpass');
+    const hat = new Tone.NoiseSynth({ noise: { type: 'white' }, envelope: { attack: 0.001, decay: 0.045, sustain: 0 } });
+    hat.volume.value = -30;
+    hat.chain(hatFilter, master);
+
+    // ---------- ambience: rain + vinyl ----------
+    const rain = new Tone.Noise('pink');
+    const rainHP = new Tone.Filter(700, 'highpass');
+    const rainLP = new Tone.Filter(5500, 'lowpass');
+    const rainVol = new Tone.Volume(-34);
+    rain.chain(rainHP, rainLP, rainVol, master);
+    const rainLfo = new Tone.LFO('0.11hz', 4500, 6500).start();
+    rainLfo.connect(rainLP.frequency);
+    // no rain in techno
+
+    const crackle = new Tone.NoiseSynth({ noise: { type: 'brown' }, envelope: { attack: 0.001, decay: 0.008, sustain: 0 } });
+    const crackleHP = new Tone.Filter(2500, 'highpass');
+    crackle.volume.value = -26;
+    crackle.chain(crackleHP, master);
+
+    // ---------- arrangement (techno) ----------
+    // 0-3: kick + hats | 4-: rolling acid bass + clap | 8-: hypnotic motif + dark pad | last 2 bars: breakdown
+    const MOTIF = { 0: 'A3', 3: 'A3', 6: 'C4', 8: 'A3', 11: 'E4', 14: 'D4' };
+    for (let bar = 0; bar < BARS; bar++) {
+      const chord = CHORDS[Math.floor(bar / 4) % 4];
+      const root = BASS[Math.floor(bar / 4) % 4];
+      if (bar >= 8 && bar % 4 === 0) transport.schedule((time) => pad.triggerAttackRelease(chord, barSec * 3.8, time, 0.5), `${bar}:0:0`);
+      const breakdown = bar >= BARS - 2;
+      for (let step = 0; step < 16; step++) {
+        const pos = `${bar}:${Math.floor(step / 4)}:${step % 4}`;
+        if (!breakdown && step % 4 === 0) transport.schedule((time) => kick.triggerAttackRelease('C1', '8n', time, 1), pos);
+        if (step % 4 === 2) transport.schedule((time) => hat.triggerAttackRelease('8n', time, 0.9), pos);
+        else transport.schedule((time) => hat.triggerAttackRelease('32n', time, 0.25 + rnd() * 0.2), pos);
+        if (bar >= 4 && !breakdown && (step === 4 || step === 12)) transport.schedule((time) => snare.triggerAttackRelease('16n', time, 0.55), pos);
+        if (bar >= 4 && step % 4 !== 0) transport.schedule((time) => bass.triggerAttackRelease(root, '32n', time, step % 4 === 2 ? 0.95 : 0.55), pos);
+        if (bar >= 8 && MOTIF[step]) {
+          const note = bar % 4 === 3 && step === 14 ? 'D5' : MOTIF[step];
+          transport.schedule((time) => keys.triggerAttackRelease(note, '16n', time, 0.5 + rnd() * 0.3), pos);
+        }
+      }
+    }
+
+    // fade the whole mix out over the last bar
+    const end = BARS * barSec;
+    hat.volume.value = -27; kick.volume.value = -7;
+    fader.gain.setValueAtTime(1, end - barSec);
+    fader.gain.linearRampToValueAtTime(0, end + 2);
+
+    transport.start(0);
+  }, DURATION, 2, 44100);
+
+  // encode WAV (16-bit PCM)
+  const ch = [buffer.getChannelData(0), buffer.getChannelData(1)];
+  const len = ch[0].length;
+  const out = new DataView(new ArrayBuffer(44 + len * 4));
+  const w = (o, s) => [...s].forEach((c, i) => out.setUint8(o + i, c.charCodeAt(0)));
+  w(0, 'RIFF'); out.setUint32(4, 36 + len * 4, true); w(8, 'WAVE'); w(12, 'fmt ');
+  out.setUint32(16, 16, true); out.setUint16(20, 1, true); out.setUint16(22, 2, true);
+  out.setUint32(24, 44100, true); out.setUint32(28, 44100 * 4, true); out.setUint16(32, 4, true); out.setUint16(34, 16, true);
+  w(36, 'data'); out.setUint32(40, len * 4, true);
+  let o = 44;
+  for (let i = 0; i < len; i++) for (let c = 0; c < 2; c++) {
+    const s = Math.max(-1, Math.min(1, ch[c][i]));
+    out.setInt16(o, s < 0 ? s * 0x8000 : s * 0x7fff, true); o += 2;
+  }
+  const bytes = new Uint8Array(out.buffer);
+  let bin = '';
+  for (let i = 0; i < bytes.length; i += 0x8000) bin += String.fromCharCode(...bytes.subarray(i, i + 0x8000));
+  window.__wav = btoa(bin);
+  let peak = 0; for (const c of ch) for (let i = 0; i < len; i++) peak = Math.max(peak, Math.abs(c[i]));
+  window.__peak = peak;
+  window.__done = true;
+}
+render().catch((e) => { window.__error = String(e && e.stack || e); window.__done = true; });
+</script>
+</body></html>
