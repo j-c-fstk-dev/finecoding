@@ -24,7 +24,7 @@ export default function RadioPage() {
       </header>
 
       <section className="mx-auto mt-14 max-w-[640px]" aria-label="Player">
-        <div className="overflow-hidden rounded-xl border bg-card">
+        <div className="screen overflow-hidden rounded-xl border bg-card">
           <div className="flex items-center justify-between border-b px-4 py-2.5 font-mono text-xs text-muted-foreground/80">
             <span className="flex items-center gap-1.5" aria-hidden="true">
               <span className="h-2 w-2 rounded-full bg-phosphor-dim" />

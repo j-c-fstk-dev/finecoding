@@ -4,27 +4,27 @@
 
 @layer base {
   :root {
-    --background: 90 12% 96.9%;
-    --foreground: 160 19% 6.3%;
-    --card: 0 0% 100.0%;
-    --card-foreground: 160 19% 6.3%;
-    --popover: 0 0% 100.0%;
-    --popover-foreground: 160 19% 6.3%;
-    --primary: 151 78% 26.9%;
+    --background: 84 13% 92.4%;
+    --foreground: 163 24% 5.7%;
+    --card: 90 25% 98.4%;
+    --card-foreground: 163 24% 5.7%;
+    --popover: 90 25% 98.4%;
+    --popover-foreground: 163 24% 5.7%;
+    --primary: 150 81% 22.9%;
     --primary-foreground: 0 0% 100.0%;
-    --secondary: 120 10% 93.9%;
-    --secondary-foreground: 160 19% 6.3%;
-    --muted: 120 10% 93.9%;
-    --muted-foreground: 152 7% 38.2%;
-    --accent: 145 27% 91.4%;
-    --accent-foreground: 160 19% 6.3%;
-    --destructive: 0 72% 50.6%;
+    --secondary: 108 9% 89.2%;
+    --secondary-foreground: 163 24% 5.7%;
+    --muted: 108 9% 89.2%;
+    --muted-foreground: 150 9% 26.7%;
+    --accent: 140 20% 88.2%;
+    --accent-foreground: 163 24% 5.7%;
+    --destructive: 0 74% 45.1%;
     --destructive-foreground: 0 0% 98.0%;
-    --border: 135 7% 89.4%;
-    --input: 140 8% 85.1%;
-    --ring: 151 78% 26.9%;
-    --phosphor: 151 78% 26.9%;
-    --phosphor-dim: 148 29% 43.5%;
+    --border: 135 8% 80.4%;
+    --input: 138 8% 74.5%;
+    --ring: 150 81% 22.9%;
+    --phosphor: 150 81% 22.9%;
+    --phosphor-dim: 149 43% 30.2%;
     --radius: 0.5rem;
   }
 
@@ -974,4 +974,42 @@
 }
 @media (prefers-reduced-motion: reduce) {
   .radio-eq span, .radio-live-dot { animation: none; }
+}
+
+
+/* ------------------------------------------------------------------ */
+/* Light theme contrast                                                */
+/* ------------------------------------------------------------------ */
+
+/* No faded secondary text in the light theme: dates, tags, paths and hints
+   use the full muted color (about 7.9:1 on the background). */
+html:not(.dark) .text-muted-foreground\/80,
+html:not(.dark) .text-muted-foreground\/70,
+html:not(.dark) .text-muted-foreground\/60 {
+  color: hsl(var(--muted-foreground));
+}
+
+/* "Screens": covers, the radio panel and code blocks always look like a dark
+   phosphor monitor, in both themes. The dark tokens are re-declared locally. */
+.screen,
+html:not(.dark) .cover-frame {
+  --card: 195 14% 5.5%;
+  --border: 171 12% 11.6%;
+  --input: 164 13% 16.7%;
+  --foreground: 146 23% 93.9%;
+  --muted-foreground: 150 7% 57.3%;
+  --phosphor: 149 100% 62.0%;
+  --phosphor-dim: 150 64% 34.1%;
+  color: hsl(var(--foreground));
+  background: hsl(var(--card));
+}
+html:not(.dark) .cover-frame {
+  border-color: hsl(164 13% 16.7%);
+}
+html:not(.dark) .cover-frame::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(to bottom, rgba(0, 0, 0, 0.35) 0 1px, transparent 1px 3px);
 }
