@@ -43,26 +43,20 @@ export function EmailSignup() {
   };
 
   return (
-    <div className="rounded-lg border bg-card p-6 shadow-lg">
-      <h3 className="font-headline text-lg font-semibold text-card-foreground">Stay Updated</h3>
-      <p className="mt-2 text-sm text-muted-foreground">
-        Get the latest posts, tutorials, and insights delivered to your inbox.
-      </p>
-      <form onSubmit={handleSubmit} className="mt-4 flex w-full max-w-md flex-col gap-2 sm:flex-row">
-        <Input
-          type="email"
-          placeholder="hacker@matrix.com"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-          className="flex-1"
-          disabled={isLoading}
-        />
-        <Button type="submit" disabled={isLoading}>
-          {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Mail className="mr-2 h-4 w-4" />}
-          Subscribe
-        </Button>
-      </form>
-    </div>
+    <form onSubmit={handleSubmit} className="mx-auto flex w-full max-w-md flex-col gap-2 sm:flex-row">
+      <Input
+        type="email"
+        placeholder="you@domain.dev"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        disabled={isLoading}
+        aria-label="Email address"
+        className="h-11 flex-1 rounded-full border-input bg-card px-5 font-mono text-[13px]"
+      />
+      <Button type="submit" disabled={isLoading} className="h-11 rounded-full bg-foreground px-6 text-background hover:bg-foreground/85">
+        {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Mail className="mr-2 h-4 w-4" />}
+        Subscribe
+      </Button>
+    </form>
   );
 }

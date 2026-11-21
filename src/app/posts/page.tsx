@@ -1,5 +1,6 @@
 import { getPosts } from '@/lib/posts';
 import { FilterablePostGrid } from '@/components/blog/FilterablePostGrid';
+import { topTags } from '@/lib/post-content';
 import type { Metadata } from 'next';
 
 // Re-fetch from Firestore at most every 5 minutes (ISR). Saving a post in the
@@ -26,21 +27,17 @@ export const metadata: Metadata = {
 
 export default async function AllPostsPage() {
   const posts = await getPosts();
-  const allTags = [...new Set(posts.flatMap(post => post.tags))].sort();
+  const tabs = topTags(posts.map((p) => p.tags), 5);
 
   return (
-    <div className="container mx-auto max-w-5xl px-4 py-16">
-      <section>
-        <h1 className="font-headline text-4xl font-bold tracking-tight text-foreground sm:text-5xl">
-          All Posts
-        </h1>
-        <p className="mt-4 text-lg text-muted-foreground">
-          Browse all articles or filter by tags below.
-        </p>
-      </section>
-      <section className="mt-12">
-        <FilterablePostGrid posts={posts} tags={allTags} />
-      </section>
+    <div className="mx-auto max-w-[1280px] px-4 pb-8 pt-14 sm:px-6 md:pt-[72px] lg:px-10">
+      <div className="mb-3.5 font-mono text-[13px] text-muted-foreground/80">
+        ~/fine-coding/<span className="text-phosphor">posts</span>
+      </div>
+      <h1 className="font-headline text-5xl font-[560] leading-none tracking-[-0.035em] text-foreground md:text-[56px]">
+        Posts
+      </h1>
+      <FilterablePostGrid posts={posts} tabs={tabs} />
     </div>
   );
 }

@@ -2,9 +2,11 @@ import { notFound } from 'next/navigation';
 import type { Metadata, ResolvingMetadata } from 'next'
 import { getPosts } from '@/lib/posts';
 import { getComments } from '@/lib/comments';
-import { Badge } from '@/components/ui/badge';
-import { Calendar, Tag } from 'lucide-react';
+import Link from 'next/link';
 import { formatPostDate } from '@/lib/dates';
+import { extractToc, primaryTag, readingMinutes, splitPostContent } from '@/lib/post-content';
+import { SITE } from '@/lib/site';
+import { PostCover } from '@/components/blog/PostCover';
 import { MarkdownRenderer } from '@/components/blog/MarkdownRenderer';
 import { PostInteraction } from '@/components/blog/PostInteraction';
 
@@ -91,40 +93,62 @@ export default async function PostPage({ params }: Props) {
 
   const comments = await getComments(post.id);
 
+  const { headline, body } = splitPostContent(post.content);
+  const toc = extractToc(body);
+  const tag = primaryTag(post.tags);
+
   return (
-    <article className="container mx-auto max-w-3xl px-4 py-12 md:py-20">
-      <header className="mb-8">
-        <h1 className="font-headline text-3xl font-extrabold tracking-tight md:text-5xl">
-          {post.title}
-        </h1>
-        <div className="mt-4 flex items-center space-x-4 text-sm text-muted-foreground">
-          <div className="flex items-center gap-2">
-            <Calendar className="h-4 w-4" />
-            <span>{formatPostDate(post.date)}</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <Tag className="h-4 w-4" />
-            <div className="flex flex-wrap gap-1">
-              {post.tags.map((tag) => (
-                <Badge key={tag} variant="secondary" className="font-code text-xs">
-                  {tag}
-                </Badge>
-              ))}
-            </div>
-          </div>
+    <article className="mx-auto max-w-[1280px] px-4 pb-8 pt-14 sm:px-6 md:pt-20 lg:px-10">
+      <header className="text-center">
+        <div className="mb-5 font-mono text-[13px] text-muted-foreground/80">
+          <Link href="/posts" className="transition-colors hover:text-foreground">posts</Link>
+          {tag && (
+            <>
+              {' / '}
+              <span className="text-muted-foreground">{tag.replace(/-/g, ' ')}</span>
+            </>
+          )}
         </div>
+        <h1 className="mx-auto max-w-[880px] font-headline text-4xl font-[590] leading-[1.05] tracking-[-0.035em] text-foreground md:text-[52px]">
+          {headline ?? post.title}
+        </h1>
       </header>
-      <div className="prose prose-lg dark:prose-invert max-w-none font-body">
-        <MarkdownRenderer content={post.content} />
+
+      <PostCover seed={post.slug} className="mx-auto mb-10 mt-12 max-w-[880px] md:mt-14" />
+
+      <div className="mb-14 text-center text-[15px] text-muted-foreground">
+        {SITE.author}
+        <span className="mx-2.5 text-muted-foreground/50">·</span>
+        {formatPostDate(post.date)}
+        <span className="mx-2.5 text-muted-foreground/50">·</span>
+        <span className="font-mono text-[12.5px] text-phosphor-dim">{readingMinutes(body)} min read</span>
       </div>
-      
-      <PostInteraction 
-        post={post} 
-        initialComments={comments} 
-        previousPost={previousPost} 
-        nextPost={nextPost}
-      />
-      
+
+      <div className="relative mx-auto max-w-[640px]">
+        {toc.length > 1 && (
+          <aside className="absolute left-[calc(100%+72px)] top-0 hidden h-full w-52 xl:block">
+            <nav className="sticky top-24 text-[13px]" aria-label="On this page">
+              <div className="mb-3.5 font-mono text-[11.5px] uppercase tracking-[0.12em] text-muted-foreground/80">On this page</div>
+              {toc.map((h) => (
+                <a key={h.id} href={`#${h.id}`} className="mb-2.5 block leading-snug text-muted-foreground transition-colors hover:text-foreground">
+                  {h.text}
+                </a>
+              ))}
+            </nav>
+          </aside>
+        )}
+
+        <div className="article-prose">
+          <MarkdownRenderer content={body} />
+        </div>
+
+        <PostInteraction
+          post={post}
+          initialComments={comments}
+          previousPost={previousPost}
+          nextPost={nextPost}
+        />
+      </div>
     </article>
   );
 }

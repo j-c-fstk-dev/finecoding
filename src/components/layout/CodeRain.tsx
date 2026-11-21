@@ -38,7 +38,7 @@ export function CodeRain() {
       w = canvas.width = window.innerWidth;
       h = canvas.height = window.innerHeight;
       if (ctx) {
-         ctx.fillStyle = 'rgba(26, 26, 26, 1)';
+         ctx.fillStyle = 'rgba(7, 9, 10, 1)';
          ctx.fillRect(0, 0, w, h);
       }
       p = Array(Math.ceil(w / 15)).fill(0);
@@ -52,9 +52,9 @@ export function CodeRain() {
     let p = Array(Math.ceil(w / font)).fill(0);
 
     const draw = () => {
-      ctx.fillStyle = 'rgba(26, 26, 26, 0.05)';
+      ctx.fillStyle = 'rgba(7, 9, 10, 0.05)';
       ctx.fillRect(0, 0, w, h);
-      ctx.fillStyle = '#00674F'; // Use the correct dark theme green
+      ctx.fillStyle = '#1f8f57'; // phosphor-dim
       ctx.font = `${font}px monospace`;
       p.forEach((v, i) => {
         ctx.fillText(matrix[Math.floor(Math.random() * matrix.length)], i * font, v);
@@ -77,5 +77,13 @@ export function CodeRain() {
   }
 
   // Once mounted on the client, if the theme is dark, we render the canvas.
-  return <canvas ref={canvasRef} className="fixed top-0 left-0 w-full h-full -z-10 opacity-20"></canvas>;
+  // Fades out below the hero so the post list stays calm and readable.
+  return (
+    <canvas
+      ref={canvasRef}
+      aria-hidden="true"
+      className="pointer-events-none fixed left-0 top-0 -z-10 h-full w-full opacity-25"
+      style={{ maskImage: 'linear-gradient(to bottom, black 0%, transparent 65%)', WebkitMaskImage: 'linear-gradient(to bottom, black 0%, transparent 65%)' }}
+    />
+  );
 }

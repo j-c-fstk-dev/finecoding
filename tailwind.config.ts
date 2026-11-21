@@ -9,9 +9,10 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        body: ['Inter', 'sans-serif'],
-        headline: ['Inter', 'sans-serif'],
-        code: ['Source Code Pro', 'monospace'],
+        body: ['"Inter Variable"', 'Inter', 'system-ui', 'sans-serif'],
+        headline: ['"Inter Variable"', 'Inter', 'system-ui', 'sans-serif'],
+        code: ['"JetBrains Mono"', 'ui-monospace', 'monospace'],
+        mono: ['"JetBrains Mono"', 'ui-monospace', 'monospace'],
       },
       colors: {
         background: 'hsl(var(--background))',
@@ -45,6 +46,10 @@ export default {
           foreground: 'hsl(var(--destructive-foreground))',
         },
         border: 'hsl(var(--border))',
+        phosphor: {
+          DEFAULT: 'hsl(var(--phosphor))',
+          dim: 'hsl(var(--phosphor-dim))',
+        },
         input: 'hsl(var(--input))',
         ring: 'hsl(var(--ring))',
         chart: {

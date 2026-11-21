@@ -1,64 +1,87 @@
 "use client";
 
-import { useState, useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import type { Post } from '@/types';
-import { PostCard } from './PostCard';
-import { TagFilter } from './TagFilter';
-import { AnimatePresence, motion } from 'framer-motion';
+import { cn } from '@/lib/utils';
+import { postTags } from '@/lib/post-content';
+import { FeaturedPost, PostCard } from './PostCard';
+
+const ACRONYMS: Record<string, string> = { ai: 'AI', ui: 'UI', ux: 'UX', api: 'API', n8n: 'n8n', nextjs: 'Next.js' };
+
+function tabLabel(tag: string) {
+  return tag.split('-').map((w) => ACRONYMS[w] ?? w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+}
 
 interface FilterablePostGridProps {
   posts: Post[];
-  tags: string[];
+  /** Tabs shown above the grid (normalized tags). */
+  tabs: string[];
 }
 
-export function FilterablePostGrid({ posts, tags }: FilterablePostGridProps) {
-  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+export function FilterablePostGrid({ posts, tabs }: FilterablePostGridProps) {
+  const [tab, setTab] = useState<string | null>(null);
+  const [query, setQuery] = useState('');
 
-  const filteredPosts = useMemo(() => {
-    if (selectedTags.length === 0) {
-      return posts;
-    }
-    return posts.filter(post =>
-      selectedTags.every(tag => post.tags.includes(tag))
-    );
-  }, [posts, selectedTags]);
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    return posts.filter((post) => {
+      if (tab && !postTags(post.tags).includes(tab)) return false;
+      if (!q) return true;
+      return [post.title, post.excerpt, ...(post.tags || [])].join(' ').toLowerCase().includes(q);
+    });
+  }, [posts, tab, query]);
 
-  const handleTagToggle = (tag: string) => {
-    setSelectedTags(prev =>
-      prev.includes(tag)
-        ? prev.filter(t => t !== tag)
-        : [...prev, tag]
-    );
-  };
-  
+  const showFeatured = !tab && !query.trim() && filtered.length > 0;
+  const [featured, ...rest] = filtered;
+  const gridPosts = showFeatured ? rest : filtered;
+
   return (
     <div>
-      <TagFilter
-        tags={tags}
-        selectedTags={selectedTags}
-        onTagToggle={handleTagToggle}
-      />
-      <AnimatePresence>
-        <motion.div 
-            key={selectedTags.join('-')}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.3 }}
-            className="mt-8 grid gap-8 md:grid-cols-2 lg:grid-cols-3"
-        >
-          {filteredPosts.length > 0 ? (
-            filteredPosts.map(post => (
-              <PostCard key={post.slug} post={post} />
-            ))
-          ) : (
-            <div className="col-span-full text-center py-16 text-muted-foreground border-2 border-dashed rounded-lg">
-                <p className="font-semibold text-lg">No posts found</p>
-                <p className="text-sm mt-1">Try adjusting your tag selection.</p>
-            </div>
-          )}
-        </motion.div>
-      </AnimatePresence>
+      <div className="mb-10 mt-7 flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
+        <nav className="-mx-4 flex gap-5 overflow-x-auto px-4 text-[15px] hide-scrollbar md:mx-0 md:px-0" aria-label="Filter posts by topic">
+          {[null, ...tabs].map((t) => (
+            <button
+              key={t ?? 'all'}
+              onClick={() => setTab(t)}
+              className={cn(
+                'shrink-0 whitespace-nowrap transition-colors hover:text-foreground',
+                tab === t ? 'text-foreground' : 'text-muted-foreground'
+              )}
+              aria-pressed={tab === t}
+            >
+              {t === null ? 'All' : tabLabel(t)}
+            </button>
+          ))}
+        </nav>
+        <label className="flex h-10 w-full items-center gap-2.5 rounded-full border border-input bg-card px-4 md:w-72">
+          <span className="font-mono text-sm text-phosphor" aria-hidden="true">&gt;</span>
+          <input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="grep posts…"
+            aria-label="Search posts"
+            className="w-full bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground/70"
+          />
+        </label>
+      </div>
+
+      {showFeatured && featured && (
+        <div className="mb-14">
+          <FeaturedPost post={featured} label="latest" />
+        </div>
+      )}
+
+      {gridPosts.length > 0 ? (
+        <div className="divided-grid grid md:grid-cols-2 lg:grid-cols-3">
+          {gridPosts.map((post) => <PostCard key={post.slug} post={post} />)}
+        </div>
+      ) : (
+        !showFeatured && (
+          <div className="rounded-lg border border-dashed py-16 text-center font-mono text-sm text-muted-foreground">
+            <p>grep: no posts match{query ? ` "${query}"` : ''}</p>
+          </div>
+        )
+      )}
     </div>
   );
 }

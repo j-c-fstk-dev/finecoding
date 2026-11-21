@@ -1,187 +1,120 @@
-
 "use client";
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useState } from 'react';
+import { Menu, Share2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { Menu, CodeXml, Home, LayoutList, Library, Info, Headphones, Share2 } from 'lucide-react';
 import { ThemeSwitch } from '@/components/ui/ThemeSwitch';
-import { useState, useEffect, useRef } from 'react';
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { Button } from '@/components/ui/button';
+import { Sheet, SheetContent, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { SearchBar } from '@/components/search/SearchBar';
 import { ShareDialog } from '@/components/layout/ShareDialog';
 
 const navLinks = [
-  { href: '/', label: 'Home', icon: Home },
-  { href: '/posts', label: 'All Posts', icon: LayoutList },
-  { href: '/resources', label: 'Resources', icon: Library },
-  { href: '/radio', label: 'Radio', icon: Headphones },
-  { href: '/about', label: 'About', icon: Info },
+  { href: '/', label: 'Home' },
+  { href: '/posts', label: 'Posts' },
+  { href: '/resources', label: 'Resources' },
+  { href: '/radio', label: 'Radio' },
+  { href: '/about', label: 'About' },
 ];
+
+function isActive(pathname: string, href: string) {
+  return href === '/' ? pathname === '/' : pathname === href || pathname.startsWith(`${href}/`);
+}
+
+export function Logo({ onClick }: { onClick?: () => void }) {
+  return (
+    <Link href="/" onClick={onClick} className="flex items-center gap-2.5 font-mono text-[15px] font-medium tracking-tight text-foreground">
+      <span className="text-phosphor phosphor-glow">&lt;/&gt;</span>
+      <span>
+        fine_coding<span className="terminal-cursor" aria-hidden="true" />
+      </span>
+    </Link>
+  );
+}
 
 export function Header() {
   const pathname = usePathname();
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
-  const [isGlitching, setIsGlitching] = useState(false);
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
-
-  useEffect(() => {
-    const scheduleGlitch = () => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-      }
-
-      const randomDelay = Math.random() * 4000 + 8000; // 8 to 12 seconds
-
-      timeoutRef.current = setTimeout(() => {
-        setIsGlitching(true);
-        setTimeout(() => {
-          setIsGlitching(false);
-        }, 300); // Duration of the glitch animation
-        scheduleGlitch();
-      }, randomDelay);
-    };
-
-    scheduleGlitch();
-
-    return () => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-      }
-    };
-  }, []);
-
-  const renderNavLinks = (isMobile = false) => (
-    <>
-      {navLinks.map(({ href, label, icon: Icon }) => (
-        <Link
-          key={href}
-          href={href}
-          className={cn(
-            'transition-colors hover:text-foreground/80 flex items-center gap-3',
-            isMobile ? 'text-lg' : 'text-sm font-medium',
-            pathname === href ? 'text-foreground font-semibold' : 'text-muted-foreground'
-          )}
-          onClick={isMobile ? () => setIsMobileMenuOpen(false) : undefined}
-        >
-          <Icon className="h-5 w-5 text-primary" />
-          {label}
-        </Link>
-      ))}
-      {/* Share Button for Mobile */}
-      {isMobile && (
-         <button
-            onClick={() => {
-                setIsShareDialogOpen(true);
-                setIsMobileMenuOpen(false);
-            }}
-            className={cn(
-                'transition-colors hover:text-foreground/80 flex items-center gap-3 text-lg text-muted-foreground'
-            )}
-        >
-            <Share2 className="h-5 w-5 text-primary" />
-            Share
-        </button>
-      )}
-    </>
-  );
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isShareOpen, setIsShareOpen] = useState(false);
 
   return (
     <>
-      <header 
-        className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/80 backdrop-blur-sm"
-        style={{ '--header-height': '7rem' } as React.CSSProperties}
-      >
-        <div className="container relative flex h-28 max-w-screen-2xl items-center">
-          
-          {/* Left Side: Mobile Menu Sheet & Desktop Popover */}
-          <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center">
-            {/* Mobile Navigation Sheet */}
-            <div className="md:hidden">
-              <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
-                <SheetTrigger asChild>
-                  <Button variant="ghost" size="icon">
-                    <Menu className="h-6 w-6" />
-                    <span className="sr-only">Open menu</span>
-                  </Button>
-                </SheetTrigger>
-                <SheetContent side="left" className="flex flex-col bg-background/90 backdrop-blur-sm">
-                  <div>
-                    <div className="mb-8">
-                        <Link href="/" className="flex items-center space-x-2" onClick={() => setIsMobileMenuOpen(false)}>
-                          <span className={cn('glitch-icon', { 'is-glitching': isGlitching })}>
-                              <CodeXml className="h-6 w-6 text-primary" />
-                          </span>
-                          <span className="font-headline text-xl font-bold">
-                            Fine{' '}
-                              <span
-                                className={cn('glitch-text text-primary', { 'is-glitching': isGlitching })}
-                                data-glitch="Coding"
-                              >
-                                Coding
-                              </span>
-                          </span>
-                        </Link>
-                    </div>
-                    <nav className="grid gap-4">
-                      {renderNavLinks(true)}
-                    </nav>
-                  </div>
-                  <div className="mt-auto border-t border-border/40 pt-4">
-                    <div className="flex items-center justify-between">
-                        <span className="text-lg text-muted-foreground">Change Theme</span>
-                        <ThemeSwitch />
-                    </div>
-                  </div>
-                </SheetContent>
-              </Sheet>
-            </div>
+      <header className="sticky top-0 z-50 h-16 w-full border-b bg-background/85 backdrop-blur-md">
+        <div className="mx-auto flex h-full max-w-[1280px] items-center justify-between gap-4 px-4 sm:px-6 lg:px-10">
+          <Logo />
 
-            {/* Desktop Navigation */}
-            <nav className="hidden md:flex items-center gap-6">
-               {renderNavLinks()}
+          {/* Desktop */}
+          <div className="hidden items-center gap-7 md:flex">
+            <nav className="flex items-center gap-7 text-[13.5px]">
+              {navLinks.map(({ href, label }) => (
+                <Link
+                  key={href}
+                  href={href}
+                  className={cn('transition-colors hover:text-foreground', isActive(pathname, href) ? 'text-foreground' : 'text-muted-foreground')}
+                >
+                  {label}
+                </Link>
+              ))}
             </nav>
-          </div>
-
-          {/* Center: Title */}
-          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-            <Link href="/" className="flex items-center space-x-2">
-              <span className={cn('glitch-icon', { 'is-glitching': isGlitching })}>
-                  <CodeXml className="h-8 w-8 text-primary transition-colors" />
-              </span>
-              <span className="font-headline text-2xl font-bold sm:text-3xl">
-                Fine{' '}
-                <span
-                  className={cn('glitch-text text-primary', { 'is-glitching': isGlitching })}
-                  data-glitch="Coding"
-                >
-                  Coding
-                </span>
-              </span>
-            </Link>
-          </div>
-
-          {/* Right Side: Search and Theme Switch */}
-          <div className="absolute right-4 top-1/2 -translate-y-1/2 flex flex-col items-end gap-2">
+            <span className="h-[18px] w-px bg-input" aria-hidden="true" />
+            <div className="flex items-center gap-2">
+              <SearchBar />
+              <button
+                onClick={() => setIsShareOpen(true)}
+                className="flex h-10 w-10 items-center justify-center rounded-lg border border-input text-muted-foreground transition-colors hover:text-foreground"
+                aria-label="Share Website"
+              >
+                <Share2 className="h-4 w-4" />
+              </button>
               <ThemeSwitch />
-              <div className="flex items-center gap-2">
-                <SearchBar />
-                <Button
-                    variant="outline"
-                    size="icon"
-                    className="hidden md:inline-flex h-10 w-10"
-                    onClick={() => setIsShareDialogOpen(true)}
-                    aria-label="Share Website"
-                >
-                    <Share2 className="h-4 w-4" />
-                </Button>
-              </div>
+            </div>
+            <a href="#newsletter" className="rounded-full bg-foreground px-3.5 py-1.5 text-[13px] font-medium text-background transition-opacity hover:opacity-85">
+              Subscribe
+            </a>
+          </div>
+
+          {/* Mobile */}
+          <div className="flex items-center gap-2 md:hidden">
+            <SearchBar />
+            <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
+              <SheetTrigger asChild>
+                <button className="flex h-10 w-10 items-center justify-center rounded-lg border border-input text-muted-foreground" aria-label="Open menu">
+                  <Menu className="h-5 w-5" />
+                </button>
+              </SheetTrigger>
+              <SheetContent side="right" className="flex w-72 flex-col bg-background">
+                <SheetTitle className="sr-only">Menu</SheetTitle>
+                <Logo onClick={() => setIsMenuOpen(false)} />
+                <nav className="mt-10 grid gap-1">
+                  {navLinks.map(({ href, label }) => (
+                    <Link
+                      key={href}
+                      href={href}
+                      onClick={() => setIsMenuOpen(false)}
+                      className={cn('rounded-md px-2 py-2.5 font-mono text-[15px] transition-colors', isActive(pathname, href) ? 'text-foreground' : 'text-muted-foreground')}
+                    >
+                      <span className="mr-2 text-phosphor">{isActive(pathname, href) ? '>' : ' '}</span>
+                      {label.toLowerCase()}
+                    </Link>
+                  ))}
+                  <button
+                    onClick={() => { setIsShareOpen(true); setIsMenuOpen(false); }}
+                    className="rounded-md px-2 py-2.5 text-left font-mono text-[15px] text-muted-foreground"
+                  >
+                    <span className="mr-2"> </span>share
+                  </button>
+                </nav>
+                <div className="mt-auto flex items-center justify-between border-t pt-4">
+                  <span className="font-mono text-sm text-muted-foreground">theme</span>
+                  <ThemeSwitch />
+                </div>
+              </SheetContent>
+            </Sheet>
           </div>
         </div>
       </header>
-      <ShareDialog open={isShareDialogOpen} onOpenChange={setIsShareDialogOpen} />
+      <ShareDialog open={isShareOpen} onOpenChange={setIsShareOpen} />
     </>
   );
 }

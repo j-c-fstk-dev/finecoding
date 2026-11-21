@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>How I built this blog with AI · Fine Coding</title><link rel="stylesheet" href="style.css"></head>
+<body>
+<header class="header"><div class="inner">
+  <a class="logo" href="#"><span class="mark">&lt;/&gt;</span> fine_coding<span class="cursor"></span></a>
+  <nav class="nav">
+    <a href="#">Home</a><a class="active" href="#">Posts</a><a href="#">Resources</a><a href="#">Radio</a><a href="#">About</a>
+    <span class="sep"></span>
+    <span class="kbd">Search <b>⌘K</b></span>
+    <a class="btn" href="#">Subscribe</a>
+  </nav>
+</div></header>
+
+<main class="article">
+  <div class="crumb">posts / <b>lessons learned</b></div>
+  <h1>How I built this blog with AI, and what I got wrong about it</h1>
+  <div class="cover hero" data-art="terminal"></div>
+  <div class="byline">Jorge Cristo<span class="dot">·</span>June 29, 2025<span class="dot">·</span><span class="read">6 min read</span></div>
+
+  <div class="body-wrap">
+  <aside class="toc"><div class="toc-inner">
+    <div class="h">On this page</div>
+    <a class="on" href="#">The stack, for real</a>
+    <a href="#">Where it went wrong</a>
+    <a href="#">What was actually happening</a>
+    <a href="#">What I'd tell myself</a>
+  </div></aside>
+
+  <div class="prose">
+    <p>In June 2025 I wrote a post explaining how this blog was built. It said I used the Next.js Pages Router, pre-rendered everything as static HTML, and handled the dashboard with Firebase Functions.</p>
+    <p>None of that was true.</p>
+    <p>The blog used the App Router, rendered pages on a server, and there wasn't a single Firebase Function in the project.</p>
+    <blockquote>"I don't know what else to do.. nothing works"</blockquote>
+    <h2>What was actually happening</h2>
+    <p>The main problem was a single wrong assumption: <code>'use server'</code> code using the <em>browser</em> version of the Firebase SDK.</p>
+<pre><div class="bar"><span>src/lib/posts.ts</span><i>ts</i></div><code><span class="c-s">'use server'</span>;
+
+<span class="c-k">import</span> { adminDb, requireAdmin } <span class="c-k">from</span> <span class="c-s">'@/lib/firebase-admin'</span>;
+
+<span class="c-k">export async function</span> <span class="c-f">addPost</span>(idToken: string, post: PostInput) {
+  <span class="c-k">await</span> <span class="c-f">requireAdmin</span>(idToken); <span class="c-c">// is this really me?</span>
+  <span class="c-k">await</span> <span class="c-f">adminDb</span>().collection(<span class="c-s">'posts'</span>).add(post);
+}</code></pre>
+    <p>The disappearing posts had a related cause: the home page was generated once, at build time…</p>
+  </div>
+  </div>
+</main>
+<script src="covers.js"></script>
+</body></html>
