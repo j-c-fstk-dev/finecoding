@@ -1,7 +1,7 @@
 import 'server-only';
 
 import { cert, getApp, getApps, initializeApp, type App } from 'firebase-admin/app';
-import { getAuth, type Auth } from 'firebase-admin/auth';
+import type { Auth } from 'firebase-admin/auth';
 import { getFirestore, type Firestore } from 'firebase-admin/firestore';
 
 /**
@@ -56,7 +56,13 @@ export function adminDb(): Firestore {
   return getFirestore(getAdminApp());
 }
 
-export function adminAuth(): Auth {
+/**
+ * Loaded on demand: only admin actions need Auth, and its dependencies
+ * (jwks-rsa/jose) must never be able to break public pages that only read
+ * Firestore.
+ */
+export async function adminAuth(): Promise<Auth> {
+  const { getAuth } = await import('firebase-admin/auth');
   return getAuth(getAdminApp());
 }
 
@@ -77,7 +83,7 @@ export async function requireAdmin(idToken: string | undefined | null) {
   }
 
   // Created outside the try so a credentials problem keeps its own message.
-  const auth = adminAuth();
+  const auth = await adminAuth();
   let decoded;
   try {
     decoded = await auth.verifyIdToken(idToken);
