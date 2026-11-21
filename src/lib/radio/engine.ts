@@ -330,7 +330,7 @@ async function buildGraph(): Promise<Graph> {
   let riser: Graph['riser'] = null;
   if (!lite) {
     const noise = new Tone.Noise('white');
-    noise.volume.value = -18;
+    noise.volume.value = -30;
     const filter = new Tone.Filter(500, 'bandpass');
     const gain = new Tone.Gain(0);
     noise.chain(filter, gain, master);
@@ -524,13 +524,17 @@ function enterSection(idx: number, time: number, fresh = false) {
     graph.sweep.frequency.setValueAtTime(20, time);
     graph.sweep.frequency.exponentialRampTo(sec.sweep, dur, time);
     if (graph.riser) {
+      // short and subtle: only the last 2 bars of the build
+      const rBars = Math.min(2, sec.bars);
+      const rStart = time + (sec.bars - rBars) * barSec;
+      const rDur = rBars * barSec * 0.97;
       graph.riser.filter.frequency.cancelScheduledValues(time);
-      graph.riser.filter.frequency.setValueAtTime(400, time);
-      graph.riser.filter.frequency.exponentialRampTo(7000, dur, time);
-      graph.riser.gain.gain.setValueAtTime(0, time);
-      graph.riser.gain.gain.linearRampTo(0.9, dur, time);
+      graph.riser.filter.frequency.setValueAtTime(600, rStart);
+      graph.riser.filter.frequency.exponentialRampTo(5000, rDur, rStart);
+      graph.riser.gain.gain.setValueAtTime(0, rStart);
+      graph.riser.gain.gain.linearRampTo(0.35, rDur, rStart);
       try {
-        graph.riser.noise.start(time).stop(time + dur);
+        graph.riser.noise.start(rStart).stop(rStart + rDur);
       } catch {
         /* still running from a skipped build */
       }
