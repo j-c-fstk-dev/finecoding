@@ -9,6 +9,7 @@ import { ThemeSwitch } from '@/components/ui/ThemeSwitch';
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { SearchBar } from '@/components/search/SearchBar';
 import { ShareDialog } from '@/components/layout/ShareDialog';
+import { LogoMark } from '@/components/icons/LogoMark';
 
 const navLinks = [
   { href: '/', label: 'Home' },
@@ -25,7 +26,7 @@ function isActive(pathname: string, href: string) {
 export function Logo({ onClick }: { onClick?: () => void }) {
   return (
     <Link href="/" onClick={onClick} className="flex items-center gap-2.5 font-mono text-[15px] font-medium tracking-tight text-foreground">
-      <span className="text-phosphor phosphor-glow">&lt;/&gt;</span>
+      <LogoMark className="h-7 w-7" title="Fine Coding" />
       <span>
         fine_coding<span className="terminal-cursor" aria-hidden="true" />
       </span>
