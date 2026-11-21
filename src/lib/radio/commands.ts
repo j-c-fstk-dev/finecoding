@@ -25,10 +25,12 @@ export const HELP: Line[] = [
   { kind: 'dim', text: '  vol <layer> <0-100>     volume of one layer' },
   { kind: 'dim', text: '  fx <reverb|delay|lofi> <0-100>' },
   { kind: 'dim', text: '  volume <0-100>          master volume' },
-  { kind: 'dim', text: '  quality <auto|high|lite>  lite = lighter sound engine for slow devices' },
+  { kind: 'out', text: 'performance' },
+  { kind: 'dim', text: '  quality <auto|high|lite> auto picks lite on slower devices' },
   { kind: 'out', text: 'misc' },
   { kind: 'dim', text: '  reset                   back to the style defaults' },
   { kind: 'dim', text: '  clear                   clear the screen' },
+  { kind: 'ok', text: 'tip: sound stuttering or phone getting hot? type "quality lite"' },
 ];
 
 export const COMMANDS = ['help', 'play', 'stop', 'status', 'styles', 'style', 'bpm', 'key', 'layers', 'on', 'off', 'vol', 'fx', 'volume', 'quality', 'arrange', 'next', 'reset', 'clear'];
