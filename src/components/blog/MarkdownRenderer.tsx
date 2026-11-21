@@ -4,9 +4,7 @@ import type { ReactNode } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { oneDark, oneLight } from 'react-syntax-highlighter/dist/esm/styles/prism';
-import { useTheme } from 'next-themes';
-import { useEffect, useState } from 'react';
+import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { slugifyHeading } from '@/lib/post-content';
 
 function textOf(node: ReactNode): string {
@@ -17,14 +15,9 @@ function textOf(node: ReactNode): string {
 }
 
 export function MarkdownRenderer({ content }: { content: string }) {
-  const { resolvedTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
-
-  // The server doesn't know the reader's theme: render the default (dark) first,
-  // then switch after mounting so server and browser HTML match.
-  const isDark = mounted ? resolvedTheme !== 'light' : true;
-  const codeTheme = isDark ? oneDark : oneLight;
+  // Code blocks are always dark "terminal windows" (see .screen in globals.css),
+  // in both themes, so they never depend on the reader's theme.
+  const codeTheme = oneDark;
 
   return (
     <ReactMarkdown
@@ -48,7 +41,7 @@ export function MarkdownRenderer({ content }: { content: string }) {
           if (!isBlock) return <code className="inline-code">{children}</code>;
           const language = match?.[1] ?? 'text';
           return (
-            <div className="not-prose overflow-hidden rounded-lg border bg-card">
+            <div className="screen not-prose relative overflow-hidden rounded-lg border bg-card">
               <div className="flex items-center justify-between border-b px-4 py-2 font-mono text-xs text-muted-foreground/80">
                 <span className="flex gap-1.5" aria-hidden="true">
                   <span className="h-2 w-2 rounded-full bg-phosphor-dim" />

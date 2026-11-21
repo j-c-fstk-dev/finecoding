@@ -49,7 +49,7 @@ export default function AboutPage() {
       <PostCover seed="about" motif="pixels" className="mx-auto mb-14 mt-12 max-w-[880px] md:mt-14" />
 
       <div className="mx-auto max-w-[640px]">
-        <div className="mb-12 overflow-hidden rounded-lg border bg-card font-mono text-[13.5px]">
+        <div className="screen mb-12 overflow-hidden rounded-lg border bg-card font-mono text-[13.5px]">
           <div className="border-b px-4 py-2 text-xs text-muted-foreground/80">
             <span className="text-phosphor">$</span> whoami
           </div>
