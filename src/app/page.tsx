@@ -50,6 +50,19 @@ export default async function Home() {
             <div className="divided-grid grid md:grid-cols-2 lg:grid-cols-3">
               {recent.map((post) => <PostCard key={post.slug} post={post} />)}
             </div>
+
+            <div className="mt-6 flex flex-col items-center gap-4 border-t pt-14 text-center">
+              <p className="font-mono text-sm text-muted-foreground">
+                <span className="text-phosphor">$</span> ls ./posts | wc -l <span className="text-foreground">→ {posts.length}</span>
+              </p>
+              <Link
+                href="/posts"
+                className="group inline-flex items-center gap-2 rounded-full border border-input bg-card px-6 py-3 font-mono text-sm text-foreground transition-colors hover:border-phosphor-dim hover:text-phosphor"
+              >
+                View all posts
+                <span className="transition-transform group-hover:translate-x-0.5" aria-hidden="true">→</span>
+              </Link>
+            </div>
           </section>
         )}
       </div>
