@@ -37,8 +37,8 @@ export function Footer() {
               <LogoMark className="h-7 w-7" /> fine_coding
             </Link>
             <p className="mt-3 font-mono text-xs text-muted-foreground/80">Built with Next.js, Firebase &amp; a lot of commits.</p>
-            <a href={SITE.links.beregen} target="_blank" rel="noopener noreferrer" className="mt-6 inline-block font-mono text-xs text-muted-foreground/80 transition-colors hover:text-foreground">
-              Powered by BeRegen®
+            <a href={SITE.links.authorGithub} target="_blank" rel="noopener noreferrer" className="mt-6 inline-block font-mono text-xs text-muted-foreground/80 transition-colors hover:text-foreground">
+              Powered by <span className="text-phosphor">JCDEV</span>
             </a>
           </div>
           {columns.map((col) => (

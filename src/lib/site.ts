@@ -7,6 +7,6 @@ export const SITE = {
     github: 'https://github.com/j-c-fstk-dev/finecoding',
     x: 'https://x.com/FineCodingBlog',
     instagram: 'https://www.instagram.com/fine.coding.blog',
-    beregen: 'https://beregenerativelife.wordpress.com/',
+    authorGithub: 'https://github.com/j-c-fstk-dev',
   },
 } as const;

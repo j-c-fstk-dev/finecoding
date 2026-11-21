@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { motion, type Variants } from 'framer-motion';
 import { LogoMark } from '@/components/icons/LogoMark';
+import { SITE } from '@/lib/site';
 
 const NAME = 'fine_coding';
 
@@ -66,7 +67,14 @@ export function SplashScreen({ onExitComplete }: SplashScreenProps) {
         )}
       </div>
 
-      <div className="absolute bottom-10 font-mono text-xs text-muted-foreground/60">Powered by BeRegen®</div>
+      <a
+        href={SITE.links.authorGithub}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="absolute bottom-10 font-mono text-xs text-muted-foreground/60 transition-colors hover:text-foreground"
+      >
+        Powered by <span className="text-phosphor">JCDEV</span>
+      </a>
     </motion.div>
   );
 }
