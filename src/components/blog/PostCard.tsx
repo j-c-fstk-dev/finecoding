@@ -1,53 +1,50 @@
 import Link from 'next/link';
-import Image from 'next/image';
-import { CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import type { Post } from '@/types';
-import { Calendar } from 'lucide-react';
 import { formatPostDate } from '@/lib/dates';
+import { primaryTag } from '@/lib/post-content';
+import { SITE } from '@/lib/site';
+import { PostCover } from './PostCover';
 
-interface PostCardProps {
-  post: Post;
+export function PostCard({ post }: { post: Post }) {
+  const tag = primaryTag(post.tags);
+  return (
+    <article className="group">
+      <Link href={`/posts/${post.slug}`} className="block">
+        <PostCover seed={post.slug} className="mb-5 transition-colors group-hover:border-phosphor-dim" />
+        <h3 className="font-headline text-[1.2rem] font-[520] leading-snug tracking-[-0.015em] text-foreground transition-colors group-hover:text-phosphor">
+          {post.title}
+        </h3>
+      </Link>
+      {post.excerpt && <p className="mt-2.5 text-[15px] leading-relaxed text-muted-foreground">{post.excerpt}</p>}
+      <div className="mt-5 font-mono text-xs text-muted-foreground/80">
+        {SITE.author} · {formatPostDate(post.date)}
+        {tag && <span className="text-phosphor-dim"> · #{tag}</span>}
+      </div>
+    </article>
+  );
 }
 
-export function PostCard({ post }: PostCardProps) {
+export function FeaturedPost({ post, label = 'featured' }: { post: Post; label?: string }) {
+  const tag = primaryTag(post.tags);
   return (
-    <div className="card-glow group">
-      <div className="card-content-wrapper border-2 border-transparent group-hover:border-primary transition-all duration-300 ease-in-out">
-        <div className="overflow-hidden rounded-t-[calc(var(--radius)-4px)]">
-          <Link href={`/posts/${post.slug}`}>
-            <Image
-              src={post.imageUrl}
-              alt={post.title}
-              width={600}
-              height={400}
-              className="w-full object-cover aspect-video transition-transform duration-300 group-hover:scale-105"
-              data-ai-hint={post.imageHint}
-            />
-          </Link>
+    <section className="group grid items-center gap-8 border-b pb-14 md:grid-cols-[1.25fr_1fr] md:gap-12">
+      <Link href={`/posts/${post.slug}`} className="block">
+        <PostCover seed={post.slug} className="transition-colors group-hover:border-phosphor-dim" />
+      </Link>
+      <div>
+        <div className="mb-4 font-mono text-xs uppercase tracking-[0.12em] text-phosphor">
+          {'// '}{label}{tag ? ` · ${tag.replace(/-/g, ' ')}` : ''}
         </div>
-        <CardHeader>
-          <CardTitle className="font-headline text-xl leading-tight">
-            <Link href={`/posts/${post.slug}`} className="hover:text-primary transition-colors">
-              {post.title}
-            </Link>
-          </CardTitle>
-          <CardDescription className="flex items-center gap-2 pt-2 text-xs">
-            <Calendar className="h-4 w-4" />
-            <span>{formatPostDate(post.date)}</span>
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="flex-grow">
-          <p className="text-muted-foreground">{post.excerpt}</p>
-        </CardContent>
-        <CardFooter className="flex flex-wrap gap-2">
-          {post.tags.map((tag) => (
-            <Badge key={tag} variant="secondary" className="font-code">
-              # {tag}
-            </Badge>
-          ))}
-        </CardFooter>
+        <Link href={`/posts/${post.slug}`}>
+          <h2 className="font-headline text-3xl font-[560] leading-[1.1] tracking-[-0.03em] text-foreground transition-colors group-hover:text-phosphor md:text-4xl">
+            {post.title}
+          </h2>
+        </Link>
+        {post.excerpt && <p className="mt-4 text-[17px] leading-relaxed text-muted-foreground">{post.excerpt}</p>}
+        <div className="mt-6 font-mono text-xs text-muted-foreground/80">
+          {SITE.author} · {formatPostDate(post.date)}
+        </div>
       </div>
-    </div>
+    </section>
   );
 }

@@ -4,46 +4,52 @@
 
 @layer base {
   :root {
-    --background: 0 0% 96.1%; /* #F5F5F5 */
-    --foreground: 220 10% 15%;
-    --card: 0 0% 96.1%; /* #F5F5F5 */
-    --card-foreground: 220 10% 15%;
-    --popover: 0 0% 96.1%; /* #F5F5F5 */
-    --popover-foreground: 220 10% 15%;
-    --primary: 151 45% 45%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 0 0% 96.1%;
-    --secondary-foreground: 220 10% 9%;
-    --muted: 0 0% 85.1%; /* #D9D9D9 */
-    --muted-foreground: 220 10% 40%;
-    --accent: 151 45% 45%;
-    --accent-foreground: 0 0% 100%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 220 10% 89.8%;
-    --input: 220 10% 89.8%;
-    --ring: 151 45% 45%;
+    --background: 90 12% 96.9%;
+    --foreground: 160 19% 6.3%;
+    --card: 0 0% 100.0%;
+    --card-foreground: 160 19% 6.3%;
+    --popover: 0 0% 100.0%;
+    --popover-foreground: 160 19% 6.3%;
+    --primary: 151 78% 26.9%;
+    --primary-foreground: 0 0% 100.0%;
+    --secondary: 120 10% 93.9%;
+    --secondary-foreground: 160 19% 6.3%;
+    --muted: 120 10% 93.9%;
+    --muted-foreground: 152 7% 38.2%;
+    --accent: 145 27% 91.4%;
+    --accent-foreground: 160 19% 6.3%;
+    --destructive: 0 72% 50.6%;
+    --destructive-foreground: 0 0% 98.0%;
+    --border: 135 7% 89.4%;
+    --input: 140 8% 85.1%;
+    --ring: 151 78% 26.9%;
+    --phosphor: 151 78% 26.9%;
+    --phosphor-dim: 148 29% 43.5%;
     --radius: 0.5rem;
   }
- 
+
   .dark {
-    --background: 0 0% 10%;
-    --foreground: 0 0% 88%;
-    --card: 0 0% 13%;
-    --card-foreground: 0 0% 88%;
-    --primary: 151 51% 21%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 0 0% 15%;
-    --secondary-foreground: 0 0% 88%;
-    --muted: 0 0% 15%;
-    --muted-foreground: 0 0% 63%;
-    --accent: 151 51% 21%;
-    --accent-foreground: 0 0% 100%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 20%;
-    --input: 0 0% 20%;
-    --ring: 151 51% 21%;
+    --background: 200 18% 3.3%;
+    --foreground: 146 23% 93.9%;
+    --card: 195 14% 5.5%;
+    --card-foreground: 146 23% 93.9%;
+    --popover: 195 14% 5.5%;
+    --popover-foreground: 146 23% 93.9%;
+    --primary: 149 100% 62.0%;
+    --primary-foreground: 148 65% 4.5%;
+    --secondary: 168 13% 7.6%;
+    --secondary-foreground: 146 23% 93.9%;
+    --muted: 168 13% 7.6%;
+    --muted-foreground: 150 7% 57.3%;
+    --accent: 157 25% 10.0%;
+    --accent-foreground: 146 23% 93.9%;
+    --destructive: 0 63% 30.6%;
+    --destructive-foreground: 0 0% 98.0%;
+    --border: 171 12% 11.6%;
+    --input: 164 13% 16.7%;
+    --ring: 150 64% 34.1%;
+    --phosphor: 149 100% 62.0%;
+    --phosphor-dim: 150 64% 34.1%;
   }
 }
 
@@ -58,7 +64,10 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-body antialiased;
+  }
+  ::selection {
+    background: hsl(var(--phosphor) / 0.25);
   }
   .prose {
     @apply text-foreground;
@@ -808,4 +817,127 @@
   100% {
     clip-path: inset(0 0 0 100%);
   }
+}
+
+
+/* ------------------------------------------------------------------ */
+/* Fine Coding 2.0                                                     */
+/* ------------------------------------------------------------------ */
+
+/* Very subtle CRT scanlines over the whole page (dark theme only). */
+.dark body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 100;
+  background: repeating-linear-gradient(to bottom, rgba(255, 255, 255, 0.018) 0 1px, transparent 1px 3px);
+}
+
+.phosphor-glow {
+  text-shadow: 0 0 12px hsl(var(--phosphor) / 0.35);
+}
+
+@keyframes cursor-blink {
+  50% { opacity: 0; }
+}
+.terminal-cursor {
+  display: inline-block;
+  width: 0.5em;
+  height: 1em;
+  margin-left: 2px;
+  vertical-align: -0.12em;
+  background: hsl(var(--phosphor));
+  box-shadow: 0 0 10px hsl(var(--phosphor) / 0.4);
+  animation: cursor-blink 1.1s steps(1) infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .terminal-cursor { animation: none; }
+}
+
+/* Scanlines on generated cover art */
+.cover-frame {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid hsl(var(--border));
+  border-radius: 0.5rem;
+  background: hsl(var(--card));
+}
+.dark .cover-frame::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(to bottom, rgba(0, 0, 0, 0.35) 0 1px, transparent 1px 3px);
+}
+
+/* Grid of cards separated by thin vertical lines (Linear-style).
+   Every cell gets the same horizontal padding so all columns have the same
+   width; the grid's negative margin hides the outer padding. */
+.divided-grid > * {
+  padding-bottom: 3.5rem;
+}
+@media (min-width: 768px) {
+  .divided-grid { margin-left: -1.5rem; margin-right: -1.5rem; }
+  .divided-grid > * { padding-left: 1.5rem; padding-right: 1.5rem; border-left: 1px solid hsl(var(--border)); }
+  .divided-grid > *:nth-child(2n+1) { border-left-color: transparent; }
+}
+@media (min-width: 1024px) {
+  .divided-grid { margin-left: -2rem; margin-right: -2rem; }
+  .divided-grid > * { padding-left: 2rem; padding-right: 2rem; }
+  .divided-grid > *:nth-child(2n+1) { border-left-color: hsl(var(--border)); }
+  .divided-grid > *:nth-child(3n+1) { border-left-color: transparent; }
+}
+
+/* Article reading styles */
+.article-prose {
+  font-size: 17px;
+  line-height: 1.7;
+  color: hsl(var(--foreground) / 0.86);
+}
+.article-prose > * + * { margin-top: 1.35rem; }
+.article-prose h2 {
+  margin-top: 3rem;
+  font-size: 1.625rem;
+  line-height: 1.25;
+  font-weight: 560;
+  letter-spacing: -0.02em;
+  color: hsl(var(--foreground));
+  scroll-margin-top: 6rem;
+}
+.article-prose h3 {
+  margin-top: 2.25rem;
+  font-size: 1.2rem;
+  font-weight: 560;
+  color: hsl(var(--foreground));
+  scroll-margin-top: 6rem;
+}
+.article-prose h1 { font-size: 2rem; font-weight: 600; letter-spacing: -0.03em; color: hsl(var(--foreground)); }
+.article-prose a { color: hsl(var(--phosphor)); text-decoration: underline; text-underline-offset: 3px; text-decoration-color: hsl(var(--phosphor) / 0.4); }
+.article-prose strong { color: hsl(var(--foreground)); font-weight: 600; }
+.article-prose ul, .article-prose ol { padding-left: 1.4rem; }
+.article-prose ul { list-style: none; }
+.article-prose ul > li { position: relative; }
+.article-prose ul > li::before { content: "›"; position: absolute; left: -1.1rem; color: hsl(var(--phosphor)); font-family: theme('fontFamily.mono'); }
+.article-prose ol { list-style: decimal; }
+.article-prose ol > li::marker { color: hsl(var(--phosphor)); font-family: theme('fontFamily.mono'); font-size: 0.9em; }
+.article-prose li + li { margin-top: 0.5rem; }
+.article-prose blockquote {
+  border-left: 2px solid hsl(var(--phosphor));
+  padding: 0.1rem 0 0.1rem 1.25rem;
+  color: hsl(var(--foreground));
+}
+.article-prose hr { border-color: hsl(var(--border)); margin: 2.5rem 0; }
+.article-prose img { border-radius: 0.5rem; border: 1px solid hsl(var(--border)); }
+.article-prose table { width: 100%; font-size: 0.95rem; border-collapse: collapse; }
+.article-prose th, .article-prose td { border-bottom: 1px solid hsl(var(--border)); padding: 0.6rem 0.75rem 0.6rem 0; text-align: left; vertical-align: top; }
+.article-prose th { color: hsl(var(--foreground)); font-weight: 600; }
+.article-prose .inline-code {
+  font-family: theme('fontFamily.mono');
+  font-size: 0.86em;
+  padding: 0.1rem 0.35rem;
+  border-radius: 0.25rem;
+  border: 1px solid hsl(var(--border));
+  background: hsl(var(--card));
+  color: hsl(var(--phosphor));
 }
